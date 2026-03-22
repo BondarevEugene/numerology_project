@@ -2,45 +2,138 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Расчет Предназначения</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Genesis System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lora:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        body { background: #f4f7f6; padding-top: 50px; }
-        .form-container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+        :root {
+            --copper: #b08d57;
+            --dark-void: #0a0b0d;
+            --muted-gray: #8a8a8a; /* Тот самый приглушенный цвет */
+            --input-bg: #12141a;
+        }
+
+        body {
+            background: var(--dark-void);
+            color: var(--muted-gray);
+            font-family: 'Lora', serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .main-card {
+            background: #0f1116;
+            border: 1px solid rgba(176, 141, 87, 0.15);
+            padding: 50px;
+            width: 100%;
+            max-width: 650px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.7);
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            color: var(--copper);
+            text-align: center;
+            letter-spacing: 8px;
+            animation: ember 5s infinite;
+        }
+
+        @keyframes ember {
+            0%, 100% { opacity: 0.8; text-shadow: 0 0 5px rgba(176,141,87,0.2); }
+            50% { opacity: 1; text-shadow: 0 0 15px rgba(176,141,87,0.5); }
+        }
+
+        .section-label {
+            font-family: 'Cinzel', serif;
+            color: var(--copper);
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        /* Убираем белый цвет из инпутов */
+        .form-control {
+            background: var(--input-bg) !important;
+            border: 1px solid #1d2026 !important;
+            border-bottom: 1px solid var(--copper) !important;
+            color: var(--muted-gray) !important; /* Серый текст вместо белого */
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 25px;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        .form-control:focus {
+            border-color: #d4af37 !important;
+            color: #b0b0b0 !important;
+        }
+
+        .btn-execute {
+            background: transparent;
+            color: var(--copper);
+            border: 1px solid var(--copper);
+            font-family: 'Cinzel', serif;
+            padding: 15px;
+            width: 100%;
+            letter-spacing: 3px;
+            cursor: pointer;
+            transition: 0.4s;
+        }
+
+        .btn-execute:hover {
+            background: var(--copper);
+            color: var(--dark-void);
+        }
+
+        .result-panel {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(176, 141, 87, 0.1);
+        }
+
+        .highlight-text {
+            color: var(--copper);
+            border-left: 2px solid var(--copper);
+            padding-left: 15px;
+            font-style: italic;
+        }
+
+        .date-grid { display: flex; gap: 15px; }
+
+        ::placeholder { color: #333 !important; }
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8 form-container">
-            <h2 class="text-center mb-4">Введите данные для расчета</h2>
-            <form method="POST">
-                <div class="mb-3">
-                    <label>Имя</label>
-                    <input type="text" name="name" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label>Email</label>
-                    <input type="email" name="email" class="form-control" required>
-                </div>
-                <label>Дата рождения</label>
-                <div class="row mb-4">
-                    <div class="col-4"><input type="number" name="day" placeholder="День" class="form-control" min="1" max="31" required></div>
-                    <div class="col-4"><input type="number" name="month" placeholder="Месяц" class="form-control" min="1" max="12" required></div>
-                    <div class="col-4"><input type="number" name="year" placeholder="Год" class="form-control" min="1950" max="2026" required></div>
-                </div>
-                <button type="submit" class="btn btn-primary w-100">РАССЧИТАТЬ</button>
-            </form>
+    <div class="main-card">
+        <h1>Archetype</h1>
+        <form method="POST">
+            <span class="section-label">Subject Name</span>
+            <input type="text" name="name" class="form-control" placeholder="Имя..." required>
 
-            {% if result %}
-            <div class="mt-5 p-4 border-top">
-                <h3>{{ result.title }}</h3>
-                <p style="white-space: pre-wrap;">{{ result.body }}</p>
-                <a href="/download/{{ pdf_file }}" class="btn btn-success mt-3">СКАЧАТЬ PDF</a>
+            <span class="section-label">Electronic Mail</span>
+            <input type="email" name="email" class="form-control" placeholder="Email..." required>
+
+            <span class="section-label">Temporal Point (DD/MM/YYYY)</span>
+            <div class="date-grid">
+                <input type="number" name="day" class="form-control" placeholder="DD" required>
+                <input type="number" name="month" class="form-control" placeholder="MM" required>
+                <input type="number" name="year" class="form-control" placeholder="YYYY" required>
             </div>
-            {% endif %}
+
+            <button type="submit" class="btn-execute">Analyze</button>
+        </form>
+
+        {% if result %}
+        <div class="result-panel">
+            <h2 style="color: var(--copper); font-family: 'Cinzel';">{{ result.title }}</h2>
+            <div style="color: #777;">{{ result.html | safe }}</div>
+            <a href="/download/{{ pdf_file }}" style="color: var(--copper); text-decoration: none; font-size: 0.8rem; border: 1px solid var(--copper); padding: 5px 15px; display: inline-block; margin-top: 20px;">EXPORT PDF</a>
         </div>
+        {% endif %}
     </div>
-</div>
 </body>
 </html>

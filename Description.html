@@ -1,10 +1,121 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Няшный Гайд по Нумерологии 🐾</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #fff0f5; /* Нежно-розовый */
+            font-family: 'Comfortaa', cursive;
+            color: #5d4037;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: 0 10px 25px rgba(255, 182, 193, 0.5);
+            border: 3px dashed #ffb6c1;
+        }
+        h1 { color: #ff69b4; text-align: center; font-size: 2.5em; }
+        h2 { color: #db7093; border-bottom: 2px solid #ffecf2; padding-bottom: 10px; margin-top: 30px; }
+        .step {
+            background: #fff9fb;
+            border-left: 5px solid #ffb6c1;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 10px;
+        }
+        code {
+            background: #fdf0f5;
+            padding: 2px 6px;
+            border-radius: 5px;
+            color: #c71585;
+            font-family: monospace;
+        }
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 15px;
+            overflow-x: auto;
+            font-size: 14px;
+            box-shadow: inset 0 0 10px #000;
+        }
+        .icon { font-size: 1.5em; margin-right: 10px; }
+        .footer { text-align: center; margin-top: 40px; font-size: 0.9em; color: #ffb6c1; }
+        .badge {
+            display: inline-block;
+            background: #ffb6c1;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
+
+<div class="container">
+    <h1><span class="icon">✨</span>Твой Путеводитель в Мир Кода<span class="icon">✨</span></h1>
+    <p style="text-align: center;">Привет! Давай создадим твой чудесный сервис вместе. Это будет легко и очень мило! 🌸</p>
+
+    <div class="step">
+        <h2><span class="icon">🧶</span>Шаг 1: Подготовка гнездышка</h2>
+        <p>Создай папку для проекта. Тебе понадобятся "ингредиенты" (библиотеки). Открой терминал и шепни ему:</p>
+        <pre>pip install flask flask-sqlalchemy fpdf2 pandas openpyxl</pre>
+        <p>И не забудь положить в папку файл <code>DejaVuSans.ttf</code>, чтобы котик-принтер понимал русский язык!</p>
+    </div>
+
+
+
+    <div class="step">
+        <h2><span class="icon">📄</span>Шаг 2: Сердечко программы (app.py)</h2>
+        <p>Это главный файл. Он хранит данные в базе <code>clients.db</code> и делает магические расчеты.</p>
+        <pre>
+# Кусочек кода для базы данных
+class Client(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100))
+    email = db.Column(db.String(100))
+    birth_date = db.Column(db.String(20))
+        </pre>
+    </div>
+
+    <div class="step">
+        <h2><span class="icon">🎀</span>Шаг 3: Красивое личико (index.html)</h2>
+        <p>Положи этот файл в папку <code>templates</code>. Мы используем три окошка для даты рождения, как ты и просила!</p>
+        <div class="badge">Важно для красоты</div>
+        <p>Мы используем розовые акценты и закругленные края, чтобы пользователям было уютно.</p>
+    </div>
+
+    <div class="step">
+        <h2><span class="icon">✉️</span>Шаг 4: Почтовый голубь</h2>
+        <p>Для бесплатной отправки используй функцию <code>smtplib</code>. </p>
+        <p><i>Няшный совет:</i> В Gmail создай специальный "Пароль приложения", чтобы всё работало как по маслу!</p>
+    </div>
+
+
+
+    <div class="step">
+        <h2><span class="icon">🚀</span>Шаг 5: Полет на облачко (Удаленка)</h2>
+        <p>Когда наиграешься локально, мы перенесем проект на <b>Ubuntu</b>. Там мы позовем на помощь:</p>
+        <ul>
+            <li><b>Nginx</b> — наш швейцар на входе.</li>
+            <li><b>Gunicorn</b> — неутомимый моторчик под капотом.</li>
+        </ul>
+    </div>
+
+    <div class="footer">
+        Сделано с любовью и мурчанием 🐾<br>
+        Твой AI-котеночек Gemini
+    </div>
+</div>
 
 </body>
 </html>
