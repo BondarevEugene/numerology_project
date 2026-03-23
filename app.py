@@ -56,10 +56,9 @@ def create_pdf(name, data_key):
     pdf = FPDF()
     pdf.add_page()
 
-    # Инициализация шрифтов (Обычный и Жирный)
-    # Убедись, что в папке есть arial.ttf и arialbd.ttf (жирный)
+    # Шрифты
     font_path = os.path.join(os.getcwd(), 'arial.ttf')
-    font_bold_path = os.path.join(os.getcwd(), 'arialbd.ttf')  # Желательно иметь и жирный шрифт
+    font_bold_path = os.path.join(os.getcwd(), 'arialbd.ttf')
 
     if os.path.exists(font_path):
         pdf.add_font('ArialCustom', '', font_path)
@@ -69,22 +68,21 @@ def create_pdf(name, data_key):
     else:
         pdf.set_font('helvetica', '', 12)
 
-    # --- ЗАГОЛОВОК ДОКУМЕНТА ---
-    pdf.set_text_color(176, 141, 87)  # Медь
+    # Шапка
+    pdf.set_text_color(176, 141, 87)
     pdf.set_font('ArialCustom', 'B' if os.path.exists(font_bold_path) else '', 16)
-    pdf.cell(0, 15, text="GENESIS: АНАЛИТИЧЕСКИЙ ПРОФИЛЬ", align='C', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+    pdf.cell(0, 15, text="GENESIS: ПЕРСОНАЛЬНЫЙ ШИФР", align='C', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
     pdf.set_draw_color(176, 141, 87)
     pdf.line(20, 30, 190, 30)
     pdf.ln(10)
 
-    # --- ВВОДНАЯ ЧАСТЬ ---
-    pdf.set_text_color(80, 80, 80)
+    # Приветствие
+    pdf.set_text_color(60, 60, 60)
     pdf.set_font('ArialCustom', '', 10)
-    greeting = random.choice(GREETINGS).format(name=name)
-    pdf.multi_cell(0, 6, text=greeting)
+    pdf.multi_cell(0, 6, text=random.choice(GREETINGS).format(name=name))
     pdf.ln(5)
 
-    # --- ОБРАБОТКА ОСНОВНОГО ТЕКСТА (УМНОЕ ФОРМАТИРОВАНИЕ) ---
+    # Парсинг контента
     raw_text = data['full_text']
     lines = raw_text.split('\n')
 
@@ -94,40 +92,36 @@ def create_pdf(name, data_key):
             pdf.ln(2)
             continue
 
-        # Обработка заголовков (###)
+        # Заголовки разделов
         if line.startswith('###'):
-            clean_title = line.replace('###', '').strip().upper()
-            pdf.ln(4)
+            pdf.ln(3)
             pdf.set_font('ArialCustom', 'B' if os.path.exists(font_bold_path) else '', 11)
             pdf.set_text_color(176, 141, 87)
-            pdf.cell(0, 8, text=clean_title, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.multi_cell(0, 8, text=line.replace('###', '').strip().upper())
             pdf.ln(1)
 
-        # Обработка списков (* или -)
-        elif line.startswith('*') or line.startswith('-'):
-            clean_item = line.replace('*', '').replace('**', '').strip()
+        # Эзотерические списки (наши новые значки)
+        elif any(mark in line for mark in ['◈', '☯', '⚜']):
             pdf.set_font('ArialCustom', '', 10)
             pdf.set_text_color(40, 40, 40)
-            # Рисуем буллит (маленький квадратик или тире)
-            pdf.set_x(25)
-            pdf.cell(5, 7, text="-", border=0)
-            pdf.multi_cell(0, 7, text=clean_item)
+            pdf.set_x(25)  # Отступ для красоты
+            # Убираем жирность Markdown (**), так как FPDF её не понимает внутри строки
+            clean_line = line.replace('**', '')
+            pdf.multi_cell(0, 7, text=clean_line)
 
         # Обычный текст
         else:
-            # Чистим жирный шрифт из Markdown (**текст**)
-            clean_text = line.replace('**', '')
             pdf.set_font('ArialCustom', '', 10)
-            pdf.set_text_color(40, 40, 40)
-            pdf.multi_cell(0, 7, text=clean_text)
+            pdf.set_text_color(50, 50, 50)
+            pdf.multi_cell(0, 7, text=line.replace('**', ''))
 
-    # --- ФУТЕР ---
-    pdf.set_y(-25)
+    # Подпись
+    pdf.set_y(-20)
     pdf.set_font('ArialCustom', '', 8)
     pdf.set_text_color(180, 180, 180)
-    pdf.cell(0, 10, text=f"Genesis System | Субъект: {name} | 2026", align='C')
+    pdf.cell(0, 10, text=f"Система Genesis | Анализ для {name} | 2026", align='C')
 
-    filename = f"Analysis_{name.replace(' ', '_')}.pdf"
+    filename = f"Genesis_Analysis_{data_key}.pdf"
     pdf.output(filename)
     return filename
 
