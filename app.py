@@ -1,17 +1,23 @@
 import os
+import random
+from datetime import datetime
 from flask import Flask, render_template, request, send_file
 from flask_sqlalchemy import SQLAlchemy
-from fpdf import FPDF, XPos, YPos  # Добавили новые константы для позиционирования
-from datetime import datetime
+from fpdf import FPDF, XPos, YPos
+
+# ИМПОРТ НАШИХ ТЕКСТОВ
+from content import ARCHETYPES, GREETINGS, INTRO_TEXTS, RECOMMENDATIONS
 
 app = Flask(__name__)
 
-# БД
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///genesis_archive.db'
+# Настройка путей для БД (чтобы файл лежал в корне)
+basedir = os.path.abspath(os.path.dirname(__file__))
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'genesis_archive.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 
+# Модель БД
 class AnalysisRecord(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
@@ -26,99 +32,102 @@ with app.app_context():
 
 
 def get_interpretation(day):
-    library = {
-        "1": {
-            "title": "Архетип I: Солнечный Трон",
-            "html": """
-                <div class="highlight-text">«Вы — лидер, рожденный с сознанием Царя.»</div>
-                <p>Ваша воля — ваш главный инструмент. Избегайте стагнации.</p>
-            """,
-            "plain": "Архетип 1: Рожденный на Троне. Лидерская природа, железная воля."
+    # Приводим к строке, так как ключи в словаре — строки "1", "2" и т.д.
+    data = ARCHETYPES.get(str(day))
+
+    if not data:
+        return {
+            "title": f"Архетип Числа {day}",
+            "short_desc": "Анализ в очереди на обработку.",
+            "full_text": "Детальные данные для этого числа будут доступны в ближайшем обновлении системы.",
+            "html_display": "<p>Система Genesis калибрует данные для этого временного отрезка...</p>"
         }
-    }
-    return library.get(str(day), {"title": "В разработке", "html": "Данные готовятся...", "plain": "Нет данных"})
+
+    # Если в твоем файле нет поля html_display, создаем его на лету из текста
+    if "html_display" not in data:
+        data[
+            "html_display"] = f"<div class='highlight-text'>{data.get('short_desc', '')}</div><p>{data['full_text'][:300].replace('\n', '<br>')}...</p>"
+
+    return data
 
 
-import random
-
-
-def create_pdf(name, data_plain):
+def create_pdf(name, data_key):
+    data = get_interpretation(data_key)
     pdf = FPDF()
     pdf.add_page()
 
-    # Подключаем шрифт (убедись, что arial.ttf в папке)
+    # Инициализация шрифтов (Обычный и Жирный)
+    # Убедись, что в папке есть arial.ttf и arialbd.ttf (жирный)
     font_path = os.path.join(os.getcwd(), 'arial.ttf')
+    font_bold_path = os.path.join(os.getcwd(), 'arialbd.ttf')  # Желательно иметь и жирный шрифт
+
     if os.path.exists(font_path):
         pdf.add_font('ArialCustom', '', font_path)
+        if os.path.exists(font_bold_path):
+            pdf.add_font('ArialCustom', 'B', font_bold_path)
         pdf.set_font('ArialCustom', '', 12)
     else:
         pdf.set_font('helvetica', '', 12)
 
-    # --- СТИЛИЗАЦИЯ ЗАГОЛОВКА ---
-    pdf.set_text_color(176, 141, 87)  # Цвет меди (наш брендовый)
-    pdf.set_font('ArialCustom', '', 18)
+    # --- ЗАГОЛОВОК ДОКУМЕНТА ---
+    pdf.set_text_color(176, 141, 87)  # Медь
+    pdf.set_font('ArialCustom', 'B' if os.path.exists(font_bold_path) else '', 16)
     pdf.cell(0, 15, text="GENESIS: АНАЛИТИЧЕСКИЙ ПРОФИЛЬ", align='C', new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-
-    # Тонкая линия-разделитель
     pdf.set_draw_color(176, 141, 87)
     pdf.line(20, 30, 190, 30)
     pdf.ln(10)
 
-    # --- ЛИРИЧЕСКОЕ ВСТУПЛЕНИЕ (МАСКИ) ---
-    greetings = [
-        f"Уважаемый {name}, мы завершили глубокий анализ вашего архетипического кода.",
-        f"Для нас большая честь представить результаты исследования системы Genesis для субъекта: {name}.",
-        f"Ниже представлен детальный разбор ваших фундаментальных настроек, полученный на основе даты вашего воплощения."
-    ]
-
-    intro_text = [
-        "Данный отчет подготовлен ведущим аналитиком отдела психотипологии. Мы рассматриваем личность не как набор цифр, а как сложную динамическую систему потенциалов.",
-        "Ваш код указывает на уникальное сочетание волевых качеств и внутренних ресурсов, которые требуют осознанного управления."
-    ]
-
-    pdf.set_text_color(60, 60, 60)  # Темно-серый для основного текста
-    pdf.set_font('ArialCustom', '', 11)
-    pdf.multi_cell(0, 8, text=random.choice(greetings))
-    pdf.ln(5)
+    # --- ВВОДНАЯ ЧАСТЬ ---
+    pdf.set_text_color(80, 80, 80)
     pdf.set_font('ArialCustom', '', 10)
-    pdf.multi_cell(0, 7, text=random.choice(intro_text))
-    pdf.ln(10)
-
-    # --- ОСНОВНОЙ БЛОК АНАЛИЗА ---
-    pdf.set_fill_color(245, 245, 245)  # Светло-серый фон для блока данных
-    pdf.set_font('ArialCustom', '', 12)
-    pdf.set_text_color(176, 141, 87)
-    pdf.cell(0, 10, text="КЛЮЧЕВЫЕ ХАРАКТЕРИСТИКИ АРХЕТИПА", fill=True, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+    greeting = random.choice(GREETINGS).format(name=name)
+    pdf.multi_cell(0, 6, text=greeting)
     pdf.ln(5)
 
-    pdf.set_text_color(40, 40, 40)
-    pdf.set_font('ArialCustom', '', 11)
-    # Сюда вставляем основной текст анализа
-    pdf.multi_cell(0, 9, text=data_plain)
-    pdf.ln(15)
+    # --- ОБРАБОТКА ОСНОВНОГО ТЕКСТА (УМНОЕ ФОРМАТИРОВАНИЕ) ---
+    raw_text = data['full_text']
+    lines = raw_text.split('\n')
 
-    # --- ЗАКЛЮЧЕНИЕ ПСИХОЛОГА ---
-    pdf.set_draw_color(200, 200, 200)
-    pdf.line(20, pdf.get_y(), 190, pdf.get_y())
-    pdf.ln(10)
+    for line in lines:
+        line = line.strip()
+        if not line:
+            pdf.ln(2)
+            continue
 
-    recommendations = [
-        "Рекомендация: Интегрируйте полученные знания в повседневную практику. Помните, что осознание — это 50% трансформации.",
-        "Совет эксперта: Ваша энергия требует дисциплины. Направьте вектор внимания на созидательные задачи.",
-        "Заключение: Вы обладаете достаточным ресурсом для преодоления текущих вызовов. Опирайтесь на свою внутреннюю опору."
-    ]
+        # Обработка заголовков (###)
+        if line.startswith('###'):
+            clean_title = line.replace('###', '').strip().upper()
+            pdf.ln(4)
+            pdf.set_font('ArialCustom', 'B' if os.path.exists(font_bold_path) else '', 11)
+            pdf.set_text_color(176, 141, 87)
+            pdf.cell(0, 8, text=clean_title, new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+            pdf.ln(1)
 
-    pdf.set_font('ArialCustom', '', 10)
-    pdf.set_text_color(100, 100, 100)
-    pdf.multi_cell(0, 7, text=random.choice(recommendations))
+        # Обработка списков (* или -)
+        elif line.startswith('*') or line.startswith('-'):
+            clean_item = line.replace('*', '').replace('**', '').strip()
+            pdf.set_font('ArialCustom', '', 10)
+            pdf.set_text_color(40, 40, 40)
+            # Рисуем буллит (маленький квадратик или тире)
+            pdf.set_x(25)
+            pdf.cell(5, 7, text="-", border=0)
+            pdf.multi_cell(0, 7, text=clean_item)
 
-    # Футер (подпись)
-    pdf.set_y(-30)
+        # Обычный текст
+        else:
+            # Чистим жирный шрифт из Markdown (**текст**)
+            clean_text = line.replace('**', '')
+            pdf.set_font('ArialCustom', '', 10)
+            pdf.set_text_color(40, 40, 40)
+            pdf.multi_cell(0, 7, text=clean_text)
+
+    # --- ФУТЕР ---
+    pdf.set_y(-25)
     pdf.set_font('ArialCustom', '', 8)
     pdf.set_text_color(180, 180, 180)
-    pdf.cell(0, 10, text="Genesis System | Отдел системного анализа | 2026", align='C')
+    pdf.cell(0, 10, text=f"Genesis System | Субъект: {name} | 2026", align='C')
 
-    filename = f"Analysis_{name}.pdf"
+    filename = f"Analysis_{name.replace(' ', '_')}.pdf"
     pdf.output(filename)
     return filename
 
@@ -139,13 +148,13 @@ def index():
             name=name,
             email=email,
             birth_date=day,
-            result_text=data['plain']
+            result_text=data['full_text']
         )
         db.session.add(new_record)
         db.session.commit()
 
-        # Генерация PDF
-        pdf_file = create_pdf(name, data['plain'])
+        # Генерация PDF (передаем имя и номер дня)
+        pdf_file = create_pdf(name, day)
         result = data
 
     return render_template('index.html', result=result, pdf_file=pdf_file)

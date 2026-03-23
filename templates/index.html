@@ -2,13 +2,13 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Genesis System</title>
+    <title>Genesis System | Archetype Analysis</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lora:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
             --copper: #b08d57;
             --dark-void: #0a0b0d;
-            --muted-gray: #8a8a8a; /* Тот самый приглушенный цвет */
+            --muted-gray: #8a8a8a;
             --input-bg: #12141a;
         }
 
@@ -16,11 +16,12 @@
             background: var(--dark-void);
             color: var(--muted-gray);
             font-family: 'Lora', serif;
+            margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            margin: 0;
+            overflow-x: hidden;
         }
 
         .main-card {
@@ -30,6 +31,7 @@
             width: 100%;
             max-width: 650px;
             box-shadow: 0 30px 60px rgba(0,0,0,0.7);
+            margin: 40px 20px;
         }
 
         h1 {
@@ -37,12 +39,7 @@
             color: var(--copper);
             text-align: center;
             letter-spacing: 8px;
-            animation: ember 5s infinite;
-        }
-
-        @keyframes ember {
-            0%, 100% { opacity: 0.8; text-shadow: 0 0 5px rgba(176,141,87,0.2); }
-            50% { opacity: 1; text-shadow: 0 0 15px rgba(176,141,87,0.5); }
+            margin-bottom: 40px;
         }
 
         .section-label {
@@ -54,23 +51,25 @@
             margin-bottom: 8px;
         }
 
-        /* Убираем белый цвет из инпутов */
         .form-control {
             background: var(--input-bg) !important;
             border: 1px solid #1d2026 !important;
             border-bottom: 1px solid var(--copper) !important;
-            color: var(--muted-gray) !important; /* Серый текст вместо белого */
+            color: var(--muted-gray) !important;
             width: 100%;
             padding: 12px;
             margin-bottom: 25px;
             box-sizing: border-box;
             outline: none;
+            transition: 0.3s;
         }
 
         .form-control:focus {
-            border-color: #d4af37 !important;
-            color: #b0b0b0 !important;
+            border-bottom: 1px solid #d4af37 !important;
+            background: #161920 !important;
         }
+
+        .date-grid { display: flex; gap: 15px; }
 
         .btn-execute {
             background: transparent;
@@ -82,57 +81,146 @@
             letter-spacing: 3px;
             cursor: pointer;
             transition: 0.4s;
+            margin-top: 10px;
         }
 
         .btn-execute:hover {
             background: var(--copper);
             color: var(--dark-void);
+            box-shadow: 0 0 20px rgba(176, 141, 87, 0.3);
         }
 
+        /* --- Стили Wow-эффекта --- */
         .result-panel {
-            margin-top: 40px;
-            padding-top: 30px;
+            margin-top: 60px;
+            padding-top: 40px;
             border-top: 1px solid rgba(176, 141, 87, 0.1);
+        }
+
+        .sigil-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .sacred-sigil {
+            width: 100px;
+            height: 100px;
+            filter: drop-shadow(0 0 8px rgba(176, 141, 87, 0.4));
+        }
+
+        .reveal-box {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: finalReveal 1.2s forwards;
+            animation-delay: 0.3s;
+        }
+
+        @keyframes finalReveal {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .typewriter-title {
+            font-family: 'Cinzel', serif;
+            color: var(--copper);
+            text-align: center;
+            letter-spacing: 4px;
+            margin-bottom: 25px;
+        }
+
+        .content-fade-in {
+            line-height: 1.8;
+            color: #777;
+            text-align: justify;
         }
 
         .highlight-text {
             color: var(--copper);
             border-left: 2px solid var(--copper);
             padding-left: 15px;
+            margin-bottom: 20px;
             font-style: italic;
         }
 
-        .date-grid { display: flex; gap: 15px; }
+        .action-zone {
+            text-align: center;
+            margin-top: 40px;
+        }
 
-        ::placeholder { color: #333 !important; }
+        .pdf-link-premium {
+            display: inline-block;
+            padding: 12px 30px;
+            color: var(--copper);
+            text-decoration: none;
+            border: 1px solid var(--copper);
+            font-family: 'Cinzel', serif;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            transition: 0.3s;
+        }
+
+        .pdf-link-premium:hover {
+            background: rgba(176, 141, 87, 0.1);
+        }
+
+        ::placeholder { color: #333; }
     </style>
 </head>
 <body>
     <div class="main-card">
-        <h1>Archetype</h1>
+        <h1>Genesis</h1>
+
         <form method="POST">
             <span class="section-label">Subject Name</span>
-            <input type="text" name="name" class="form-control" placeholder="Имя..." required>
+            <input type="text" name="name" class="form-control" placeholder="ФИО" required>
 
             <span class="section-label">Electronic Mail</span>
-            <input type="email" name="email" class="form-control" placeholder="Email..." required>
+            <input type="email" name="email" class="form-control" placeholder="Email" required>
 
             <span class="section-label">Temporal Point (DD/MM/YYYY)</span>
             <div class="date-grid">
-                <input type="number" name="day" class="form-control" placeholder="DD" required>
-                <input type="number" name="month" class="form-control" placeholder="MM" required>
-                <input type="number" name="year" class="form-control" placeholder="YYYY" required>
+                <input type="number" name="day" class="form-control" placeholder="DD" min="1" max="31" required>
+                <input type="number" name="month" class="form-control" placeholder="MM" min="1" max="12" required>
+                <input type="number" name="year" class="form-control" placeholder="YYYY" min="1900" max="2026" required>
             </div>
 
             <button type="submit" class="btn-execute">Analyze</button>
         </form>
 
         {% if result %}
-        <div class="result-panel">
-            <h2 style="color: var(--copper); font-family: 'Cinzel';">{{ result.title }}</h2>
-            <div style="color: #777;">{{ result.html | safe }}</div>
-            <a href="/download/{{ pdf_file }}" style="color: var(--copper); text-decoration: none; font-size: 0.8rem; border: 1px solid var(--copper); padding: 5px 15px; display: inline-block; margin-top: 20px;">EXPORT PDF</a>
+        <div class="result-panel" id="resultTrigger">
+            <div class="sigil-container">
+                <svg class="sacred-sigil" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45" fill="none" stroke="#b08d57" stroke-width="0.5" opacity="0.3"/>
+                    <polygon points="50,5 95,75 5,75" fill="none" stroke="#b08d57" stroke-width="1">
+                        <animateTransform attributeName="transform" type="rotate" from="0 50 50" to="360 50 50" dur="20s" repeatCount="indefinite"/>
+                    </polygon>
+                    <polygon points="50,95 5,25 95,25" fill="none" stroke="#b08d57" stroke-width="1">
+                        <animateTransform attributeName="transform" type="rotate" from="360 50 50" to="0 50 50" dur="15s" repeatCount="indefinite"/>
+                    </polygon>
+                </svg>
+            </div>
+
+            <div class="reveal-box">
+                <h2 class="typewriter-title">{{ result.title }}</h2>
+                <div class="content-fade-in">
+                    {{ result.html_display | safe }}
+                </div>
+
+                <div class="action-zone">
+                    <a href="/download/{{ pdf_file }}" class="pdf-link-premium">EXPORT ARCHIVE (PDF)</a>
+                </div>
+            </div>
         </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                const element = document.getElementById('resultTrigger');
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            });
+        </script>
         {% endif %}
     </div>
 </body>
