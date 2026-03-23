@@ -4,6 +4,8 @@ from datetime import datetime
 from flask import Flask, render_template, request, send_file
 from flask_sqlalchemy import SQLAlchemy
 from fpdf import FPDF, XPos, YPos
+import re
+from markupsafe import Markup
 
 # ИМПОРТ НАШИХ ТЕКСТОВ
 from content import ARCHETYPES, GREETINGS, INTRO_TEXTS, RECOMMENDATIONS
@@ -157,6 +159,72 @@ def index():
 @app.route('/download/<filename>')
 def download(filename):
     return send_file(filename, as_attachment=True)
+
+from markupsafe import Markup
+
+@app.template_filter('safe_text')
+def safe_text_filter(text):
+    if not text: return ""
+    # Заменяем ### на HTML заголовки
+    formatted = text.replace('###', '<h3>').replace('✥', '</h3>')
+    # Подсвечиваем значки
+    for sym in ['◈', '☯', '⚜']:
+        formatted = formatted.replace(sym, f'<span class="symbol-highlight">{sym}</span>')
+    return Markup(formatted)
+
+# В HTML коде выше  уже использовалось | safe, но лучше использовать этот фильтр:
+
+import re
+from markupsafe import Markup
+
+
+@app.template_filter('genesis_style')
+def genesis_style_filter(text):
+    if not text:
+        return ""
+
+    # Сначала очистим лишние пробелы в начале строк
+    lines = [line.strip() for line in text.split('\n')]
+
+    formatted_html = []
+    for line in lines:
+        if not line:
+            continue
+
+        # Заголовки (###) превращаем в мистические разделители
+        if line.startswith('###'):
+            title = line.replace('###', '').replace('✥', '').strip()
+            formatted_html.append(f'<div class="mystic-header"><span>{title}</span></div>')
+
+        # Списки (значки) превращаем в карточки задач
+        elif any(mark in line for mark in ['◈', '☯', '⚜', '✥']):
+            # Выделяем жирный текст внутри списка
+            line = re.sub(r'\*\*(.*?)\*\*', r'<b class="gold-accent">\1</b>', line)
+            formatted_html.append(
+                f'<div class="task-row"><span class="icon">{line[0]}</span><span class="text">{line[1:].strip()}</span></div>')
+
+        # Обычный текст
+        else:
+            line = re.sub(r'\*\*(.*?)\*\*', r'<b class="gold-accent">\1</b>', line)
+            formatted_html.append(f'<p class="paragrapth">{line}</p>')
+
+    return Markup('\n'.join(formatted_html))
+
+    # 1. Заменяем заголовки ### Текст ✥ на красивые блоки
+    text = re.sub(r'### (.*?) ✥', r'<h3 class="genesis-header">\1</h3>', text)
+    text = re.sub(r'### (.*?) ###', r'<h3 class="genesis-header">\1</h3>', text)
+
+    # 2. Подсвечиваем эзотерические значки
+    for sym in ['◈', '☯', '⚜', '✥']:
+        text = text.replace(sym, f'<span class="symbol-mark">{sym}</span>')
+
+    # 3. Делаем жирный текст из Markdown (**текст**) рабочим в HTML
+    text = re.sub(r'\*\*(.*?)\*\*', r'<strong class="copper-gold">\1</strong>', text)
+
+    # 4. Сохраняем переносы строк
+    text = text.replace('\n', '<br>')
+
+    return Markup(text)
 
 
 if __name__ == '__main__':
