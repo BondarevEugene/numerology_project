@@ -103,7 +103,7 @@
                 <h2 class="typewriter-title">{{ result.title }}</h2>
 
                 <div class="analysis-content">
-                    {{ result.full_text | genesis_style }}
+                    {{ result.full_text | safe }}
                 </div>
 
                 {% if result.compatibility %}
