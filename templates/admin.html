@@ -2,45 +2,109 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Genesis | Terminal Admin</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <title>Genesis | Command Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lora&display=swap" rel="stylesheet">
     <style>
-        body { background: #060709; color: #a0a0a0; font-family: sans-serif; padding: 40px; }
-        h1 { font-family: 'Cinzel', serif; color: #b08d57; letter-spacing: 5px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 30px; background: #0c0e12; }
-        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #1d2026; }
-        th { color: #b08d57; font-family: 'Cinzel', serif; font-size: 0.8rem; }
-        tr:hover { background: #11141a; }
-        .archetype-badge { background: #b08d57; color: #060709; padding: 2px 8px; border-radius: 3px; font-weight: bold; }
+        :root { --copper: #b08d57; --gold: #d4af37; --void: #060709; --glass: rgba(255, 255, 255, 0.03); }
+        body { background: var(--void); color: #ccc; font-family: 'Lora', serif; margin: 0; }
+        .admin-nav { background: rgba(12, 14, 18, 0.9); border-bottom: 1px solid var(--copper); padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(10px); }
+        h1, h2 { font-family: 'Cinzel'; color: var(--copper); letter-spacing: 3px; }
+        .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 30px; border-bottom: 1px solid #222; overflow-x: auto; }
+        .tab-btn { padding: 15px 25px; background: none; border: none; color: #555; font-family: 'Cinzel'; cursor: pointer; transition: 0.3s; white-space: nowrap; }
+        .tab-btn.active { color: var(--gold); border-bottom: 2px solid var(--gold); }
+        .edit-card { background: var(--glass); border: 1px solid rgba(176, 141, 87, 0.1); padding: 25px; margin-bottom: 20px; border-radius: 8px; }
+        .form-input { background: #111; border: 1px solid #222; color: #eee; width: 100%; padding: 12px; margin: 10px 0; border-radius: 4px; box-sizing: border-box; }
+        .btn-save { background: var(--copper); color: var(--void); border: none; padding: 10px 25px; font-family: 'Cinzel'; cursor: pointer; font-weight: bold; }
+        .history-table { width: 100%; border-collapse: collapse; }
+        .history-table th { text-align: left; color: var(--copper); padding: 15px; border-bottom: 1px solid #222; font-family: 'Cinzel'; font-size: 0.8rem; }
+        .history-table td { padding: 15px; border-bottom: 1px solid #111; font-size: 0.9rem; }
+        .stat-bar-bg { height: 4px; background: #111; width: 100%; margin-top: 10px; }
+        .stat-bar-fill { height: 100%; background: var(--gold); box-shadow: 0 0 10px var(--gold); transition: 1s; }
+        .badge { background: rgba(212, 175, 55, 0.1); color: var(--gold); padding: 2px 8px; border-radius: 4px; font-weight: bold; }
     </style>
 </head>
 <body>
-    <h1>Sacred Database Records</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Дата</th>
-                <th>Имя</th>
-                <th>Email</th>
-                <th>ДР</th>
-                <th>Число</th>
-                <th>Профессии</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for r in records %}
-            <tr>
-                <td>{{ r.id }}</td>
-                <td>{{ r.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                <td>{{ r.name }}</td>
-                <td>{{ r.email }}</td>
-                <td>{{ r.birth_date }}</td>
-                <td><span class="archetype-badge">{{ r.archetype }}</span></td>
-                <td style="font-size: 0.8rem;">{{ r.professions }}</td>
-            </tr>
+
+    <nav class="admin-nav">
+        <h1>Genesis Control Center</h1>
+        <a href="/" style="color: var(--copper); text-decoration: none; font-family: 'Cinzel'; font-size: 0.8rem;">[ Exit Terminal ]</a>
+    </nav>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('history')">Logs</button>
+            <button class="tab-btn" onclick="showTab('stats')">Statistics</button>
+            <button class="tab-btn" onclick="showTab('archetypes')">Archetypes</button>
+            <button class="tab-btn" onclick="showTab('profs')">Professions</button>
+        </div>
+
+        <div id="history" class="tab-content">
+            <table class="history-table">
+                <thead><tr><th>Time</th><th>Subject</th><th>Code</th><th>Action</th></tr></thead>
+                <tbody>
+                    {% for r in records %}
+                    <tr>
+                        <td>{{ r.created_at.strftime('%H:%M | %d.%m') }}</td>
+                        <td style="color: var(--gold);">{{ r.name }}</td>
+                        <td><span class="badge">{{ r.archetype }}</span></td>
+                        <td>
+                            <form action="/admin/delete-record/{{ r.id }}" method="POST" onsubmit="return confirm('Erase from archive?');">
+                                <button type="submit" style="background:none; border:none; color:#ff4444; cursor:pointer; font-family:'Cinzel'; font-size:0.7rem;">[ DESTROY ]</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div id="stats" class="tab-content" style="display:none;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                {% for n in range(1, 10) %}
+                {% set count = stats.get(n|string, 0) %}
+                <div class="edit-card" style="text-align: center;">
+                    <div style="font-family: 'Cinzel'; color: var(--gold); font-size: 2rem;">#{{ n }}</div>
+                    <p>Frequency: {{ count }}</p>
+                    <div class="stat-bar-bg"><div class="stat-bar-fill" style="width: {{ count * 10 }}%;"></div></div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div id="archetypes" class="tab-content" style="display:none;">
+            {% for a in archetypes %}
+            <div class="edit-card">
+                <form action="/admin/edit/arch/{{ a.id }}" method="POST">
+                    <h3 style="color:var(--gold); font-family:Cinzel;">Code {{ a.number }}</h3>
+                    <input type="text" name="title" class="form-input" value="{{ a.title }}">
+                    <textarea name="full_text" class="form-input" rows="4">{{ a.full_text }}</textarea>
+                    <button type="submit" class="btn-save">Update Data</button>
+                </form>
+            </div>
             {% endfor %}
-        </tbody>
-    </table>
+        </div>
+
+        <div id="profs" class="tab-content" style="display:none;">
+            {% for p in profs %}
+            <div class="edit-card">
+                <form action="/admin/edit/prof/{{ p.id }}" method="POST">
+                    <h3 style="color:var(--gold); font-family:Cinzel;">Professions for #{{ p.number }}</h3>
+                    <input type="text" name="list_csv" class="form-input" value="{{ p.list_csv }}">
+                    <button type="submit" class="btn-save">Save Vectors</button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        function showTab(id) {
+            document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).style.display = 'block';
+            event.currentTarget.classList.add('active');
+        }
+    </script>
 </body>
 </html>
