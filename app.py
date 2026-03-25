@@ -1,14 +1,17 @@
 import os
-import csv
-import io
+import requests
 import pdfkit
 from datetime import datetime
-from flask import Flask, render_template, request, send_file, redirect, url_for, Response
+from flask import Flask, render_template, request, send_file
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
-from data import ARCHETYPE_EXTRAS
 
-# 1. НАСТРОЙКА ПРИЛОЖЕНИЯ
+# --- ИМПОРТ ДОПОЛНИТЕЛЬНЫХ ДАННЫХ ---
+try:
+    from data import ARCHETYPE_EXTRAS
+except ImportError:
+    ARCHETYPE_EXTRAS = {}
+
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -17,10 +20,10 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-# Настройка путей для PDF
-if os.name == 'nt':  # Windows
+# --- НАСТРОЙКА PDF (wkhtmltopdf) ---
+if os.name == 'nt':
     path_wkhtmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
-else:  # Linux (Render)
+else:
     path_wkhtmltopdf = '/usr/bin/wkhtmltopdf'
 
 try:
@@ -29,13 +32,12 @@ except:
     PDF_CONFIG = None
 
 
-# 2. МОДЕЛИ ДАННЫХ
+# --- МОДЕЛИ ДАННЫХ ---
 class ArchetypeContent(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     number = db.Column(db.String(5), unique=True, nullable=False)
     title = db.Column(db.String(200))
     full_text = db.Column(db.Text)
-    # Новые социальные поля
     shadow_side = db.Column(db.Text)
     growth_point = db.Column(db.Text)
     partner_type = db.Column(db.String(255))
@@ -58,7 +60,54 @@ class AnalysisRecord(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
-# 3. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+# --- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ---
+def calculate_compatibility_score(matrix1, matrix2):
+    if not matrix1 or not matrix2: return None
+    score, details, areas = 0, [], []
+
+    # 1. Энергия (2-5-8)
+    e1 = matrix1['2'] + matrix1['5'] + matrix1['8']
+    e2 = matrix2['2'] + matrix2['5'] + matrix2['8']
+    if abs(e1 - e2) <= 1:
+        score += 35
+        details.append("Высокий энергетический резонанс.")
+    else:
+        score += 15
+        areas.append("Энергия")
+        details.append("Разный темп жизни: требуется подстройка.")
+
+    # 2. Быт (3-6-9)
+    s1 = matrix1['3'] + matrix1['6'] + matrix1['9']
+    s2 = matrix2['3'] + matrix2['6'] + matrix2['9']
+    if (s1 + s2) >= 6:
+        score += 35
+        details.append("Сильный материальный фундамент.")
+    else:
+        score += 20
+        areas.append("Быт")
+        details.append("Союз на почве идей, а не быта.")
+
+    # 3. Духовность (1-4-7)
+    sp1 = matrix1['1'] + matrix1['4'] + matrix1['7']
+    sp2 = matrix2['1'] + matrix2['4'] + matrix2['7']
+    if abs(sp1 - sp2) <= 2:
+        score += 30; details.append("Единство жизненных целей.")
+    else:
+        areas.append("Цели")
+
+    final_score = min(score, 100)
+    advice = None
+    if final_score < 50:
+        a_map = {
+            "Энергия": "Чаще отдыхайте порознь, чтобы не перегружать друг друга.",
+            "Быт": "Делегируйте домашние дела, чтобы избежать конфликтов.",
+            "Цели": "Сформулируйте общую миссию, которая выше личных амбиций."
+        }
+        advice = f"Оптимизация: {a_map.get(areas[0] if areas else 'Энергия')}"
+
+    return {"percent": final_score, "notes": details, "harmony_advice": advice}
+
+
 def calculate_digit(n):
     try:
         s = sum(int(d) for d in str(n) if d.isdigit())
@@ -67,243 +116,135 @@ def calculate_digit(n):
         return 1
 
 
-def create_pdf_report(name, result, professions, extras, compatibility):
-    prof_list = professions.split(',') if professions else []
+def calculate_pythagoras(date_str):
+    digits = [int(d) for d in str(date_str) if d.isdigit()]
+    if not digits: return None
+    n1 = sum(digits)
+    n2 = sum(int(d) for d in str(n1))
+    first = digits[0] if digits[0] != 0 else digits[1]
+    n3 = abs(n1 - (2 * first))
+    n4 = sum(int(d) for d in str(n3))
+    all_num = "".join(map(str, digits)) + str(n1) + str(n2) + str(n3) + str(n4)
+    return {str(i): all_num.count(str(i)) for i in range(1, 10)}
 
-    # Генерируем HTML для PDF с логотипом VVV
-    styled_html = f"""
-    <html>
-    <head>
-        <meta charset="UTF-8">
-        <style>
-            body {{ background-color: #060709; color: #a0a0a0; font-family: 'Helvetica', 'Arial', sans-serif; padding: 50px; line-height: 1.5; }}
 
-            /* ЛОГОТИП VVV */
-            .logo-container {{ text-align: center; margin-bottom: 20px; }}
-            .vvv-logo {{
-                display: inline-block;
-                font-family: 'Georgia', serif;
-                font-size: 40px;
-                color: #d4af37;
-                letter-spacing: -12px; /* Сближаем буквы для эффекта сплетения */
-                font-weight: bold;
-                opacity: 0.9;
-                border-bottom: 1px solid #b08d57;
-                padding-bottom: 5px;
-            }}
+def get_detailed_interpretation(matrix):
+    if not matrix: return []
+    meanings = {
+        '1': {1: "Эгоцентрик.", 2: "Мягкий характер.", 3: "Золотая середина.", 4: "Лидер.", 5: "Диктатор."},
+        '2': {0: "Дефицит энергии.", 1: "Мало сил.", 2: "Норма.", 3: "Экстрасенс.", 4: "Донор."},
+        '3': {0: "Гуманитарий.", 1: "Творчество.", 2: "Технарь.", 3: "Ученый."},
+        '4': {0: "Здоровье слабое.", 1: "Среднее.", 2: "Крепкое.", 3: "Атлет."},
+        '5': {0: "Логика слабая.", 1: "Интуит.", 2: "Провидец.", 3: "Стратег."},
+        '6': {0: "Духовный поиск.", 1: "Ручной труд.", 2: "Мастер.", 3: "Трудоголик."},
+        '7': {0: "Все сам.", 1: "Удача есть.", 2: "Везунчик.", 3: "Знак Ангела."},
+        '8': {0: "Без долгов.", 1: "Ответственный.", 2: "Служение.", 3: "Карма семьи."},
+        '9': {1: "Память средняя.", 2: "Умный.", 3: "Мудрец."}
+    }
+    return [f"<b>{n}:</b> {meanings[n][c]}" for n, c in matrix.items() if c in meanings[n]]
 
-            .header {{ text-align: center; margin-bottom: 40px; }}
-            .system-label {{ color: #b08d57; letter-spacing: 8px; font-size: 10px; text-transform: uppercase; margin-bottom: 10px; }}
-            .title {{ color: #d4af37; font-size: 32px; letter-spacing: 4px; text-transform: uppercase; margin: 15px 0; }}
 
-            .meta-grid {{ display: table; width: 100%; margin-bottom: 40px; border-top: 1px solid rgba(176,141,87,0.2); border-bottom: 1px solid rgba(176,141,87,0.2); padding: 15px 0; }}
-            .meta-item {{ display: table-cell; text-align: center; color: #d4af37; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }}
-
-            h3 {{ color: #b08d57; border-bottom: 1px solid rgba(176,141,87,0.2); padding-bottom: 8px; font-size: 18px; text-transform: uppercase; }}
-            .main-text {{ text-align: justify; font-size: 14px; margin-bottom: 40px; color: #d1d1d1; }}
-
-            .grid-box {{ display: table; width: 100%; border-spacing: 20px 0; margin: 20px -20px; }}
-            .box-item {{ display: table-cell; width: 50%; padding: 20px; border-radius: 8px; vertical-align: top; }}
-            .shadow {{ background: rgba(255, 68, 68, 0.08); border-left: 4px solid #ff4444; }}
-            .growth {{ background: rgba(0, 200, 81, 0.08); border-left: 4px solid #00c851; }}
-
-            .warning-box {{ background: rgba(255, 68, 68, 0.03); border: 1px solid rgba(255, 68, 68, 0.3); padding: 20px; margin-top: 30px; }}
-            .gold-box {{ border: 1px solid #d4af37; padding: 25px; margin-top: 30px; background: rgba(212, 175, 55, 0.02); }}
-
-            .footer {{ text-align: center; font-size: 9px; margin-top: 60px; opacity: 0.4; letter-spacing: 2px; }}
-        </style>
-    </head>
-    <body>
-        <div class="logo-container">
-            <div class="vvv-logo">V V V</div>
-        </div>
-
-        <div class="header">
-            <div class="system-label">Sacred Geometry & Frequency</div>
-            <div class="title">{result.title}</div>
-            <p style="font-style: italic; font-size: 14px;">Индивидуальный энергетический оттиск: <b>{name}</b></p>
-        </div>
-
-        <div class="meta-grid">
-            <div class="meta-item">АРКАН: {extras['arcane'] if extras else '---'}</div>
-            <div class="meta-item">ПЛАНЕТА: {extras['planet'] if extras else '---'}</div>
-            <div class="meta-item">СТИХИЯ: {extras['element'] if extras else '---'}</div>
-        </div>
-
-        <div class="main-text">
-            {result.full_text}
-        </div>
-
-        <div class="grid-box">
-            <div class="box-item shadow">
-                <b style="color:#ff4444; font-size: 12px; text-transform: uppercase;">Теневая сторона:</b><br>
-                <p style="font-size:13px; margin-top: 10px;">{result.shadow_side}</p>
-            </div>
-            <div class="box-item growth">
-                <b style="color:#00c851; font-size: 12px; text-transform: uppercase;">Точка роста:</b><br>
-                <p style="font-size:13px; margin-top: 10px;">{result.growth_point}</p>
-            </div>
-        </div>
-
-        <h3>Резонирующие сферы (Профессии):</h3>
-        <p style="color: #fff; font-size: 14px; margin-bottom: 30px;">{", ".join(prof_list)}</p>
-
-        <div class="warning-box">
-            <b style="color:#ff4444; font-size: 12px; text-transform: uppercase;">⚠️ Внимание: Зоны энергетического спада</b><br>
-            <p style="font-size:13px; font-style: italic; margin-top: 10px;">Не рекомендуется: {result.avoid_spheres}</p>
-        </div>
-
-        <div class="gold-box">
-            <div style="text-align: center; color: #d4af37; font-size: 14px; letter-spacing: 3px; margin-bottom: 15px;">СВЯЩЕННЫЕ РЕЗОНАНСЫ</div>
-            <table style="width: 100%; font-size: 13px;">
-                <tr>
-                    <td style="color: #d4af37;"><b>Числа Силы:</b></td>
-                    <td>{compatibility['perfect']}</td>
-                </tr>
-                <tr>
-                    <td style="color: #ff4444;"><b>Точка Трения:</b></td>
-                    <td>{compatibility['challenge']}</td>
-                </tr>
-                <tr>
-                    <td><b>Идеальный партнер:</b></td>
-                    <td>{compatibility['partner_desc']}</td>
-                </tr>
-            </table>
-        </div>
-
-        <div class="footer">
-            GENESIS SYSTEM PROTOCOL v3.0 | SECURED ARCHIVE | {datetime.now().strftime('%Y')}
-        </div>
-    </body>
-    </html>
-    """
-
-    filename = f"Genesis_Report_{name.replace(' ', '_')}.pdf"
+def get_real_jobs(keyword):
     try:
-        options = {
-            'encoding': "UTF-8",
-            'page-size': 'A4',
-            'margin-top': '0.5in',
-            'margin-right': '0.5in',
-            'margin-bottom': '0.5in',
-            'margin-left': '0.5in',
-            'no-outline': None,
-            'quiet': ''
-        }
-        pdfkit.from_string(styled_html, filename, configuration=PDF_CONFIG, options=options)
-        return filename
+        url = f"https://api.hh.ru/vacancies?text={keyword}&per_page=3"
+        r = requests.get(url, headers={'User-Agent': 'Genesis'}, timeout=5)
+        if r.status_code == 200:
+            return [{'title': i['name'], 'salary': 'По договоренности', 'url': i['alternate_url'],
+                     'employer': i['employer']['name']} for i in r.json().get('items', [])]
+    except:
+        pass
+    return []
+
+
+# --- PDF GENERATOR ---
+def create_pdf_report(name, result, professions, extras, compatibility, pif_report, synergy=None):
+    prof_list = professions.split(',') if professions else []
+    pif_html = f"<h3>Психоматрица</h3><ul>{''.join([f'<li>{l}</li>' for l in pif_report])}</ul>" if pif_report else ""
+
+    synergy_html = ""
+    if synergy:
+        color = "#00c851" if synergy['percent'] >= 50 else "#ff4444"
+        synergy_html = f"""
+        <div style="border: 2px solid {color}; padding: 20px; margin-top: 30px; border-radius: 10px; background: #0c0e12;">
+            <h3 style="color: {color}; margin-top: 0;">СИНЕРГИЯ ПАРЫ: {synergy['percent']}%</h3>
+            <ul>{"".join([f"<li>{n}</li>" for n in synergy['notes']])}</ul>
+            {f'<p style="font-style: italic; color: #fff;">{synergy["harmony_advice"]}</p>' if synergy.get('harmony_advice') else ''}
+        </div>
+        """
+
+    html = f"""
+    <html><head><meta charset="UTF-8"><style>
+        body {{ background: #060709; color: #a0a0a0; font-family: 'DejaVu Sans', sans-serif; padding: 40px; }}
+        .title {{ color: #d4af37; font-size: 28px; text-align: center; text-transform: uppercase; }}
+        .box {{ padding: 15px; border-radius: 5px; margin: 15px 0; background: #0c0e12; border-left: 4px solid #d4af37; }}
+    </style></head><body>
+        <div class="title">{result.title if result else "Genesis Report"}</div>
+        <p style="text-align:center;">Для: {name}</p>
+        <div class="box">Аркан: {extras.get('arcane', '-')} | Стихия: {extras.get('element', '-')}</div>
+        <div>{result.full_text if result else ""}</div>
+        {pif_html}
+        {synergy_html}
+        <p><b>Сферы:</b> {", ".join(prof_list)}</p>
+    </body></html>
+    """
+    fname = f"Genesis_{name.replace(' ', '_')}.pdf"
+    opts = {'encoding': "UTF-8", 'quiet': ''}
+    try:
+        pdfkit.from_string(html, fname, configuration=PDF_CONFIG, options=opts)
+        return fname
     except Exception as e:
-        print(f"Ошибка генерации PDF: {e}")
+        print(f"PDF Error: {e}")
         return None
 
 
-# 4. МАРШРУТЫ
+# --- МАРШРУТЫ ---
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    # Инициализируем переменные, чтобы страница не падала при обычном открытии (GET)
-    result, pdf_file, professions, compatibility, extras = None, None, None, None, None
+    data = {'result': None, 'professions': None, 'extras': None, 'compatibility': None,
+            'pif_matrix': None, 'real_jobs': [], 'pdf_file': None, 'pif_full_report': [], 'synergy': None}
 
     if request.method == 'POST':
-        # 1. Извлекаем данные из формы
-        name = request.form.get('name')
-        email = request.form.get('email')
-        day = request.form.get('day')
-        month = request.form.get('month')
-        year = request.form.get('year')
+        name, email = request.form.get('name'), request.form.get('email')
+        d, m, y = request.form.get('day'), request.form.get('month'), request.form.get('year')
+        pd, pm, py = request.form.get('p_day'), request.form.get('p_month'), request.form.get('p_year')
 
-        if day and month and year:
-            # Складываем всё в одну строку, чтобы посчитать общую сумму цифр
-            full_date_str = f"{day}{month}{year}"
-            arch_number = str(calculate_digit(full_date_str))
+        if d and m and y:
+            a_num = str(calculate_digit(d))
+            res = ArchetypeContent.query.filter_by(number=a_num).first()
+            p_cont = ProfessionContent.query.filter_by(number=a_num).first()
 
-            # Для отладки: выведи в консоль, что посчиталось
-            print(f"--- DEBUG: Full Date: {full_date_str} | Archetype: {arch_number} ---")
+            u_date = f"{d.zfill(2)}{m.zfill(2)}{y}"
+            matrix = calculate_pythagoras(u_date)
+            report = get_detailed_interpretation(matrix)
 
-        # Проверяем, что day не пустой, прежде чем считать
-        if day:
-            arch_number = str(calculate_digit(day))
+            # Расчет партнера
+            syn = None
+            if pd and pm and py:
+                p_matrix = calculate_pythagoras(f"{pd.zfill(2)}{pm.zfill(2)}{py}")
+                syn = calculate_compatibility_score(matrix, p_matrix)
 
-            # 2. Ищем данные в БД
-            result = ArchetypeContent.query.filter_by(number=arch_number).first()
-            prof_data = ProfessionContent.query.filter_by(number=arch_number).first()
+            num = int(a_num)
+            comp = {"perfect": f"{(num + 2) % 9 + 1}, {(num + 5) % 9 + 1}", "challenge": str((num + 3) % 9 + 1),
+                    "partner_desc": res.partner_type if res else "-"}
+            p_str = p_cont.list_csv if p_cont else "Специалист"
 
-            if result:
-                professions = prof_data.list_csv if prof_data else ""
+            # PDF (теперь передаем syn)
+            pdf = create_pdf_report(name, res, p_str, ARCHETYPE_EXTRAS.get(a_num, {}), comp, report, synergy=syn)
 
-                # 3. Считаем совместимость
-                num = int(arch_number)
-                compatibility = {
-                    "perfect": f"{(num + 2) % 9 + 1}, {(num + 5) % 9 + 1}",
-                    "challenge": str((num + 3) % 9 + 1),
-                    "partner_desc": result.partner_type
-                }
+            db.session.add(
+                AnalysisRecord(name=name, email=email, birth_date=f"{d}-{m}-{y}", archetype=a_num, professions=p_str))
+            db.session.commit()
 
-                # 4. Доп. метаданные из твоего словаря в data.py
-                extras = ARCHETYPE_EXTRAS.get(arch_number)
+            data.update({'result': res, 'professions': p_str, 'extras': ARCHETYPE_EXTRAS.get(a_num, {}),
+                         'compatibility': comp, 'pif_matrix': matrix, 'real_jobs': get_real_jobs(p_str.split(',')[0]),
+                         'pdf_file': pdf, 'pif_full_report': report, 'synergy': syn})
 
-                # 5. Сохраняем запись в историю
-                db.session.add(AnalysisRecord(
-                    name=name,
-                    email=email,
-                    birth_date=day,
-                    archetype=arch_number,
-                    professions=professions
-                ))
-                db.session.commit()
-
-                # 6. Генерируем PDF
-                pdf_file = create_pdf_report(name, result, professions, extras, compatibility)
-
-    # Возвращаем все переменные в шаблон
-    return render_template('index.html',
-                           result=result,
-                           pdf_file=pdf_file,
-                           professions=professions,
-                           compatibility=compatibility,
-                           extras=extras)
-
-@app.route('/genesis-admin')
-def admin_dashboard():
-    records = AnalysisRecord.query.order_by(AnalysisRecord.created_at.desc()).all()
-    archetypes = ArchetypeContent.query.order_by(ArchetypeContent.number).all()
-    profs = ProfessionContent.query.order_by(ProfessionContent.number).all()
-    stats_raw = db.session.query(AnalysisRecord.archetype, func.count(AnalysisRecord.archetype)).group_by(
-        AnalysisRecord.archetype).all()
-    return render_template('admin.html', records=records, archetypes=archetypes, profs=profs,
-                           stats={str(k): v for k, v in stats_raw})
-
-
-@app.route('/admin/edit/<type>/<int:id>', methods=['POST'])
-def quick_edit(type, id):
-    if type == 'arch':
-        item = db.session.get(ArchetypeContent, id)
-        if item:
-            item.title = request.form.get('title')
-            item.full_text = request.form.get('full_text_html')
-            item.shadow_side = request.form.get('shadow_side')  # Поддержка новых полей
-            item.growth_point = request.form.get('growth_point')
-            item.partner_type = request.form.get('partner_type')
-    elif type == 'prof':
-        item = db.session.get(ProfessionContent, id)
-        if item: item.list_csv = request.form.get('list_csv')
-    db.session.commit()
-    return redirect(url_for('admin_dashboard'))
+    return render_template('index.html', **data)
 
 
 @app.route('/download/<filename>')
 def download(filename):
     return send_file(filename, as_attachment=True)
-
-
-@app.route('/admin/export-csv')
-def export_csv():
-    records = AnalysisRecord.query.all()
-    output = io.StringIO()
-    writer = csv.writer(output)
-    writer.writerow(['Имя', 'Email', 'Архетип'])
-    for r in records: writer.writerow([r.name, r.email, r.archetype])
-    return Response(output.getvalue(), mimetype="text/csv",
-                    headers={"Content-Disposition": "attachment; filename=export.csv"})
 
 
 if __name__ == '__main__':
