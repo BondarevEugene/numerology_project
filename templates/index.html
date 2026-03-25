@@ -1,267 +1,283 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Genesis | Sacred System</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
-    <style>
-        :root { --copper: #b08d57; --gold: #d4af37; --void: #060709; --card-bg: #0c0e12; --text: #a0a0a0; }
+    <!DOCTYPE html>
+    <html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Genesis | Sacred Geometry & Synergy</title>
+        <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 
-        body {
-            background: var(--void);
-            background-image: radial-gradient(circle at center, #11141a 0%, #060709 100%);
-            color: var(--text); font-family: 'Lora', serif; margin: 0; display: flex; justify-content: center; min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        .genesis-container {
-            display: flex; gap: 30px; width: 100%; max-width: 1200px; margin: 40px 20px; align-items: flex-start;
-            transition: filter 1.5s ease, opacity 1.5s ease;
-        }
-
-        .fade-out { filter: blur(20px) brightness(0); opacity: 0; pointer-events: none; }
-
-        .side-panel {
-            background: var(--card-bg); border: 1px solid rgba(176, 141, 87, 0.2);
-            padding: 40px; width: 350px; flex-shrink: 0; position: sticky; top: 40px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        .content-panel {
-            background: var(--card-bg); border: 1px solid rgba(176, 141, 87, 0.2);
-            padding: 40px 60px; flex-grow: 1; min-height: 500px; position: relative;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            animation: contentReveal 2s ease-out;
-        }
-
-        @keyframes contentReveal {
-            from { opacity: 0; filter: blur(10px); transform: translateY(10px); }
-            to { opacity: 1; filter: blur(0); transform: translateY(0); }
-        }
-
-        h1 { font-family: 'Cinzel', serif; color: var(--copper); letter-spacing: 8px; text-align: center; font-size: 1.8rem; margin-bottom: 40px; }
-        .section-label { font-family: 'Cinzel', serif; color: var(--copper); font-size: 0.65rem; letter-spacing: 2px; margin-bottom: 8px; display: block; opacity: 0.7; }
-
-        .form-control {
-            background: transparent !important; border: none !important; border-bottom: 1px solid rgba(176,141,87,0.3) !important;
-            color: #fff !important; width: 100%; padding: 12px 0; margin-bottom: 25px; font-size: 1rem; font-family: 'Lora';
-            transition: border-color 0.4s;
-        }
-        .form-control:focus { outline: none; border-bottom-color: var(--gold) !important; }
-
-        .date-grid { display: flex; gap: 15px; }
-
-        .btn-execute {
-            background: transparent; color: var(--copper); border: 1px solid var(--copper);
-            font-family: 'Cinzel'; padding: 15px; width: 100%; letter-spacing: 3px; cursor: pointer; transition: 0.4s;
-            margin-top: 10px;
-        }
-        .btn-execute:hover { background: var(--copper); color: var(--void); box-shadow: 0 0 25px rgba(176,141,87,0.4); }
-
-        .analysis-content { line-height: 1.8; color: #d1d1d1; }
-        .analysis-content h3 { color: var(--copper); font-family: 'Cinzel'; margin-top: 35px; border-bottom: 1px solid rgba(176,141,87,0.2); padding-bottom: 8px; font-size: 1.2rem; }
-        .analysis-content p { margin-bottom: 20px; text-align: justify; }
-        .analysis-content b, .analysis-content strong { color: var(--gold); }
-
-        .task-row { display: flex; background: rgba(176,141,87,0.05); border-left: 3px solid var(--gold); padding: 20px; margin-top: 40px; align-items: center; }
-        .gold-accent { color: var(--gold); font-weight: 500; font-family: 'Cinzel'; font-size: 0.95rem; letter-spacing: 1px; }
-
-        .typewriter-title { font-family: 'Cinzel'; color: var(--gold); text-align: center; margin-bottom: 10px; letter-spacing: 4px; font-size: 1.7rem; text-shadow: 0 0 15px rgba(212,175,55,0.3); }
-
-        .pdf-link-premium {
-            text-decoration: none; color: var(--copper); font-family: 'Cinzel'; font-size: 0.75rem; letter-spacing: 3px;
-            padding: 15px 40px; border: 1px solid var(--copper); transition: 0.4s; display: inline-block;
-        }
-        .pdf-link-premium:hover { background: var(--copper); color: var(--void); box-shadow: 0 0 20px var(--copper); }
-
-        .empty-state { height: 100%; display: flex; align-items: center; justify-content: center; opacity: 0.2; font-family: 'Cinzel'; letter-spacing: 8px; font-size: 1.2rem; }
-
-        #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: 0.3; }
-
-        .sacred-meta-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; border-bottom: 1px solid rgba(176,141,87,0.1); padding-bottom: 20px; margin-bottom: 30px; }
-        .meta-item { text-align: center; }
-        .meta-val { color: var(--gold); font-family: 'Cinzel'; font-size: 0.85rem; display: block; margin-top: 5px; letter-spacing: 1px; }
-
-        .star-mirror { font-style: italic; text-align: center; color: var(--copper); font-size: 0.85rem; margin-bottom: 30px; padding: 0 20px; opacity: 0.9; }
-    </style>
-</head>
-<body>
-
-    <canvas id="bg-canvas"></canvas>
-
-    <div id="loader-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(6,7,9,0.98); z-index:9999; flex-direction:column; justify-content:center; align-items:center;">
-        <div style="font-family:'Cinzel'; color:#b08d57; letter-spacing:5px; margin-bottom:20px; font-size: 1.2rem;" id="loader-text">READING THE STARS...</div>
-        <div style="width:300px; height:1px; background:rgba(176,141,87,0.1); position:relative;">
-            <div id="energy-bar" style="position:absolute; height:100%; width:0%; background:#d4af37; box-shadow:0 0 15px #d4af37;"></div>
-        </div>
-    </div>
-
-    <div class="genesis-container">
-        <div class="side-panel">
-            <h1>GENESIS</h1>
-            <form method="POST" id="analysisForm">
-                <span class="section-label">Identity Designation</span>
-                <input type="text" name="name" class="form-control" placeholder="YOUR NAME" required autocomplete="off">
-
-                <span class="section-label">Digital Frequency</span>
-                <input type="email" name="email" class="form-control" placeholder="EMAIL ADDRESS" required autocomplete="off">
-
-                <span class="section-label">Temporal Coordinates</span>
-                <div class="date-grid">
-                    <input type="number" name="day" class="form-control" placeholder="DD" required min="1" max="31">
-                    <input type="number" name="month" class="form-control" placeholder="MM" required min="1" max="12">
-                    <input type="number" name="year" class="form-control" placeholder="YYYY" required min="1900" max="2026">
-                </div>
-
-                <button type="submit" class="btn-execute">Begin Analysis</button>
-            </form>
-        </div>
-
-        <div class="content-panel">
-            {% if result %}
-                {% if extras %}
-                <div class="sacred-meta-grid">
-                    <div class="meta-item">
-                        <span class="section-label">Аркан</span>
-                        <span class="meta-val">{{ extras.arcane }}</span>
-                    </div>
-                    <div class="meta-item">
-                        <span class="section-label">Планета</span>
-                        <span class="meta-val">{{ extras.planet }}</span>
-                    </div>
-                    <div class="meta-item">
-                        <span class="section-label">Стихия</span>
-                        <span class="meta-val">{{ extras.element }}</span>
-                    </div>
-                </div>
-                {% endif %}
-
-                <h2 class="typewriter-title">{{ result.title }}</h2>
-
-                {% if extras %}
-                <div class="star-mirror">
-                    "Ваша частота резонирует с душами: <span style="color: #fff;">{{ extras.star }}</span>"
-                </div>
-                {% endif %}
-
-                <div class="analysis-content">
-                    {{ result.full_text | safe }}
-                </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 40px;">
-                    <div style="background: rgba(255, 68, 68, 0.05); border-left: 2px solid #ff4444; padding: 20px; border-radius: 0 8px 8px 0;">
-                        <span class="section-label" style="color: #ff4444; margin-bottom: 10px;">Теневая сторона</span>
-                        <p style="font-size: 0.85rem; color: #d1d1d1; margin: 0; line-height: 1.5;">{{ result.shadow_side or "Данные синхронизируются..." }}</p>
-                    </div>
-                    <div style="background: rgba(0, 200, 81, 0.05); border-left: 2px solid #00c851; padding: 20px; border-radius: 0 8px 8px 0;">
-                        <span class="section-label" style="color: #00c851; margin-bottom: 10px;">Точка роста</span>
-                        <p style="font-size: 0.85rem; color: #d1d1d1; margin: 0; line-height: 1.5;">{{ result.growth_point or "Данные синхронизируются..." }}</p>
-                    </div>
-                </div>
-
-                {% if professions %}
-                <div class="task-row">
-                    <span style="color: var(--gold); margin-right: 15px; font-size: 1.5rem;">✧</span>
-                    <span class="gold-accent">Резонирующие сферы: {{ professions }}</span>
-                </div>
-                {% endif %}
-
-                {% if result.avoid_spheres %}
-                <div style="margin-top: 20px; padding: 20px; background: rgba(255, 68, 68, 0.03); border: 1px solid rgba(255, 68, 68, 0.2); border-radius: 8px;">
-                    <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                        <span style="color: #ff4444; margin-right: 10px; font-size: 1.2rem;">⚠️</span>
-                        <span class="section-label" style="color: #ff4444; margin: 0; letter-spacing: 1px;">Зоны энергетического истощения:</span>
-                    </div>
-                    <p style="font-size: 0.85rem; color: #d1d1d1; margin: 0; font-style: italic; line-height: 1.4;">
-                        Не рекомендуется: {{ result.avoid_spheres }}
-                    </p>
-                </div>
-                {% endif %}
-
-                {% if compatibility %}
-                <div class="compatibility-container" style="margin-top: 40px; border: 1px solid rgba(176, 141, 87, 0.4); border-radius: 12px; padding: 30px; background: linear-gradient(145deg, rgba(12, 14, 18, 0.9), rgba(20, 24, 30, 0.9)); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-                    <h3 style="font-family: 'Cinzel'; color: var(--gold); font-size: 1.2rem; margin-top: 0; letter-spacing: 3px; text-align: center; border-bottom: 1px solid rgba(212, 175, 55, 0.2); padding-bottom: 15px; text-transform: uppercase;">Священные Резонансы</h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 25px;">
-                        <div style="text-align: center; padding: 15px; background: rgba(212, 175, 55, 0.03); border-radius: 8px;">
-                            <span class="section-label" style="margin-bottom: 12px; display: block; color: var(--gold); opacity: 1;">Числа Силы</span>
-                            <div style="font-family: 'Cinzel'; font-size: 2.2rem; color: var(--gold); text-shadow: 0 0 15px rgba(212,175,55,0.6);">{{ compatibility.perfect }}</div>
-                            <p style="font-size: 0.8rem; opacity: 0.8; margin-top: 15px; line-height: 1.5; color: #fff;">Ваши гармоничные аспекты. Усиливают ваш потенциал.</p>
-                        </div>
-                        <div style="text-align: center; padding: 15px; background: rgba(255, 68, 68, 0.03); border-radius: 8px;">
-                            <span class="section-label" style="margin-bottom: 12px; display: block; color: #ff4444; opacity: 1;">Точка Трения</span>
-                            <div style="font-family: 'Cinzel'; font-size: 2.2rem; color: #ff4444; text-shadow: 0 0 15px rgba(255,68,68,0.6);">{{ compatibility.challenge }}</div>
-                            <p style="font-size: 0.8rem; opacity: 0.8; margin-top: 15px; line-height: 1.5; color: #fff;">Ваш учитель-антагонист. Приносит рост через усилия.</p>
-                        </div>
-                    </div>
-                    <div style="margin-top: 30px; padding: 20px; border-top: 1px dashed rgba(176, 141, 87, 0.3); text-align: center;">
-                        <span class="section-label" style="letter-spacing: 1px;">Идеальный партнер для реализации:</span>
-                        <div style="font-family: 'Lora'; font-style: italic; color: #fff; font-size: 1.05rem; margin-top: 10px; letter-spacing: 0.5px;">"{{ compatibility.partner_desc or 'Личность, способная стать вашим надежным тылом.' }}"</div>
-                    </div>
-                </div>
-                {% endif %}
-
-                <div style="text-align: center; margin-top: 50px; padding-bottom: 20px;">
-                    {% if pdf_file %}
-                        <a href="/download/{{ pdf_file }}" class="pdf-link-premium">Extract Full PDF Archive</a>
-                    {% endif %}
-                </div>
-            {% else %}
-                <div class="empty-state">Waiting for coordinates...</div>
-            {% endif %}
-        </div>
-    </div>
-
-    <div style="text-align: center; margin-bottom: 20px; opacity: 0.05;">
-        <a href="/genesis-admin" style="color: var(--copper); text-decoration: none; font-size: 0.5rem;">✺</a>
-    </div>
-
-    <script>
-        const canvas = document.getElementById('bg-canvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-        function init() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            particles = [];
-            for(let i=0; i<60; i++) {
-                particles.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    size: Math.random() * 2,
-                    speed: Math.random() * 0.4 + 0.1
-                });
+        <style>
+            /* 1. ПЕРЕМЕННЫЕ И БАЗОВЫЕ СТИЛИ */
+            :root {
+                --copper: #b08d57;
+                --gold: #d4af37;
+                --void: #060709;
+                --card-bg: #0c0e12;
+                --text: #a0a0a0;
+                --accent-red: #ff4444;
+                --accent-green: #00c851;
             }
-        }
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "rgba(176, 141, 87, 0.4)";
-            particles.forEach(p => {
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                ctx.fill();
-                p.y -= p.speed;
-                if(p.y < 0) p.y = canvas.height;
-            });
-            requestAnimationFrame(draw);
-        }
-        window.addEventListener('resize', init);
-        init(); draw();
 
-        const form = document.getElementById('analysisForm');
-        form.onsubmit = function() {
-            document.querySelector('.genesis-container').classList.add('fade-out');
-            setTimeout(() => {
-                document.getElementById('loader-overlay').style.display = 'flex';
-                const bar = document.getElementById('energy-bar');
-                let progress = 0;
-                const interval = setInterval(() => {
-                    progress += Math.random() * 3;
-                    if (progress >= 100) { progress = 100; clearInterval(interval); }
-                    bar.style.width = progress + '%';
-                }, 50);
-            }, 500);
-        };
-    </script>
-</body>
-</html>
+            body {
+                background: var(--void);
+                background-image: radial-gradient(circle at center, #11141a 0%, #060709 100%);
+                color: var(--text); font-family: 'Lora', serif; margin: 0; display: flex; justify-content: center; min-height: 100vh;
+                overflow-x: hidden;
+            }
+
+            /* 2. МАКЕТ КОНТЕЙНЕРА */
+            .genesis-container {
+                display: flex; gap: 30px; width: 100%; max-width: 1250px; margin: 40px 20px; align-items: flex-start;
+            }
+
+            /* Левая панель управления */
+            .side-panel {
+                background: var(--card-bg); border: 1px solid rgba(176, 141, 87, 0.2);
+                padding: 40px; width: 320px; flex-shrink: 0; position: sticky; top: 40px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            }
+
+            /* Правая панель с результатами */
+            .content-panel {
+                background: var(--card-bg); border: 1px solid rgba(176, 141, 87, 0.2);
+                padding: 40px 60px; flex-grow: 1; min-height: 700px; position: relative;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+                animation: contentReveal 1.2s ease-out;
+            }
+
+            @keyframes contentReveal {
+                from { opacity: 0; transform: translateY(20px); filter: blur(5px); }
+                to { opacity: 1; transform: translateY(0); filter: blur(0); }
+            }
+
+            /* 3. ТИПОГРАФИКА И ЭЛЕМЕНТЫ ФОРМ */
+            h1 { font-family: 'Cinzel', serif; color: var(--copper); letter-spacing: 8px; text-align: center; font-size: 1.8rem; margin-bottom: 40px; }
+            .section-label { font-family: 'Cinzel', serif; color: var(--copper); font-size: 0.65rem; letter-spacing: 2px; margin-bottom: 8px; display: block; opacity: 0.7; text-transform: uppercase; }
+
+            .form-control {
+                background: transparent !important; border: none !important; border-bottom: 1px solid rgba(176,141,87,0.3) !important;
+                color: #fff !important; width: 100%; padding: 12px 0; margin-bottom: 25px; font-size: 1rem; font-family: 'Lora';
+                transition: 0.3s;
+            }
+            .form-control:focus { outline: none; border-bottom-color: var(--gold) !important; }
+
+            .btn-execute {
+                background: transparent; color: var(--copper); border: 1px solid var(--copper);
+                font-family: 'Cinzel'; padding: 15px; width: 100%; letter-spacing: 3px; cursor: pointer; transition: 0.4s;
+                margin-top: 10px; text-transform: uppercase;
+            }
+            .btn-execute:hover { background: var(--copper); color: var(--void); box-shadow: 0 0 20px rgba(176,141,87,0.4); }
+
+            /* 4. СПЕЦИАЛЬНЫЕ БЛОКИ (МАТРИЦА, ВАКАНСИИ) */
+            .pif-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 240px; margin: 0 auto; }
+            .pif-cell { border: 1px solid rgba(176,141,87,0.3); padding: 15px 5px; text-align: center; background: rgba(176,141,87,0.02); }
+            .pif-val { color: #fff; font-size: 1.1rem; font-family: 'Cinzel'; letter-spacing: 2px; }
+
+            .job-card { background: rgba(212, 175, 55, 0.03); border: 1px solid rgba(212, 175, 55, 0.1); padding: 18px; margin-bottom: 12px; transition: 0.3s; }
+            .job-card:hover { border-color: var(--gold); background: rgba(212, 175, 55, 0.06); }
+
+            /* 5. АНИМАЦИОННЫЙ ФОН */
+            #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.2; pointer-events: none; }
+        </style>
+    </head>
+    <body>
+
+        <canvas id="bg-canvas"></canvas>
+
+        <div class="genesis-container">
+
+            <div class="side-panel">
+                <h1>GENESIS</h1>
+                <form method="POST">
+                    <span class="section-label">Identity Designation</span>
+                    <input type="text" name="name" class="form-control" placeholder="ИМЯ" required>
+
+                    <span class="section-label">Digital Frequency</span>
+                    <input type="email" name="email" class="form-control" placeholder="EMAIL" required>
+
+                    <span class="section-label">Temporal Coordinates</span>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="number" name="day" class="form-control" placeholder="ДД" required min="1" max="31">
+                        <input type="number" name="month" class="form-control" placeholder="ММ" required min="1" max="12">
+                        <input type="number" name="year" class="form-control" placeholder="ГГГГ" required min="1900" max="2026">
+                    </div>
+
+                    <div style="margin-top: 20px; padding-top: 20px; border-top: 1px dashed rgba(176,141,87,0.2);">
+                        <span class="section-label">Partner Resonance (Optional)</span>
+                        <div style="display: flex; gap: 5px;">
+                            <input type="number" name="p_day" class="form-control" placeholder="P-ДД" style="font-size: 0.8rem;">
+                            <input type="number" name="p_month" class="form-control" placeholder="P-ММ" style="font-size: 0.8rem;">
+                            <input type="number" name="p_year" class="form-control" placeholder="P-ГГГГ" style="font-size: 0.8rem;">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-execute">Begin Analysis</button>
+                </form>
+            </div>
+
+            <div class="content-panel">
+                {% if result %}
+
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; border-bottom: 1px solid rgba(176,141,87,0.1); padding-bottom: 25px; margin-bottom: 30px;">
+                        <div style="text-align: center;">
+                            <span class="section-label">Аркан</span>
+                            <span style="color: var(--gold); font-family: 'Cinzel'; font-size: 0.85rem;">{{ extras.arcane if extras else '???' }}</span>
+                        </div>
+                        <div style="text-align: center;">
+                            <span class="section-label">Планета</span>
+                            <span style="color: var(--gold); font-family: 'Cinzel'; font-size: 0.85rem;">{{ extras.planet if extras else '???' }}</span>
+                        </div>
+                        <div style="text-align: center;">
+                            <span class="section-label">Стихия</span>
+                            <span style="color: var(--gold); font-family: 'Cinzel'; font-size: 0.85rem;">{{ extras.element if extras else '???' }}</span>
+                        </div>
+                    </div>
+
+                    <h2 style="font-family: 'Cinzel'; color: var(--gold); text-align: center; margin-bottom: 30px; letter-spacing: 4px; font-size: 2rem;">{{ result.title }}</h2>
+
+                    <div style="line-height: 1.8; text-align: justify; margin-bottom: 40px; color: #d1d1d1;">
+                        {{ result.full_text | safe }}
+                    </div>
+
+                    {% if pif_matrix %}
+                    <div style="border: 1px solid rgba(176,141,87,0.2); padding: 40px 20px; border-radius: 8px; background: rgba(255,255,255,0.01); margin-bottom: 50px;">
+                        <h3 style="text-align: center; color: var(--gold); font-family: 'Cinzel'; margin-top: 0; margin-bottom: 30px; letter-spacing: 2px;">Психоматрица Пифагора</h3>
+
+                        <div class="pif-grid">
+                            {% for i in ['1','4','7','2','5','8','3','6','9'] %}
+                            <div class="pif-cell">
+                                <span style="font-size: 0.6rem; color: var(--copper); font-family: 'Cinzel'; display: block; margin-bottom: 5px;">{{ i }}</span>
+                                <div class="pif-val">
+                                    {% if pif_matrix[i]|int > 0 %}{{ 'I' * pif_matrix[i]|int }}{% else %}<span style="opacity: 0.2;">-</span>{% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        {% if pif_full_report %}
+                        <div style="margin-top: 40px; border-top: 1px solid rgba(176,141,87,0.1); padding-top: 30px;">
+                            <span class="section-label" style="text-align: center; margin-bottom: 20px;">Интерпретация энергетических узлов</span>
+                            {% for line in pif_full_report %}
+                            <div style="margin-bottom: 12px; font-size: 0.85rem; border-left: 2px solid var(--gold); padding-left: 15px; color: #d1d1d1;">
+                                {{ line | safe }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    {% if compatibility %}
+                    <div style="margin-top: 40px; border: 1px solid var(--gold); border-radius: 12px; padding: 35px; background: linear-gradient(145deg, rgba(12, 14, 18, 0.9), rgba(20, 24, 30, 0.9));">
+                        <h3 style="font-family: 'Cinzel'; color: var(--gold); font-size: 1.2rem; margin-top: 0; letter-spacing: 3px; text-align: center; text-transform: uppercase;">Synergy Analysis</h3>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 25px;">
+                            <div style="text-align: center; padding: 15px; background: rgba(212, 175, 55, 0.05); border-radius: 8px;">
+                                <span class="section-label" style="color: var(--gold); opacity: 1;">Числа Силы</span>
+                                <div style="font-family: 'Cinzel'; font-size: 2.2rem; color: var(--gold);">{{ compatibility.perfect }}</div>
+                                <p style="font-size: 0.75rem; opacity: 0.8; margin-top: 10px;">Гармоничный резонанс</p>
+                            </div>
+                            <div style="text-align: center; padding: 15px; background: rgba(255, 68, 68, 0.05); border-radius: 8px;">
+                                <span class="section-label" style="color: var(--accent-red); opacity: 1;">Точка Трения</span>
+                                <div style="font-family: 'Cinzel'; font-size: 2.2rem; color: var(--accent-red);">{{ compatibility.challenge }}</div>
+                                <p style="font-size: 0.75rem; opacity: 0.8; margin-top: 10px;">Конфликтный аспект</p>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 25px; text-align: center; border-top: 1px dashed rgba(176,141,87,0.3); padding-top: 20px;">
+                            <span class="section-label">Идеальный архетип партнера:</span>
+                            <div style="font-style: italic; color: #fff; font-size: 1rem; margin-top: 10px;">"{{ compatibility.partner_desc }}"</div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                {% if synergy %}
+                <div style="margin-top: 40px; padding: 35px; border: 1px solid var(--accent-green); border-radius: 12px; background: rgba(0, 200, 81, 0.05);">
+                    <h3 style="font-family: 'Cinzel'; color: var(--accent-green); text-align: center; margin-top: 0; letter-spacing: 2px;">
+                        Synergy Resonance: {{ synergy.percent }}%
+                    </h3>
+
+                    <div style="margin-top: 20px;">
+                        <span class="section-label" style="color: var(--accent-green);">Ключевые аспекты союза:</span>
+                        <ul style="list-style: none; padding: 0; margin-top: 15px;">
+                            {% for note in synergy.notes %}
+                            <li style="margin-bottom: 12px; font-size: 0.9rem; color: #fff; display: flex; align-items: center;">
+                                <span style="color: var(--accent-green); margin-right: 15px; font-size: 1.2rem;">✦</span>
+                                {{ note }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                {% endif %}
+                    {% if real_jobs %}
+                    <div style="margin-top: 50px;">
+                        <span class="section-label" style="margin-bottom: 20px;">Реализация потенциала (HH.ru Live)</span>
+                        {% for job in real_jobs %}
+                        <div class="job-card">
+                            <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                                <strong style="color: #fff; font-size: 0.95rem;">{{ job.title }}</strong>
+                                <span style="color: var(--gold); font-family: 'Cinzel'; font-size: 0.85rem;">{{ job.salary }}</span>
+                            </div>
+                            <div style="color: var(--copper); font-size: 0.8rem; margin: 5px 0 15px;">{{ job.employer }}</div>
+                            <a href="{{ job.url }}" target="_blank" style="color: var(--gold); text-decoration: none; font-size: 0.65rem; letter-spacing: 1px; border: 1px solid var(--gold); padding: 6px 12px; text-transform: uppercase; transition: 0.3s;">Взаимодействовать ↗</a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    {% if pdf_file %}
+                    <div style="text-align: center; margin-top: 60px; padding-bottom: 40px;">
+                        <a href="/download/{{ pdf_file }}" style="text-decoration: none; color: var(--gold); border: 1px solid var(--gold); padding: 15px 40px; font-family: 'Cinzel'; letter-spacing: 3px; transition: 0.4s;">
+                            Extract PDF Archive
+                        </a>
+                    </div>
+                    {% endif %}
+
+                {% else %}
+                    <div style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0.2;">
+                        <div style="font-size: 5rem; margin-bottom: 20px;">✺</div>
+                        <div style="font-family: 'Cinzel'; letter-spacing: 8px; font-size: 1.2rem;">Waiting for coordinates...</div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <script>
+            // Космический фон на Canvas
+            const canvas = document.getElementById('bg-canvas');
+            const ctx = canvas.getContext('2d');
+            let dots = [];
+
+            function init() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                dots = [];
+                for(let i=0; i<100; i++) {
+                    dots.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height,
+                        s: Math.random() * 1.5,
+                        v: Math.random() * 0.3 + 0.1
+                    });
+                }
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = "rgba(176, 141, 87, 0.4)";
+                dots.forEach(d => {
+                    ctx.beginPath();
+                    ctx.arc(d.x, d.y, d.s, 0, Math.PI * 2);
+                    ctx.fill();
+                    d.y -= d.v;
+                    if(d.y < 0) d.y = canvas.height;
+                });
+                requestAnimationFrame(animate);
+            }
+
+            window.addEventListener('resize', init);
+            init(); animate();
+        </script>
+    </body>
+    </html>
