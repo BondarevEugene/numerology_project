@@ -1,300 +1,212 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-    <style>
-    /* Стили для редактора, чтобы он вписывался в наш темный дизайн */
-    .ql-toolbar { background: #eee !important; border-radius: 8px 8px 0 0; }
-    .ql-container { background: #111; color: #ccc; border-radius: 0 0 8px 8px; font-size: 1rem; min-height: 200px; }
-    .ql-editor img { max-width: 100%; height: auto; border: 1px solid var(--copper); margin: 10px 0; }
-    </style>
     <meta charset="UTF-8">
-    <title>Genesis | Matrix Terminal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lora&display=swap" rel="stylesheet">
+    <title>Genesis Admin | Sacred Control</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lora:ital,wght@0,400;0,700&display=swap" rel="stylesheet">
+    <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
     <style>
-        :root { --copper: #b08d57; --gold: #d4af37; --void: #060709; --glass: rgba(255, 255, 255, 0.03); --glow: rgba(176, 141, 87, 0.3); }
-        body { background: var(--void); color: #ccc; font-family: 'Lora', serif; margin: 0; }
+        :root { --gold: #d4af37; --copper: #b08d57; --void: #060709; --card-bg: #0c0e12; --text: #a0a0a0; }
 
+        body {
+            background: var(--void); color: var(--text); font-family: 'Lora', serif; margin: 0; overflow-x: hidden;
+            background-image: radial-gradient(circle at center, #11141a 0%, #060709 100%);
+        }
+
+        /* АНИМАЦИЯ ФОНА (ЧЕРНАЯ МАГИЯ) */
+        .magic-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.3; pointer-events: none; }
+
+        /* ВКЛАДКИ */
         .admin-nav {
-            background: rgba(12, 14, 18, 0.95); border-bottom: 1px solid var(--copper);
-            padding: 15px 40px; display: flex; justify-content: space-between; align-items: center;
-            position: sticky; top: 0; z-index: 100; backdrop-filter: blur(15px);
+            display: flex; justify-content: center; gap: 20px; padding: 30px;
+            background: rgba(0,0,0,0.5); border-bottom: 1px solid rgba(176,141,87,0.2);
+            backdrop-filter: blur(10px); sticky; top: 0; z-index: 100;
         }
-
-        h1 { font-family: 'Cinzel'; color: var(--copper); letter-spacing: 2px; font-size: 1.1rem; }
-
-        .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
-
-        /* TABS */
-        .tabs { display: flex; gap: 5px; margin-bottom: 30px; background: #0c0e12; padding: 5px; border-radius: 50px; border: 1px solid #222; width: fit-content; }
         .tab-btn {
-            padding: 10px 25px; background: none; border: none; color: #555;
-            font-family: 'Cinzel'; cursor: pointer; transition: 0.4s; border-radius: 50px;
+            background: transparent; border: 1px solid var(--copper); color: var(--copper);
+            padding: 12px 25px; cursor: pointer; font-family: 'Cinzel'; letter-spacing: 2px;
+            transition: 0.5s; position: relative; overflow: hidden;
         }
-        .tab-btn.active { background: var(--copper); color: var(--void); font-weight: bold; box-shadow: 0 0 15px var(--glow); }
+        .tab-btn:hover, .tab-btn.active { background: var(--copper); color: var(--void); box-shadow: 0 0 15px var(--copper); }
 
-        /* CARDS */
-        .edit-card {
-            background: var(--glass); border: 1px solid rgba(176, 141, 87, 0.1);
-            padding: 25px; margin-bottom: 25px; border-radius: 12px; transition: 0.3s;
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(176, 141, 87, 0.2);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+        .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; animation: fadeIn 1.5s ease; }
+
+        /* ЭФФЕКТЫ ПОЯВЛЕНИЯ */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .tab-content { display: none; animation: slideIn 0.6s ease-out; }
+        .tab-content.active { display: block; }
+        @keyframes slideIn { from { opacity: 0; filter: blur(10px); } to { opacity: 1; filter: blur(0); } }
+
+        /* КАРТОЧКИ РЕДАКТИРОВАНИЯ */
+        .card {
+            background: var(--card-bg); border: 1px solid rgba(176,141,87,0.1);
+            padding: 30px; margin-bottom: 30px; position: relative;
+            transition: 0.3s;
         }
-        /* Анимированный фон (плавающие сферы) */
-        body::before {
-        content: "";
-        position: fixed;
-        top: 0; left: 0; width: 100%; height: 100%;
-        background: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #060709 100%);
-        z-index: -1;
-    }
+        .card:hover { border-color: var(--copper); box-shadow: 0 0 30px rgba(176,141,87,0.05); }
+        h2, h3 { font-family: 'Cinzel'; color: var(--copper); letter-spacing: 3px; }
 
-        /* Красивый скроллбар */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #060709; }
-        ::-webkit-scrollbar-thumb { background: var(--copper); border-radius: 10px; }
-        /* ANALYTICS */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 15px; }
-        .stat-item { background: #0c0e12; border: 1px solid #1a1c20; padding: 20px; border-radius: 10px; text-align: center; }
-        .bar-bg { height: 4px; background: #111; border-radius: 10px; overflow: hidden; margin-top: 15px; }
-        .bar-fill { height: 100%; background: linear-gradient(90deg, var(--copper), var(--gold)); box-shadow: 0 0 10px var(--glow); transition: 1.5s ease-out; }
-
-        /* FORMS & BUTTONS */
-        .form-input { background: #111; border: 1px solid #333; color: white; width: 100%; padding: 12px; margin: 8px 0; border-radius: 6px; box-sizing: border-box; font-family: 'Lora'; }
-        .btn-action {
-            background: var(--copper); color: var(--void); border: none; padding: 12px 24px;
-            font-family: 'Cinzel'; cursor: pointer; border-radius: 4px; font-weight: bold; text-decoration: none; display: inline-block;
+        input, textarea {
+            background: transparent; border: none; border-bottom: 1px solid rgba(176,141,87,0.3);
+            color: #fff; width: 100%; padding: 12px 0; margin-bottom: 20px; font-family: 'Lora'; font-size: 1rem;
         }
-        .btn-action:hover { background: var(--gold); transform: translateY(-2px); box-shadow: 0 5px 15px var(--glow); }
+        input:focus { outline: none; border-bottom-color: var(--gold); }
 
-        #toast {
-            position: fixed; bottom: 30px; right: 30px; background: var(--gold); color: var(--void);
-            padding: 15px 30px; border-radius: 8px; font-family: 'Cinzel'; font-weight: bold;
-            transform: translateY(100px); opacity: 0; transition: 0.5s; z-index: 1000;
+        .btn-magic {
+            background: transparent; color: var(--gold); border: 1px solid var(--gold);
+            padding: 10px 30px; font-family: 'Cinzel'; cursor: pointer; transition: 0.4s;
         }
-        #toast.show { transform: translateY(0); opacity: 1; }
+        .btn-magic:hover { background: var(--gold); color: var(--void); box-shadow: 0 0 20px var(--gold); }
 
-        .history-table { width: 100%; border-collapse: collapse; }
-        .history-table th { color: var(--copper); font-family: 'Cinzel'; padding: 15px; text-align: left; border-bottom: 1px solid #222; font-size: 0.8rem; }
-        .history-table td { padding: 15px; border-bottom: 1px solid #111; font-size: 0.9rem; }
+        /* ТАБЛИЦА КЛИЕНТОВ */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { font-family: 'Cinzel'; color: var(--copper); padding: 15px; text-align: left; border-bottom: 2px solid var(--copper); }
+        td { padding: 15px; border-bottom: 1px solid rgba(176,141,87,0.1); }
+        .email-key { color: var(--gold); font-weight: bold; }
+
+        /* СТАТИСТИКА */
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .stat-item { background: rgba(176,141,87,0.05); padding: 30px; text-align: center; border: 1px solid rgba(176,141,87,0.1); }
+        .stat-num { font-size: 2.5rem; color: var(--gold); font-family: 'Cinzel'; display: block; }
+
+        /* ПУЛЬСИРУЮЩАЯ ПЕЧАТЬ ПРИ ЗАГРУЗКЕ */
+        #magic-loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--void);
+            display: flex; justify-content: center; align-items: center; z-index: 1000; transition: 0.8s;
+        }
+        .seal { width: 100px; height: 100px; border: 2px solid var(--copper); border-radius: 50%; display: flex; justify-content: center; align-items: center; animation: rotateSeal 10s linear infinite; }
+        .seal::after { content: "✺"; color: var(--copper); font-size: 3rem; }
+        @keyframes rotateSeal { from { transform: rotate(0deg); box-shadow: 0 0 20px var(--copper); } to { transform: rotate(360deg); box-shadow: 0 0 60px var(--gold); } }
     </style>
 </head>
-<body>
+<body onload="hideLoader()">
 
-    <div id="toast">Matrix Successfully Updated</div>
+    <div id="magic-loader"><div class="seal"></div></div>
+
+    <canvas class="magic-bg" id="particles"></canvas>
 
     <nav class="admin-nav">
-        <h1>[ GENESIS_CONTROL_v3 ]</h1>
-        <div style="display: flex; gap: 15px;">
-            <a href="/admin/export-csv" class="btn-action" style="font-size: 0.7rem; padding: 8px 15px;">↓ CSV EXPORT</a>
-            <a href="/" style="color: #555; text-decoration: none; font-family: 'Cinzel'; font-size: 0.8rem; padding-top: 8px;">[ EXIT ]</a>
-        </div>
+        <button class="tab-btn active" onclick="showTab('arch')">Архетипы</button>
+        <button class="tab-btn" onclick="showTab('prof')">Mapping</button>
+        <button class="tab-btn" onclick="showTab('users')">Клиенты</button>
+        <button class="tab-btn" onclick="showTab('stats')">Статистика</button>
     </nav>
 
     <div class="container">
-        <div class="tabs">
-            <button class="tab-btn active" onclick="showTab('history')">LOGS</button>
-            <button class="tab-btn" onclick="showTab('stats')">STATS</button>
-            <button class="tab-btn" onclick="showTab('archetypes')">TEXTS</button>
-            <button class="tab-btn" onclick="showTab('profs')">PROFS</button>
-        </div>
 
-        <div id="history" class="tab-content">
-            <div class="edit-card">
-                <table class="history-table">
-                    <thead><tr><th>Temporal</th><th>Subject</th><th>Code</th><th>Action</th></tr></thead>
-                    <tbody>
-                        {% for r in records %}
-                        <tr>
-                            <td>{{ r.created_at.strftime('%H:%M | %d.%m') }}</td>
-                            <td style="color: var(--gold);">{{ r.name }}</td>
-                            <td><span style="color: var(--copper);">#{{ r.archetype }}</span></td>
-                            <td>
-                                <form action="/admin/delete-record/{{ r.id }}" method="POST" onsubmit="return confirm('Erase?');">
-                                    <button type="submit" style="background:none; border:none; color:#444; cursor:pointer; font-family:Cinzel; font-size: 0.7rem;">[ DESTROY ]</button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+        <div id="arch" class="tab-content active">
+            <h2>Редактирование Знаний</h2>
+            {% for item in archetypes %}
+            <div class="card">
+                <h3>Код {{ item.number }}</h3>
+                <form action="/admin/edit/arch/{{ item.id }}" method="POST">
+                    <input type="text" name="title" value="{{ item.title }}" placeholder="Заголовок">
+                    <textarea name="full_text_html" id="ed_{{ item.id }}">{{ item.full_text | safe }}</textarea>
+                    <button type="submit" class="btn-magic">Запечатать изменения</button>
+                </form>
+                <script>CKEDITOR.replace('ed_{{ item.id }}');</script>
             </div>
+            {% endfor %}
         </div>
 
-        <div id="stats" class="tab-content" style="display:none;">
-            <div class="stats-grid">
-                {% for n in range(1, 10) %}
-                {% set count = stats.get(n|string, 0) %}
-                <div class="stat-item">
-                    <div style="font-family: Cinzel; color: var(--gold); font-size: 1.5rem;">#{{ n }}</div>
-                    <div style="font-size: 0.7rem; color: #555;">{{ count }} REQS</div>
-                    <div class="bar-bg"><div class="bar-fill" style="width: {{ count * 10 }}%;"></div></div>
+        <div id="prof" class="tab-content">
+            <h2>Матрица Профессий</h2>
+            {% for prof in profs %}
+            <div class="card" style="display: flex; align-items: center; gap: 30px;">
+                <span style="font-family: 'Cinzel'; font-size: 1.5rem; color: var(--gold);">{{ prof.number }}</span>
+                <form action="/admin/edit/prof/{{ prof.id }}" method="POST" style="flex-grow: 1; display: flex; gap: 20px;">
+                    <input type="text" name="list_csv" value="{{ prof.list_csv }}" style="margin: 0;">
+                    <button type="submit" class="btn-magic">Save</button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div id="users" class="tab-content">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2>Свитки Искателей</h2>
+                <a href="/admin/export-csv" class="btn-magic" style="text-decoration: none;">Экспорт Душ (CSV)</a>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Дата</th>
+                        <th>Имя</th>
+                        <th>Email (Ключ)</th>
+                        <th>Код</th>
+                        <th>Удаление</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in records %}
+                    <tr>
+                        <td>{{ record.created_at.strftime('%d.%m.%Y') }}</td>
+                        <td>{{ record.name }}</td>
+                        <td class="email-key">{{ record.email }}</td>
+                        <td>{{ record.archetype }}</td>
+                        <td>
+                            <form action="/admin/delete-record/{{ record.id }}" method="POST">
+                                <button type="submit" style="background:none; border:none; color:red; cursor:pointer;">✕</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div id="stats" class="tab-content">
+            <h2>Вибрации Поля</h2>
+            <div class="stat-grid">
+                <div class="stat-item"><span class="stat-num">{{ records|length }}</span>Анализов проведено</div>
+                <div class="stat-item"><span class="stat-num">{{ stats|length }}</span>Активных кодов</div>
+            </div>
+            <div style="margin-top: 40px;">
+                {% for code, count in stats.items() %}
+                <div style="margin-bottom: 15px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span>Аркан {{ code }}</span>
+                        <span>{{ count }} проявлений</span>
+                    </div>
+                    <div style="height: 4px; background: rgba(176,141,87,0.1); width: 100%;">
+                        <div style="height: 100%; background: var(--copper); width: {{ (count / records|length * 100)|round }}%; box-shadow: 0 0 10px var(--copper);"></div>
+                    </div>
                 </div>
                 {% endfor %}
             </div>
         </div>
 
-        <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-
-<div id="archetypes" class="tab-content" style="display:none;">
-    {% for a in archetypes %}
-    <div class="edit-card">
-        <form id="form-arch-{{ a.id }}" onsubmit="saveRichData(event, 'arch', {{ a.id }})">
-            <h3 style="font-family:Cinzel; color:var(--gold);">Archetype #{{ a.number }}</h3>
-            <input type="text" name="title" class="form-input" value="{{ a.title }}" style="margin-bottom:10px; background:#000; color:#fff; border:1px solid #333;">
-
-            <div id="editor-{{ a.id }}" style="height: 300px; background: #fff; color: #000; border-radius: 4px;">
-                {{ a.full_text | safe }}
-            </div>
-
-            <input type="hidden" name="full_text_html" id="hidden-{{ a.id }}">
-
-            <button type="submit" class="btn-action" style="margin-top:15px;">COMMIT CHANGES</button>
-        </form>
-    </div>
-    {% endfor %}
-</div>
-
-<script>
-    // 1. Инициализация всех редакторов
-    const quillInstances = {};
-
-    document.querySelectorAll('[id^="editor-"]').forEach(el => {
-        const id = el.id.split('-')[1];
-        quillInstances[id] = new Quill('#' + el.id, {
-            theme: 'snow',
-            modules: {
-                toolbar: [
-                    [{ 'header': [1, 2, false] }],
-                    ['bold', 'italic', 'underline'],
-                    ['image', 'link'], // Вот тут кнопка КАРТИНКИ
-                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                    ['clean']
-                ]
-            }
-        });
-    });
-
-async function saveRichData(event, type, id) {
-    event.preventDefault();
-    const form = event.target;
-
-    // 1. Берем инстанс редактора
-    const quill = quillInstances[id];
-    // 2. Берем скрытое поле
-    const hiddenInput = document.getElementById('hidden-' + id);
-
-    // 3. ПЕРЕНОСИМ ДАННЫЕ (Самый важный момент)
-    const htmlContent = quill.root.innerHTML;
-    hiddenInput.value = htmlContent;
-
-    console.log("Отправка данных для ID:", id); // Для отладки в консоли (F12)
-
-    const formData = new FormData(form);
-
-    try {
-        const response = await fetch(`/admin/edit/${type}/${id}`, {
-            method: 'POST',
-            body: formData
-        });
-
-        if (response.ok) {
-            const toast = document.getElementById('toast');
-            toast.innerText = "Matrix Synchronized (Content Saved)";
-            toast.style.background = "#d4af37"; // Золотой цвет успеха
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
-        } else {
-            alert("Ошибка сервера при сохранении");
-        }
-    } catch (err) {
-        console.error("Ошибка сети:", err);
-        alert("Ошибка сети. Возможно, картинка слишком тяжелая.");
-    }
-}
-    // Функция для обычных вкладок (переключение)
-    function showTab(id) {
-        document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(id).style.display = 'block';
-        event.currentTarget.classList.add('active');
-    }
-</script>
-
-        <div id="profs" class="tab-content" style="display:none;">
-            {% for p in profs %}
-            <div class="edit-card">
-                <form onsubmit="saveData(event, 'prof', {{ p.id }})">
-                    <h3 style="font-family:Cinzel; color:var(--gold);">Vectors for {{ p.number }}</h3>
-                    <input type="text" name="list_csv" class="form-input" value="{{ p.list_csv }}">
-                    <button type="submit" class="btn-action">SAVE VECTORS</button>
-                </form>
-            </div>
-            {% endfor %}
-        </div>
     </div>
 
     <script>
-        function showTab(id) {
-            document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+        function hideLoader() { document.getElementById('magic-loader').style.opacity = '0'; setTimeout(() => { document.getElementById('magic-loader').style.display = 'none'; }, 800); }
+
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(id).style.display = 'block';
+            document.getElementById(tabId).classList.add('active');
             event.currentTarget.classList.add('active');
         }
 
-        async function saveData(event, type, id) {
-            event.preventDefault();
-            const formData = new FormData(event.target);
-            await fetch(`/admin/edit/${type}/${id}`, { method: 'POST', body: formData });
-            const toast = document.getElementById('toast');
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
-    // Инициализация редакторов для каждого архетипа
-const editors = {};
+        // КАНВАС ЧАСТИЦ (МЕРЦАНИЕ)
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+        let dots = [];
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
 
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.quill-editor').forEach(container => {
-        const id = container.id.split('-')[1];
-        editors[id] = new Quill(`#${container.id}`, {
-            theme: 'snow',
-            modules: {
-                toolbar: [
-                    [{ 'header': [1, 2, 3, false] }],
-                    ['bold', 'italic', 'underline'],
-                    ['link', 'image', 'video'], // Добавляем поддержку картинок и видео
-                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                    ['clean']
-                ]
-            }
-        });
-    });
-});
-
-async function saveRichData(event, type, id) {
-    event.preventDefault();
-    const form = event.target;
-
-    // Записываем HTML из редактора в скрытое поле
-    const hiddenInput = document.getElementById(`hidden-${id}`);
-    hiddenInput.value = editors[id].root.innerHTML;
-
-    const formData = new FormData(form);
-    const response = await fetch(`/admin/edit/${type}/${id}`, {
-        method: 'POST',
-        body: formData
-    });
-
-    if (response.ok) {
-        const toast = document.getElementById('toast');
-        toast.innerText = "Matrix Content Synchronized";
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 3000);
-    }
-}    }
+        for(let i=0; i<80; i++) { dots.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, r: Math.random()*2, d: Math.random()*1 }); }
+        function draw() {
+            ctx.clearRect(0,0,canvas.width, canvas.height);
+            ctx.fillStyle = "rgba(176, 141, 87, 0.3)";
+            dots.forEach(p => {
+                ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
+                p.y -= p.d; if(p.y < 0) p.y = canvas.height;
+            });
+            requestAnimationFrame(draw);
+        }
+        draw();
     </script>
 </body>
 </html>
