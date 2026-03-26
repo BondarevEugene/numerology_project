@@ -4,7 +4,6 @@ import pdfkit
 from datetime import datetime
 from flask import Flask, render_template, request, send_file
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import func
 
 # --- ИМПОРТ ДОПОЛНИТЕЛЬНЫХ ДАННЫХ ---
 try:
@@ -37,12 +36,12 @@ class ArchetypeContent(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     number = db.Column(db.String(5), unique=True, nullable=False)
     title = db.Column(db.String(200))
+    # ДОБАВЛЕННЫЕ ПОЛЯ:
     power_vector = db.Column(db.Text)
-    shadow_trap = db.Column(db.Text)
+    shadow_side = db.Column(db.Text)
     growth_point = db.Column(db.Text)
-    # ----------------------
+    # ОСТАЛЬНЫЕ ПОЛЯ:
     full_text = db.Column(db.Text)
-    shadow_side = db.Column(db.Text) # Можно использовать shadow_trap вместо него, если хочешь
     partner_type = db.Column(db.String(255))
     avoid_spheres = db.Column(db.Text)
 
@@ -64,53 +63,6 @@ class AnalysisRecord(db.Model):
 
 
 # --- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ---
-def calculate_compatibility_score(matrix1, matrix2):
-    if not matrix1 or not matrix2: return None
-    score, details, areas = 0, [], []
-
-    # 1. Энергия (2-5-8)
-    e1 = matrix1['2'] + matrix1['5'] + matrix1['8']
-    e2 = matrix2['2'] + matrix2['5'] + matrix2['8']
-    if abs(e1 - e2) <= 1:
-        score += 35
-        details.append("Высокий энергетический резонанс.")
-    else:
-        score += 15
-        areas.append("Энергия")
-        details.append("Разный темп жизни: требуется подстройка.")
-
-    # 2. Быт (3-6-9)
-    s1 = matrix1['3'] + matrix1['6'] + matrix1['9']
-    s2 = matrix2['3'] + matrix2['6'] + matrix2['9']
-    if (s1 + s2) >= 6:
-        score += 35
-        details.append("Сильный материальный фундамент.")
-    else:
-        score += 20
-        areas.append("Быт")
-        details.append("Союз на почве идей, а не быта.")
-
-    # 3. Духовность (1-4-7)
-    sp1 = matrix1['1'] + matrix1['4'] + matrix1['7']
-    sp2 = matrix2['1'] + matrix2['4'] + matrix2['7']
-    if abs(sp1 - sp2) <= 2:
-        score += 30; details.append("Единство жизненных целей.")
-    else:
-        areas.append("Цели")
-
-    final_score = min(score, 100)
-    advice = None
-    if final_score < 50:
-        a_map = {
-            "Энергия": "Чаще отдыхайте порознь, чтобы не перегружать друг друга.",
-            "Быт": "Делегируйте домашние дела, чтобы избежать конфликтов.",
-            "Цели": "Сформулируйте общую миссию, которая выше личных амбиций."
-        }
-        advice = f"Оптимизация: {a_map.get(areas[0] if areas else 'Энергия')}"
-
-    return {"percent": final_score, "notes": details, "harmony_advice": advice}
-
-
 def calculate_digit(n):
     try:
         s = sum(int(d) for d in str(n) if d.isdigit())
@@ -147,47 +99,28 @@ def get_detailed_interpretation(matrix):
     return [f"<b>{n}:</b> {meanings[n][c]}" for n, c in matrix.items() if c in meanings[n]]
 
 
-def get_real_jobs(keyword):
-    try:
-        url = f"https://api.hh.ru/vacancies?text={keyword}&per_page=3"
-        r = requests.get(url, headers={'User-Agent': 'Genesis'}, timeout=5)
-        if r.status_code == 200:
-            return [{'title': i['name'], 'salary': 'По договоренности', 'url': i['alternate_url'],
-                     'employer': i['employer']['name']} for i in r.json().get('items', [])]
-    except:
-        pass
-    return []
-
-
 # --- PDF GENERATOR ---
-def create_pdf_report(name, result, professions, extras, compatibility, pif_report, synergy=None):
-    prof_list = professions.split(',') if professions else []
+def create_pdf_report(name, result, professions, extras, pif_report):
     pif_html = f"<h3>Психоматрица</h3><ul>{''.join([f'<li>{l}</li>' for l in pif_report])}</ul>" if pif_report else ""
-
-    synergy_html = ""
-    if synergy:
-        color = "#00c851" if synergy['percent'] >= 50 else "#ff4444"
-        synergy_html = f"""
-        <div style="border: 2px solid {color}; padding: 20px; margin-top: 30px; border-radius: 10px; background: #0c0e12;">
-            <h3 style="color: {color}; margin-top: 0;">СИНЕРГИЯ ПАРЫ: {synergy['percent']}%</h3>
-            <ul>{"".join([f"<li>{n}</li>" for n in synergy['notes']])}</ul>
-            {f'<p style="font-style: italic; color: #fff;">{synergy["harmony_advice"]}</p>' if synergy.get('harmony_advice') else ''}
-        </div>
-        """
 
     html = f"""
     <html><head><meta charset="UTF-8"><style>
         body {{ background: #060709; color: #a0a0a0; font-family: 'DejaVu Sans', sans-serif; padding: 40px; }}
         .title {{ color: #d4af37; font-size: 28px; text-align: center; text-transform: uppercase; }}
         .box {{ padding: 15px; border-radius: 5px; margin: 15px 0; background: #0c0e12; border-left: 4px solid #d4af37; }}
+        .gold {{ color: #d4af37; font-weight: bold; }}
     </style></head><body>
         <div class="title">{result.title if result else "Genesis Report"}</div>
-        <p style="text-align:center;">Для: {name}</p>
+        <p style="text-align:center;">Identity: {name}</p>
+        <div class="box">
+            <span class="gold">Power Vector:</span> {result.power_vector if result else "-"}<br>
+            <span class="gold">Shadow Side:</span> {result.shadow_side if result else "-"}<br>
+            <span class="gold">Growth Point:</span> {result.growth_point if result else "-"}
+        </div>
         <div class="box">Аркан: {extras.get('arcane', '-')} | Стихия: {extras.get('element', '-')}</div>
         <div>{result.full_text if result else ""}</div>
         {pif_html}
-        {synergy_html}
-        <p><b>Сферы:</b> {", ".join(prof_list)}</p>
+        <p><b>Рекомендуемые сферы:</b> {professions}</p>
     </body></html>
     """
     fname = f"Genesis_{name.replace(' ', '_')}.pdf"
@@ -203,13 +136,13 @@ def create_pdf_report(name, result, professions, extras, compatibility, pif_repo
 # --- МАРШРУТЫ ---
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    data = {'result': None, 'professions': None, 'extras': None, 'compatibility': None,
-            'pif_matrix': None, 'real_jobs': [], 'pdf_file': None, 'pif_full_report': [], 'synergy': None}
+    data = {'result': None, 'professions': None, 'extras': None, 'pif_matrix': None, 'pdf_file': None,
+            'pif_full_report': []}
 
     if request.method == 'POST':
-        name, email = request.form.get('name'), request.form.get('email')
+        name = request.form.get('name')
+        email = request.form.get('email')
         d, m, y = request.form.get('day'), request.form.get('month'), request.form.get('year')
-        pd, pm, py = request.form.get('p_day'), request.form.get('p_month'), request.form.get('p_year')
 
         if d and m and y:
             a_num = str(calculate_digit(d))
@@ -219,42 +152,20 @@ def index():
             u_date = f"{d.zfill(2)}{m.zfill(2)}{y}"
             matrix = calculate_pythagoras(u_date)
             report = get_detailed_interpretation(matrix)
-
-            # Расчет партнера
-            syn = None
-            if pd and pm and py:
-                p_matrix = calculate_pythagoras(f"{pd.zfill(2)}{pm.zfill(2)}{py}")
-                syn = calculate_compatibility_score(matrix, p_matrix)
-
-            num = int(a_num)
-            comp = {"perfect": f"{(num + 2) % 9 + 1}, {(num + 5) % 9 + 1}", "challenge": str((num + 3) % 9 + 1),
-                    "partner_desc": res.partner_type if res else "-"}
             p_str = p_cont.list_csv if p_cont else "Специалист"
 
-            # PDF (теперь передаем syn)
-            pdf = create_pdf_report(name, res, p_str, ARCHETYPE_EXTRAS.get(a_num, {}), comp, report, synergy=syn)
+            pdf = create_pdf_report(name, res, p_str, ARCHETYPE_EXTRAS.get(a_num, {}), report)
 
             db.session.add(
                 AnalysisRecord(name=name, email=email, birth_date=f"{d}-{m}-{y}", archetype=a_num, professions=p_str))
             db.session.commit()
 
-            data.update({'result': res, 'professions': p_str, 'extras': ARCHETYPE_EXTRAS.get(a_num, {}),
-                         'compatibility': comp, 'pif_matrix': matrix, 'real_jobs': get_real_jobs(p_str.split(',')[0]),
-                         'pdf_file': pdf, 'pif_full_report': report, 'synergy': syn})
+            data.update(
+                {'result': res, 'professions': p_str, 'extras': ARCHETYPE_EXTRAS.get(a_num, {}), 'pif_matrix': matrix,
+                 'pdf_file': pdf, 'pif_full_report': report})
 
     return render_template('index.html', **data)
-@app.route('/admin/edit/<type>/<int:id>', methods=['POST'])
-def quick_edit(type, id):
-    if type == 'arch':
-        item = db.session.get(ArchetypeContent, id)
-        item.title = request.form.get('title')
-        item.full_text = request.form.get('full_text_html')
-        # Новые поля
-        item.power_vector = request.form.get('power_vector')
-        item.shadow_trap = request.form.get('shadow_trap')
-        item.growth_point = request.form.get('growth_point')
-        db.session.commit()
-    return "OK", 200
+
 
 @app.route('/download/<filename>')
 def download(filename):
