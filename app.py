@@ -240,7 +240,18 @@ def index():
                          'pdf_file': pdf, 'pif_full_report': report, 'synergy': syn})
 
     return render_template('index.html', **data)
-
+@app.route('/admin/edit/<type>/<int:id>', methods=['POST'])
+def quick_edit(type, id):
+    if type == 'arch':
+        item = db.session.get(ArchetypeContent, id)
+        item.title = request.form.get('title')
+        item.full_text = request.form.get('full_text_html')
+        # Новые поля
+        item.power_vector = request.form.get('power_vector')
+        item.shadow_trap = request.form.get('shadow_trap')
+        item.growth_point = request.form.get('growth_point')
+        db.session.commit()
+    return "OK", 200
 
 @app.route('/download/<filename>')
 def download(filename):
