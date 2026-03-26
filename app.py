@@ -33,12 +33,10 @@ except:
 
 
 # --- МОДЕЛИ ДАННЫХ ---
-# --- МОДЕЛИ ДАННЫХ ---
 class ArchetypeContent(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     number = db.Column(db.String(5), unique=True, nullable=False)
     title = db.Column(db.String(200))
-    # ДОБАВЬ ЭТИ ТРИ СТРОКИ:
     power_vector = db.Column(db.Text)
     shadow_trap = db.Column(db.Text)
     growth_point = db.Column(db.Text)
