@@ -1,4 +1,6 @@
 import os
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
 from flask import Flask, render_template, request, jsonify, send_file
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
