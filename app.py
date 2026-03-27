@@ -32,6 +32,10 @@ class ArchetypeContent(db.Model):
     dharma = db.Column(db.Text)
     cycle = db.Column(db.Text)
     karmic_tasks = db.Column(db.Text)
+    # --- ДОБАВЛЯЕМ ЭТИ ПОЛЯ, ЧТОБЫ СОХРАНИТЬ ДАННЫЕ ИЗ СКРИПТА ---
+    full_text = db.Column(db.Text)  # Чтобы не было ошибки 'full_text'
+    shadow_side = db.Column(db.Text)  # Чтобы не было ошибки 'shadow_side'
+    avoid_spheres = db.Column(db.Text)  # Чтобы не было ошибки 'avoid_spheres'
 
 
 # --- ЛОГИКА РАСЧЕТОВ ---
@@ -60,6 +64,13 @@ def calculate_pythagoras(date_str):
     n4 = sum(int(d) for d in str(n3))
     all_num = "".join(map(str, digits)) + str(n1) + str(n2) + str(n3) + str(n4)
     return {str(i): (str(i) * all_num.count(str(i))) if all_num.count(str(i)) > 0 else "---" for i in range(1, 10)}
+
+
+class ProfessionContent(db.Model):
+    __tablename__ = 'profession_content'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200))
+    description = db.Column(db.Text)
 
 
 def get_personal_day_number(d, m):
