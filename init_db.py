@@ -1,4 +1,4 @@
-from app import app, db, ArchetypeContent, ProfessionContent
+from app import app, db, ArchetypeContent
 
 
 def seed_database():
