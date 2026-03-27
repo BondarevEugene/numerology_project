@@ -1,260 +1,161 @@
 import os
-import requests
-from fpdf import FPDF
-from datetime import datetime
-from flask import Flask, render_template, request, send_file
+from flask import Flask, render_template, request, jsonify, send_file
 from flask_sqlalchemy import SQLAlchemy
-
-# --- ИМПОРТ ДОПОЛНИТЕЛЬНЫХ ДАННЫХ ---
-try:
-    from data import ARCHETYPE_EXTRAS
-except ImportError:
-    ARCHETYPE_EXTRAS = {}
+from datetime import datetime
+from io import BytesIO
+from reportlab.pdfgen import canvas
 
 app = Flask(__name__)
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 basedir = os.path.abspath(os.path.dirname(__file__))
+# Используем твою новую базу v2
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'genesis_v2.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
 db = SQLAlchemy(app)
 
 
-# --- МОДЕЛИ ДАННЫХ ---
+# --- МОДЕЛЬ ДАННЫХ (ВСЕ ТВОИ ПОЛЯ) ---
 class ArchetypeContent(db.Model):
+    __tablename__ = 'archetype_content'
     id = db.Column(db.Integer, primary_key=True)
-    number = db.Column(db.String(5), unique=True, nullable=False)
+    number = db.Column(db.String(10), unique=True)  # Группа (1-9)
     title = db.Column(db.String(200))
+    planet = db.Column(db.String(100))
+    mind_power = db.Column(db.Text)
+    action_power = db.Column(db.Text)
+    realization = db.Column(db.Text)
+    life_result = db.Column(db.Text)
     power_vector = db.Column(db.Text)
-    shadow_side = db.Column(db.Text)
+    shadow_trap = db.Column(db.Text)
     growth_point = db.Column(db.Text)
-    full_text = db.Column(db.Text)
-    partner_type = db.Column(db.String(255))
-    avoid_spheres = db.Column(db.Text)
+    dharma = db.Column(db.Text)
+    cycle = db.Column(db.Text)
+    karmic_tasks = db.Column(db.Text)
 
 
-class ProfessionContent(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    number = db.Column(db.String(5), unique=True, nullable=False)
-    list_csv = db.Column(db.Text)
-
-
-class AnalysisRecord(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100))
-    email = db.Column(db.String(100))
-    birth_date = db.Column(db.String(20))
-    archetype = db.Column(db.String(10))
-    professions = db.Column(db.Text)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-
-# --- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ---
-
-def get_detailed_interpretation(matrix):
-    """Генерирует текстовое описание для каждого сектора психоматрицы"""
-    if not matrix: return []
-
-    meanings = {
-        '1': {
-            0: "Отсутствие проявленной воли, ведомость.",
-            1: "Характер утонченный, эгоцентричный. Требуется внимание.",
-            2: "Мягкий, покладистый характер, золотая середина.",
-            3: "Устойчивая психика, умение убеждать.",
-            4: "Сильная воля, задатки лидера и руководителя.",
-            5: "Диктаторский характер, жесткая волевая позиция.",
-            6: "Перегрузка воли, возможна деспотичность."
-        },
-        '2': {
-            0: "Энергодефицит. Склонность к лени и быстрой усталости.",
-            1: "Мало собственной энергии, возможна эмоциональная нестабильность.",
-            2: "Норма энергии для жизни и общения.",
-            3: "Способности к экстрасенсорике, высокая чувствительность.",
-            4: "Избыток энергии, природный донор.",
-            5: "Энергетический магнетизм, мощное влияние на людей."
-        },
-        '3': {
-            0: "Гуманитарий, чистое творчество без системности.",
-            1: "Интерес к искусству и порядку, но без фанатизма.",
-            2: "Склонность к точным наукам и глубокому анализу.",
-            3: "Ученый, технарь, мастер логических цепочек.",
-            4: "Энциклопедические знания, гениальность в деталях."
-        },
-        '4': {
-            0: "Здоровье слабое от рождения, нужно укреплять.",
-            1: "Среднее здоровье, склонность к простудам.",
-            2: "Крепкое тело, хорошая выносливость.",
-            3: "Очень крепкое здоровье, атлетическое сложение.",
-            4: "Запредельный физический потенциал."
-        },
-        '5': {
-            0: "Интуиция закрыта, опора только на голые факты.",
-            1: "Хорошее чутье, канал интуиции открыт.",
-            2: "Сильная интуиция, вещие сны, предчувствия.",
-            3: "Провидец, почти не совершает ошибок в выборе.",
-            4: "Ясновидение, прямой доступ к информационному полю."
-        },
-        '6': {
-            0: "Физический труд не в приоритете, упор на интеллект.",
-            1: "Склонность к заземленному труду.",
-            2: "Мастер на все руки, золотые руки.",
-            3: "Труд как смысл жизни, высокий профессионализм.",
-            4: "Трудоголизм, полное погружение в материальный мир."
-        },
-        '7': {
-            0: "Путь через препятствия, всё достигается своим трудом.",
-            1: "Есть Божья искра, небольшое везение в делах.",
-            2: "Везунчик, удача сопутствует в рискованных делах.",
-            3: "Человек под особой защитой Высших сил.",
-            4: "Магнит для чудес, невероятная удачливость."
-        },
-        '8': {
-            0: "Свобода от кармических обязательств перед родом.",
-            1: "Развитое чувство долга и ответственности.",
-            2: "Прирожденное служение людям, доброта.",
-            3: "Большая кармическая ответственность, миссия.",
-            4: "Глобальное влияние на судьбы людей."
-        },
-        '9': {
-            0: "Слабая память, трудности с концентрацией.",
-            1: "Средние умственные способности, нужно развивать.",
-            2: "Сильный интеллект, отличная память.",
-            3: "Мудрость, проницательность, талант к обучению.",
-            4: "Гениальный ум, доступ к скрытым знаниям."
-        }
+# --- ЛОГИКА РАСЧЕТОВ ---
+def get_group_leader(d_str):
+    mapping = {
+        "1": "1", "10": "1", "19": "1", "28": "1",
+        "2": "2", "11": "2", "20": "2", "29": "2",
+        "3": "3", "12": "3", "21": "3", "30": "3",
+        "4": "4", "13": "4", "22": "4", "31": "4",
+        "5": "5", "14": "5", "23": "5",
+        "6": "6", "15": "6", "24": "6",
+        "7": "7", "16": "7", "25": "7",
+        "8": "8", "17": "8", "26": "8",
+        "9": "9", "18": "9", "27": "9"
     }
-
-    report = []
-    # Проходим по всем цифрам от 1 до 9
-    for i in range(1, 10):
-        key = str(i)
-        count = matrix.get(key, 0)
-
-        # Берем описание из словаря или ставим заглушку
-        desc = meanings.get(key, {}).get(count, "Интерпретация в процессе настройки...")
-
-        # Форматируем для HTML (названия секторов)
-        sector_names = {
-            '1': 'Характер', '2': 'Энергия', '3': 'Познание',
-            '4': 'Здоровье', '5': 'Интуиция', '6': 'Труд',
-            '7': 'Удача', '8': 'Долг', '9': 'Память'
-        }
-        name = sector_names.get(key, key)
-        report.append(f"<b>{name}:</b> {desc}")
-
-    return report
-
-
-def create_pdf_report(name, result, professions, extras, pif_report):
-    """Генерация PDF через fpdf2 (без wkhtmltopdf)"""
-    try:
-        pdf = FPDF()
-        pdf.add_page()
-        # Стандартный шрифт (Кириллица может не отображаться без добавления .ttf файла,
-        # поэтому для стабильности деплоя пишем базовую информацию)
-        pdf.set_font("Arial", 'B', 16)
-        pdf.cell(190, 10, txt="GENESIS ANALYSIS REPORT", ln=True, align='C')
-        pdf.set_font("Arial", size=12)
-        pdf.ln(10)
-        pdf.cell(190, 10, txt=f"Identity: {name}", ln=True)
-        pdf.cell(190, 10, txt=f"Archetype: {result.title if result else 'Unknown'}", ln=True)
-        pdf.ln(5)
-        pdf.multi_cell(190, 10, txt=f"Professions: {professions}")
-
-        fname = f"Genesis_{name.replace(' ', '_')}.pdf"
-        pdf.output(fname)
-        return fname
-    except Exception as e:
-        print(f"PDF Error: {e}")
-        return None
-
-
-def calculate_compatibility_score(matrix1, matrix2):
-    if not matrix1 or not matrix2: return None
-    score = 50
-    # Упрощенная логика для стабильности
-    details = ["Энергетическая настройка в процессе.", "Резонанс по базовым частотам."]
-    return {"percent": score, "notes": details, "harmony_advice": "Синхронизируйте общие цели."}
-
-
-def get_real_jobs(keyword):
-    try:
-        url = f"https://api.hh.ru/vacancies?text={keyword}&per_page=3"
-        r = requests.get(url, headers={'User-Agent': 'Genesis'}, timeout=5)
-        if r.status_code == 200:
-            return [{'title': i['name'], 'url': i['alternate_url'], 'employer': i['employer']['name']} for i in
-                    r.json().get('items', [])]
-    except:
-        pass
-    return []
-
-
-def calculate_digit(n):
-    try:
-        s = sum(int(d) for d in str(n) if d.isdigit())
-        return s if s <= 9 else calculate_digit(s)
-    except:
-        return 1
+    return mapping.get(str(d_str), "1")
 
 
 def calculate_pythagoras(date_str):
-    digits = [int(d) for d in str(date_str) if d.isdigit()]
-    if not digits: return None
+    digits = [int(d) for d in date_str if d.isdigit()]
+    if not digits: return {}
     n1 = sum(digits)
     n2 = sum(int(d) for d in str(n1))
-    first = digits[0] if digits[0] != '0' else digits[1]
-    n3 = abs(n1 - (2 * int(first)))
+    first = digits[0] if digits[0] != 0 else (digits[1] if len(digits) > 1 else 0)
+    n3 = abs(n1 - (2 * first))
     n4 = sum(int(d) for d in str(n3))
     all_num = "".join(map(str, digits)) + str(n1) + str(n2) + str(n3) + str(n4)
-    return {str(i): all_num.count(str(i)) for i in range(1, 10)}
+    return {str(i): (str(i) * all_num.count(str(i))) if all_num.count(str(i)) > 0 else "---" for i in range(1, 10)}
+
+
+def get_personal_day_number(d, m):
+    today = datetime.now()
+    total = int(d) + int(m) + today.day + today.month + today.year
+    while total > 9: total = sum(int(digit) for digit in str(total))
+    return total
 
 
 # --- МАРШРУТЫ ---
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    data = {'result': None, 'professions': None, 'extras': None, 'pif_matrix': None,
-            'pif_full_report': [], 'compatibility': None, 'pdf_file': None, 'real_jobs': [], 'synergy': None}
+    result = None
+    matrix_raw = {}
+    day_advice = None
 
     if request.method == 'POST':
-        name = request.form.get('name')
-        email = request.form.get('email')
-        d, m, y = request.form.get('day'), request.form.get('month'), request.form.get('year')
-        pd, pm, py = request.form.get('p_day'), request.form.get('p_month'), request.form.get('p_year')
+        d = request.form.get('day')
+        m = request.form.get('month')
+        y = request.form.get('year')
 
         if d and m and y:
-            a_num = str(calculate_digit(d))
-            res = ArchetypeContent.query.filter_by(number=a_num).first()
-            p_cont = ProfessionContent.query.filter_by(number=a_num).first()
+            leader = get_group_leader(d)
+            content = ArchetypeContent.query.filter_by(number=leader).first()
 
-            matrix = calculate_pythagoras(f"{d.zfill(2)}{m.zfill(2)}{y}")
-            report = get_detailed_interpretation(matrix)
-            p_str = p_cont.list_csv if p_cont else "Консультант, Аналитик"
-            jobs = get_real_jobs(p_str.split(',')[0])
+            # Собираем данные для отображения
+            if content:
+                result = {
+                    'number': leader,
+                    'title': content.title or f"Архетип {leader}",
+                    'planet': content.planet,
+                    'mind_power': content.mind_power,
+                    'action_power': content.action_power,
+                    'realization': content.realization,
+                    'life_result': content.life_result,
+                    'power_vector': content.power_vector,
+                    'shadow_trap': content.shadow_trap,
+                    'growth_point': content.growth_point,
+                    'dharma': content.dharma,
+                    'cycle': content.cycle,
+                    'karmic_tasks': content.karmic_tasks
+                }
+            else:
+                # Если в базе нет данных, создаем пустой объект, чтобы не было ошибок в шаблоне
+                result = {'number': leader, 'title': f"Архетип {leader} (Данные не заполнены)"}
 
-            comp = {"perfect": f"{(int(a_num) + 2) % 9 + 1}", "challenge": f"{(int(a_num) + 4) % 9 + 1}",
-                    "partner_desc": res.partner_type if res else "Партнер"}
+            matrix_raw = calculate_pythagoras(f"{d}{m}{y}")
 
-            syn = None
-            if pd and pm and py:
-                p_matrix = calculate_pythagoras(f"{pd.zfill(2)}{pm.zfill(2)}{py}")
-                syn = calculate_compatibility_score(matrix, p_matrix)
+            # Совет дня
+            day_num = get_personal_day_number(d, m)
+            advices = {
+                1: "День новых начинаний. Время заявить о себе.",
+                2: "День дипломатии. Слушайте интуицию, избегайте конфликтов.",
+                3: "День творчества. Самовыражение принесет плоды.",
+                4: "День порядка. Займитесь рутиной и фундаментом дел.",
+                5: "День перемен. Будьте готовы к неожиданным встречам.",
+                6: "День гармонии. Уделите время близким и дому.",
+                7: "День анализа. Уединение пойдет на пользу мудрости.",
+                8: "День достижений. Время масштабировать свои планы.",
+                9: "День завершения. Отпустите старое, чтобы вошло новое."
+            }
+            day_advice = {"number": day_num, "text": advices.get(day_num)}
 
-            pdf = create_pdf_report(name, res, p_str, ARCHETYPE_EXTRAS.get(a_num, {}), report)
-
-            db.session.add(
-                AnalysisRecord(name=name, email=email, birth_date=f"{d}-{m}-{y}", archetype=a_num, professions=p_str))
-            db.session.commit()
-
-            data.update({'result': res, 'professions': p_str, 'extras': ARCHETYPE_EXTRAS.get(a_num, {}),
-                         'pif_matrix': matrix, 'pif_full_report': report, 'compatibility': comp,
-                         'real_jobs': jobs, 'synergy': syn, 'pdf_file': pdf})
-
-    return render_template('index.html', **data)
+    return render_template('index.html', result=result, matrix_raw=matrix_raw, day_advice=day_advice)
 
 
-@app.route('/download/<filename>')
-def download(filename):
-    return send_file(filename, as_attachment=True)
+@app.route('/admin/get/<num>')
+def admin_get(num):
+    item = ArchetypeContent.query.filter_by(number=str(num)).first()
+    if item:
+        return jsonify({'status': 'success', 'data': {c.name: getattr(item, c.name) for c in item.__table__.columns}})
+    return jsonify({'status': 'empty'})
+
+
+@app.route('/admin/update', methods=['POST'])
+def admin_update():
+    data = request.json
+    num_str = str(data.get('number'))
+    item = ArchetypeContent.query.filter_by(number=num_str).first()
+    if not item:
+        item = ArchetypeContent(number=num_str)
+        db.session.add(item)
+    for k, v in data.items():
+        if hasattr(item, k): setattr(item, k, v)
+    db.session.commit()
+    return jsonify({'status': 'success'})
+
+
+@app.route('/download_pdf', methods=['POST'])
+def download_pdf():
+    # Заглушка PDF (нужна библиотека reportlab)
+    buffer = BytesIO()
+    p = canvas.Canvas(buffer)
+    p.drawString(100, 800, "Genesis Scroll Report")
+    p.showPage()
+    p.save()
+    buffer.seek(0)
+    return send_file(buffer, as_attachment=True, download_name="genesis.pdf", mimetype='application/pdf')
 
 
 if __name__ == '__main__':
