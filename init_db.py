@@ -105,7 +105,7 @@ def seed_database():
                 number=item["number"],
                 title=item["title"],
                 power_vector=item["power"],
-                shadow_side=item["shadow"],
+                shadow_trap=item["shadow"],
                 growth_point=item["growth"],
                 full_text=item["text"],
                 partner_type=item.get("partner", "Гармоничный партнер"),
