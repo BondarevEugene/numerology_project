@@ -3,263 +3,248 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Genesis | Divine Psychology Portal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&family=Philosopher:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <title>Genesis Psychology | Архетипы</title>
+    <link href="https://fonts.googleapis.com/css2?family=Almendra&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #d4af37; --bg: #030305; --card: rgba(15, 15, 20, 0.99); --border: rgba(212, 175, 55, 0.15); }
-        body { background: var(--bg); color: #ccc; font-family: 'Philosopher', sans-serif; margin: 0; line-height: 1.7; overflow-x: hidden; }
+        :root {
+            --bg: #0a0a0a;
+            --gold: #c5a059;
+            --border: #2a2a2a;
+            --action: #00b4d8;
+            --dharma: #7209b7;
+        }
 
-        @keyframes breath { 0%, 100% { opacity: 0.7; } 50% { opacity: 1; } }
-        @keyframes glowPulse { 0% { box-shadow: 0 0 5px rgba(212, 175, 55, 0.1); } 50% { box-shadow: 0 0 20px rgba(212, 175, 55, 0.3); } 100% { box-shadow: 0 0 5px rgba(212, 175, 55, 0.1); } }
+        body {
+            background: var(--bg);
+            color: #e0e0e0;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
 
-        h1, h2, h3, h4 { font-family: 'Almendra', serif; color: var(--gold); text-transform: uppercase; letter-spacing: 2px; margin: 0; }
-        h2::before, h3::before { content: '✺ '; opacity: 0.5; }
+        header {
+            text-align: center;
+            padding: 40px 0;
+            border-bottom: 1px solid var(--border);
+        }
 
-        .container { display: flex; max-width: 1500px; margin: 50px auto; gap: 40px; padding: 0 30px; }
-        aside { width: 320px; background: var(--card); padding: 35px; border: 1px solid var(--border); border-radius: 10px; position: sticky; top: 50px; height: fit-content; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
-        main { flex-grow: 1; background: var(--card); padding: 50px; border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 0 60px rgba(0,0,0,0.6); }
+        .logo {
+            font-family: 'Almendra', serif;
+            font-size: 2.5rem;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 5px;
+        }
 
-        /* Психоматрица */
-        .matrix { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 20px 0; }
-        .m-cell { background: rgba(0,0,0,0.5); border: 1px solid #222; padding: 18px; text-align: center; border-radius: 5px; }
-        .m-cell span { color: var(--gold); font-size: 1.4rem; font-weight: bold; text-shadow: 0 0 5px var(--gold); }
+        .calc-form {
+            max-width: 500px;
+            margin: 40px auto;
+            display: flex;
+            gap: 10px;
+        }
 
-        /* Блоки контента */
-        .box { padding: 30px; margin-bottom: 25px; background: rgba(255,255,255,0.01); border: 1px solid rgba(255,255,255,0.03); border-left: 3px solid transparent; transition: 0.3s; }
-        .box-gold { border-left-color: var(--gold); background: linear-gradient(90deg, rgba(212,175,55,0.08), transparent); animation: glowPulse 5s infinite; }
-        .box-action { border-left-color: #57b0a5; background: linear-gradient(90deg, rgba(87,176,165,0.05), transparent); }
-        .box-danger { border-left-color: #b05757; background: rgba(176,87,87,0.03); }
-        .box-dharma { border: 2px solid var(--gold); background: rgba(212,175,55,0.05); text-align: center; border-radius: 10px; }
+        input {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: white;
+            padding: 12px;
+            border-radius: 4px;
+            width: 100%;
+            outline: none;
+        }
 
-        .btn { background: transparent; color: var(--gold); border: 1px solid var(--gold); padding: 15px; width: 100%; cursor: pointer; font-family: 'Almendra'; transition: 0.4s; border-radius: 4px; text-transform: uppercase; letter-spacing: 2px; }
-        .btn:hover { background: var(--gold); color: #000; box-shadow: 0 0 20px rgba(212, 175, 55, 0.4); }
+        button {
+            background: var(--gold);
+            color: black;
+            border: none;
+            padding: 12px 25px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: 0.3s;
+        }
 
-        /* Модальные окна */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 10000; overflow-y: auto; backdrop-filter: blur(15px); }
-        .modal-content { max-width: 900px; margin: 40px auto; background: #0a0a0c; border: 1px solid var(--gold); padding: 40px; position: relative; box-shadow: 0 0 100px rgba(212, 175, 55, 0.2); }
+        button:hover { opacity: 0.8; }
 
-        /* Редактор */
-        .field-group { margin-bottom: 20px; }
-        .toolbar { background: #1a1a1a; padding: 6px; border: 1px solid #333; display: flex; gap: 5px; border-bottom: none; border-radius: 4px 4px 0 0; }
-        .tool-btn { background: #2a2a2a; color: #ccc; border: 1px solid #444; padding: 4px 10px; cursor: pointer; font-size: 0.7rem; border-radius: 2px; transition: 0.2s; }
-        .tool-btn:hover { background: var(--gold); color: #000; }
-        textarea { width: 100%; background: #0c0c0c; border: 1px solid #333; color: #eee; padding: 12px; min-height: 100px; font-family: 'Philosopher'; box-sizing: border-box; border-radius: 0 0 4px 4px; resize: vertical; }
-        label { display: block; color: var(--gold); font-family: 'Almendra'; margin-bottom: 8px; font-size: 0.85rem; letter-spacing: 1px; }
+        main { max-width: 900px; margin: 0 auto; }
 
-        input[type="text"] { width: 100%; background: #0c0c0c; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 4px; box-sizing: border-box; }
+        .box {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border);
+            padding: 25px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+        }
 
-        .how-to-link { color: var(--gold); font-size: 0.75rem; cursor: pointer; text-decoration: underline; display: block; text-align: center; margin-top: 15px; opacity: 0.6; }
+        .box h3, .box h4 { margin-top: 0; font-family: 'Almendra'; letter-spacing: 2px; }
+
+        .box-gold { border-top: 3px solid var(--gold); }
+        .box-action { border-top: 3px solid var(--action); }
+        .box-dharma { border-top: 3px solid var(--dharma); text-align: center; }
+
+        /* Вакансии */
+        .job-list { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; }
+        .job-card {
+            padding: 15px;
+            border: 1px solid rgba(0,180,216,0.15);
+            border-radius: 6px;
+            transition: 0.2s;
+            text-decoration: none;
+            display: block;
+        }
+        .job-card:hover { background: rgba(0,180,216,0.05); border-color: var(--action); }
+        .job-title { color: #fff; font-weight: 600; margin-bottom: 4px; }
+        .job-meta { font-size: 0.85rem; color: #888; }
+
+        /* Админка */
+        #admin-btn { position: fixed; bottom: 20px; right: 20px; opacity: 0.3; cursor: pointer; font-size: 1.5rem; }
+        #admin-panel {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 1000; overflow-y: auto; padding: 40px;
+        }
+
+        @keyframes breath { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <aside>
-        <h1 style="text-align: center; margin-bottom: 30px;">Genesis</h1>
-        <form method="POST">
-            <input type="number" name="day" placeholder="ДЕНЬ РОЖДЕНИЯ" style="width:100%; background:transparent; border:none; border-bottom:1px solid #333; color:#fff; padding:10px; margin-bottom:15px;" required>
-            <input type="number" name="month" placeholder="МЕСЯЦ" style="width:100%; background:transparent; border:none; border-bottom:1px solid #333; color:#fff; padding:10px; margin-bottom:15px;" required>
-            <input type="number" name="year" placeholder="ГОД" style="width:100%; background:transparent; border:none; border-bottom:1px solid #333; color:#fff; padding:10px; margin-bottom:25px;" required>
-            <button type="submit" class="btn">ИНИЦИАЦИЯ</button>
-        </form>
+<header>
+    <div class="logo">Genesis Psychology</div>
+</header>
 
-        {% if matrix_raw %}
-        <div style="margin-top: 40px;">
-            <h4 style="text-align: center; font-size: 0.7rem; margin-bottom: 15px; opacity: 0.5;">ПЕЧАТЬ ПИФАГОРА</h4>
-            <div class="matrix">
-                {% for k, v in matrix_raw.items() %}
-                <div class="m-cell"><span>{{ v }}</span></div>
+<form class="calc-form" method="POST">
+    <input type="text" name="day" placeholder="День (ДД)" required>
+    <input type="text" name="month" placeholder="Месяц (ММ)" required>
+    <input type="text" name="year" placeholder="Год (ГГГГ)" required>
+    <button type="submit">РАСКРЫТЬ</button>
+</form>
+
+<main>
+    {% if result %}
+        <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid var(--gold); margin-bottom: 30px;">
+            <h1 style="font-family: 'Almendra'; font-size: 3rem; margin: 0;">{{ result.title }}</h1>
+            <span style="color: var(--gold); font-size: 1.2rem;">Группа {{ result.number }}</span>
+        </div>
+
+        <div class="box box-gold">
+            <h3>ПОТЕНЦИАЛ РАЗУМА</h3>
+            <div>{{ result.mind_power|safe }}</div>
+        </div>
+
+        {% if jobs %}
+        <div class="box" style="border-left: 4px solid var(--action);">
+            <h4 style="color: var(--action); margin-bottom: 5px;">💼 РЕКОМЕНДОВАННЫЕ ВАКАНСИИ</h4>
+            <p style="font-size: 0.8rem; color: #666; margin-bottom: 15px;">На основе ваших талантов и текущего рынка</p>
+            <div class="job-list">
+                {% for job in jobs %}
+                <a href="{{ job.alternate_url }}" target="_blank" class="job-card">
+                    <div class="job-title">{{ job.name }}</div>
+                    <div class="job-meta">
+                        {{ job.employer.name }} •
+                        {% if job.salary %}
+                            {{ job.salary.from or 'от' }} {{ job.salary.to or '' }} {{ job.salary.currency }}
+                        {% else %}
+                            з/п не указана
+                        {% endif %}
+                    </div>
+                </a>
                 {% endfor %}
             </div>
-            <span class="how-to-link" onclick="openModal('guide-modal')">✦ КАК ЧИТАТЬ МАТРИЦУ ✦</span>
-        </div>
-        {% endif %}
-    </aside>
-
-    <main>
-        {% if day_advice %}
-        <div class="box" style="border: 1px solid #8d57b0; background: rgba(141,87,176,0.05); animation: breath 4s infinite; border-left: 3px solid #8d57b0;">
-            <h4 style="color: #8d57b0; font-size: 0.7rem;">СОВЕТ ДНЯ (Вибрация №{{ day_advice.number }})</h4>
-            <p style="font-size: 1.25rem; color: #fff; margin: 8px 0;">{{ day_advice.text }}</p>
         </div>
         {% endif %}
 
-        {% if result %}
-            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px; border-bottom: 1px solid var(--border); padding-bottom: 20px;">
-                <h2 id="main-title" style="font-size: 2.8rem;">{{ result.title }}</h2>
-                <div style="text-align: right; color: var(--gold); font-family: 'Almendra'; opacity: 0.8;">
-                    Планета: {{ result.planet or '—' }}<br>
-                    Группа: {{ result.number }}
-                </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="box box-action">
+                <h4>ДЕЙСТВИЕ</h4>
+                {{ result.action_power|safe }}
             </div>
-
-            <div class="box box-gold">
-                <h3>Число УМА</h3>
-                <div style="margin-top:15px;">{{ result.mind_power|safe if result.mind_power else 'Загрузка...' }}</div>
+            <div class="box box-action">
+                <h4>РЕАЛИЗАЦИЯ</h4>
+                {{ result.realization|safe }}
             </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                <div class="box box-action"><h4>ДЕЙСТВИЕ</h4>{{ result.action_power|safe }}</div>
-                <div class="box box-action"><h4>РЕАЛИЗАЦИЯ</h4>{{ result.realization|safe }}</div>
-            </div>
-
-            <div class="box" style="border-left-color: var(--gold);"><h4>ВЕКТОР СИЛЫ</h4>{{ result.power_vector|safe }}</div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                <div class="box box-danger"><h4>ТЕНЕВАЯ ЛОВУШКА</h4>{{ result.shadow_trap|safe }}</div>
-                <div class="box" style="border-left-color: #57b06d; background: rgba(87,176,109,0.03);"><h4>ТОЧКА РОСТА</h4>{{ result.growth_point|safe }}</div>
-            </div>
-
-            <div class="box" style="border-left-color: #5778b0;"><h4>ЦИКЛ РАЗВИТИЯ</h4>{{ result.cycle|safe }}</div>
-            <div class="box"><h4>КАРМИЧЕСКИЕ ЗАДАЧИ</h4>{{ result.karmic_tasks|safe }}</div>
-
-            <div class="box box-dharma">
-                <h3 style="animation: breath 3s infinite;">ДХАРМА ДУШИ</h3>
-                <div style="font-style: italic; font-size: 1.4rem; margin-top: 15px;">{{ result.dharma|safe }}</div>
-            </div>
-
-            <div class="box" style="border-left-color: #8d57b0;"><h4>ИТОГ ЖИЗНИ</h4>{{ result.life_result|safe }}</div>
-
-            <div style="display: flex; gap: 20px; margin-top: 50px; opacity: 0.7;">
-                <button class="btn" onclick="generatePDF()" style="font-size: 0.8rem;">📜 СКАЧАТЬ PDF</button>
-                <button class="btn" onclick="shareResult()" style="font-size: 0.8rem;">✨ ПОДЕЛИТЬСЯ</button>
-            </div>
-        {% else %}
-            <div style="text-align: center; margin-top: 200px; opacity: 0.1; font-size: 4.5rem; animation: breath 5s infinite;">DIVINE GENESIS</div>
-        {% endif %}
-    </main>
-</div>
-
-<div id="guide-modal" class="modal">
-    <div class="modal-content">
-        <h2 style="text-align: center;">Толкование Психоматрицы</h2>
-        <div style="margin-top: 30px; border: 1px solid var(--border); padding: 20px;">
-            <p><b>1-2 цифры:</b> Норма. Качество проявлено гармонично.</p>
-            <p><b>3 цифры:</b> Импульс. Качество включается нестабильно.</p>
-            <p><b>4+ цифр:</b> Доминанта. Сильный дар или внутреннее давление.</p>
         </div>
-        <button class="btn" onclick="closeModal('guide-modal')" style="margin-top: 30px; width: 150px;">ЗАКРЫТЬ</button>
+
+        <div class="box box-dharma">
+            <h3>ДХАРМА</h3>
+            <div style="font-style: italic; font-size: 1.2rem; margin-top: 15px;">{{ result.dharma|safe }}</div>
+        </div>
+    {% else %}
+        <div style="text-align: center; margin-top: 100px; opacity: 0.2; letter-spacing: 10px; animation: breath 4s infinite;">
+            ВВЕДИТЕ ДАННЫЕ ДЛЯ РАСЧЕТА
+        </div>
+    {% endif %}
+</main>
+
+<div id="admin-btn" onclick="openAdmin()">✺</div>
+
+<div id="admin-panel">
+    <div style="max-width: 600px; margin: 0 auto;">
+        <h2 style="color: var(--gold);">Редактор Контента</h2>
+        <select id="group-select" onchange="loadGroup()" style="width: 100%; padding: 10px; margin-bottom: 20px; background: #222; color: white;">
+            <option value="">Выберите группу...</option>
+            {% for i in range(1, 10) %}<option value="{{ i }}">Группа {{ i }}</option>{% endfor %}
+        </select>
+        <input type="password" id="admin-key" placeholder="Ключ доступа" style="margin-bottom: 20px;">
+
+        <div id="fields"></div>
+        <button onclick="saveData()" style="width: 100%; margin-top: 20px;">СОХРАНИТЬ ИЗМЕНЕНИЯ</button>
+        <button onclick="closeAdmin()" style="background: transparent; color: #666; margin-top: 10px;">ЗАКРЫТЬ</button>
     </div>
 </div>
-
-<div id="admin-panel" class="modal">
-    <div class="modal-content" style="max-width: 950px;">
-        <h2 style="border-bottom: 2px solid var(--gold); padding-bottom: 15px; margin-bottom: 25px;">
-            📜 Хроники Группы № <span id="adm-num" style="color: #fff;"></span>
-        </h2>
-
-        <form id="admin-form">
-            <input type="hidden" name="number" id="form-num">
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
-                <div>
-                    <label>НАЗВАНИЕ АРХЕТИПА</label>
-                    <input type="text" name="title" id="in-title" placeholder="Напр: Хранитель Баланса">
-                </div>
-                <div>
-                    <label>ПЛАНЕТА-КУРАТОР</label>
-                    <input type="text" name="planet" id="in-planet" placeholder="Напр: Сатурн">
-                </div>
-            </div>
-
-            <div id="editor-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;"></div>
-
-            <div style="display:flex; gap:20px; margin-top:40px; border-top: 1px solid #333; padding-top: 30px;">
-                <button type="button" onclick="saveAdmin()" class="btn" style="background:var(--gold); color:#000; font-weight: bold;">ЗАПИСАТЬ В ХРОНИКИ</button>
-                <button type="button" onclick="closeModal('admin-panel')" class="btn" style="border-color: #444; color: #777;">ОТМЕНА</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<div onclick="openAdmin()" style="position:fixed; bottom:15px; right:15px; cursor:pointer; opacity:0.1; color:var(--gold); font-size: 1.5rem;">✺</div>
 
 <script>
-    // Конфигурация всех полей редактора
     const FIELDS = {
-        'mind_power': 'ЧИСЛО УМА',
-        'action_power': 'ЧИСЛО ДЕЙСТВИЯ',
-        'realization': 'ЧИСЛО РЕАЛИЗАЦИИ',
-        'power_vector': 'ВЕКТОР СИЛЫ',
-        'shadow_trap': 'ТЕНЕВАЯ ЛОВУШКА',
-        'growth_point': 'ТОЧКА РОСТА',
-        'cycle': 'ЦИКЛ РАЗВИТИЯ',
-        'karmic_tasks': 'КАРМИЧЕСКИЕ ЗАДАЧИ',
-        'dharma': 'ДХАРМА ДУШИ',
-        'life_result': 'ИТОГ ЖИЗНИ'
+        'title': 'Заголовок',
+        'mind_power': 'Потенциал Разума',
+        'action_power': 'Действие',
+        'realization': 'Реализация',
+        'dharma': 'Дхарма',
+        'search_keywords': 'Ключевые слова для HH (через пробел)'
     };
 
-    // Отрисовка полей при загрузке
-    const editorGrid = document.getElementById('editor-grid');
-    Object.entries(FIELDS).forEach(([key, label]) => {
-        editorGrid.innerHTML += `
-            <div class="field-group">
-                <label>${label}</label>
-                <div class="toolbar">
-                    <button type="button" class="tool-btn" onclick="applyTag('in-${key}', '<b>', '</b>')">B</button>
-                    <button type="button" class="tool-btn" onclick="applyTag('in-${key}', '<h4>', '</h4>')">H4</button>
-                    <button type="button" class="tool-btn" onclick="applyTag('in-${key}', '<li>', '</li>')">List</button>
-                    <button type="button" class="tool-btn" onclick="insertTag('in-${key}', '<br>')">↵</button>
-                    <button type="button" class="tool-btn" onclick="insertTag('in-${key}', '<hr>')">—</button>
-                </div>
-                <textarea name="${key}" id="in-${key}"></textarea>
-            </div>
-        `;
-    });
+    function openAdmin() { document.getElementById('admin-panel').style.display = 'block'; }
+    function closeAdmin() { document.getElementById('admin-panel').style.display = 'none'; }
 
-    function openModal(id) { document.getElementById(id).style.display = 'block'; }
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    async function loadGroup() {
+        const num = document.getElementById('group-select').value;
+        if (!num) return;
+        const res = await fetch(`/admin/get/${num}`).then(r => r.json());
+        const container = document.getElementById('fields');
+        container.innerHTML = '';
 
-    function applyTag(id, open, close) {
-        const a = document.getElementById(id);
-        const s = a.selectionStart, e = a.selectionEnd;
-        a.value = a.value.substring(0, s) + open + a.value.substring(s, e) + close + a.value.substring(e);
-        a.focus();
-    }
-
-    function insertTag(id, tag) {
-        const a = document.getElementById(id);
-        const p = a.selectionStart;
-        a.value = a.value.substring(0, p) + tag + a.value.substring(p);
-        a.focus();
-    }
-
-    async function openAdmin() {
-        if(prompt("КЛЮЧ ДОСТУПА:") !== "0602") return;
-        let n = "{{ result.number if result else '' }}" || prompt("Введите № группы (1-9):");
-        if(!n) return;
-
-        const r = await fetch(`/admin/get/${n}`).then(res => res.json());
-        if(r.status === 'success') {
-            const d = r.data;
-            document.getElementById('in-title').value = d.title || "";
-            document.getElementById('in-planet').value = d.planet || "";
-            Object.keys(FIELDS).forEach(key => {
-                const el = document.getElementById(`in-${key}`);
-                if(el) el.value = d[key] || "";
-            });
+        if (res.status === 'success') {
+            for (let [key, label] of Object.entries(FIELDS)) {
+                container.innerHTML += `
+                    <label style="display:block; margin: 15px 0 5px; color: var(--gold);">${label}</label>
+                    <textarea id="edit-${key}" style="width:100%; height:80px; background:#111; color:white; border:1px solid #333; padding:10px;">${res.data[key] || ''}</textarea>
+                `;
+            }
         }
-        document.getElementById('adm-num').innerText = n;
-        document.getElementById('form-num').value = n;
-        openModal('admin-panel');
     }
 
-    async function saveAdmin() {
-        const data = Object.fromEntries(new FormData(document.getElementById('admin-form')));
+    async function saveData() {
+        const key = document.getElementById('admin-key').value;
+        if (key !== '0602') return alert('Неверный ключ');
+
+        const num = document.getElementById('group-select').value;
+        const payload = { number: num };
+        for (let key in FIELDS) {
+            payload[key] = document.getElementById(`edit-${key}`).value;
+        }
+
         const res = await fetch('/admin/update', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(data)
+            body: JSON.stringify(payload)
         }).then(r => r.json());
-        if(res.status === 'success') location.reload();
-    }
 
-    function generatePDF() { alert("Генерация PDF свитка запущена..."); }
-    function shareResult() {
-        const text = `Мой архетип: ${document.getElementById('main-title')?.innerText}.`;
-        navigator.clipboard.writeText(text + " " + window.location.href);
-        alert("Ссылка скопирована!");
+        if (res.status === 'success') {
+            alert('Данные обновлены!');
+            location.reload();
+        }
     }
 </script>
+
 </body>
 </html>

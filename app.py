@@ -1,17 +1,15 @@
 import os
 from flask import Flask, render_template, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from services import CareerService
 
 app = Flask(__name__)
 
-# Настройка базы данных
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'genesis_v2.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-
-# --- МОДЕЛИ ДАННЫХ (Расширены до максимума, чтобы принять все данные из init_db) ---
 
 class ArchetypeContent(db.Model):
     __tablename__ = 'archetype_content'
@@ -19,8 +17,6 @@ class ArchetypeContent(db.Model):
     number = db.Column(db.String(10), unique=True)
     title = db.Column(db.String(200))
     planet = db.Column(db.String(100))
-
-    # Поля для твоего нового интерфейса (index.html)
     mind_power = db.Column(db.Text)
     action_power = db.Column(db.Text)
     realization = db.Column(db.Text)
@@ -31,9 +27,8 @@ class ArchetypeContent(db.Model):
     karmic_tasks = db.Column(db.Text)
     dharma = db.Column(db.Text)
     life_result = db.Column(db.Text)
-
-    # ПОЛЯ-ЗАГЛУШКИ (Для совместимости со старым init_db.py)
-    # Если скрипт передает эти данные, они просто сохранятся в БД
+    # Поля для умного поиска и совместимости
+    search_keywords = db.Column(db.Text)
     full_text = db.Column(db.Text)
     shadow_side = db.Column(db.Text)
     avoid_spheres = db.Column(db.Text)
@@ -45,15 +40,13 @@ class ArchetypeContent(db.Model):
     recommendations = db.Column(db.Text)
 
 
-# Заглушка для модели профессий (часто встречается в init_db)
 class ProfessionContent(db.Model):
     __tablename__ = 'profession_content'
     id = db.Column(db.Integer, primary_key=True)
+    number = db.Column(db.String(10))
     name = db.Column(db.String(200))
     description = db.Column(db.Text)
 
-
-# --- ЛОГИКА ---
 
 def get_group(d):
     try:
@@ -66,6 +59,8 @@ def get_group(d):
 def index():
     result = None
     matrix_raw = None
+    jobs = []  # Инициализируем пустым списком
+
     if request.method == 'POST':
         day = request.form.get('day')
         month = request.form.get('month')
@@ -74,46 +69,39 @@ def index():
         group_num = get_group(day)
         result = ArchetypeContent.query.filter_by(number=group_num).first()
 
-        # Матрица (заглушка для рендера)
+        # Матрица
         s = f"{day}{month}{year}"
         matrix_raw = {f"c{i + 1}": s[i] if i < len(s) else "?" for i in range(9)}
 
-    return render_template('index.html', result=result, matrix_raw=matrix_raw)
+        # Вызов сервиса вакансий ТОЛЬКО если найден результат
+        if result:
+            jobs = CareerService.get_vacancies(result)
 
+    return render_template('index.html', result=result, matrix_raw=matrix_raw, jobs=jobs)
 
-# --- API ДЛЯ АДМИНКИ ---
 
 @app.route('/admin/get/<num>')
 def admin_get(num):
     content = ArchetypeContent.query.filter_by(number=num).first()
     if content:
         cols = content.__table__.columns.keys()
-        return jsonify({
-            'status': 'success',
-            'data': {c: getattr(content, c) for c in cols}
-        })
+        return jsonify({'status': 'success', 'data': {c: getattr(content, c) for c in cols}})
     return jsonify({'status': 'error'})
 
 
 @app.route('/admin/update', methods=['POST'])
 def admin_update():
     data = request.json
-    num = data.get('number')
-    content = ArchetypeContent.query.filter_by(number=num).first()
-
+    content = ArchetypeContent.query.filter_by(number=data.get('number')).first()
     if not content:
-        content = ArchetypeContent(number=num)
+        content = ArchetypeContent(number=data.get('number'))
         db.session.add(content)
-
     for key, value in data.items():
-        if hasattr(content, key):
-            setattr(content, key, value)
-
+        if hasattr(content, key): setattr(content, key, value)
     db.session.commit()
     return jsonify({'status': 'success'})
 
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
+    with app.app_context(): db.create_all()
     app.run(debug=True)
