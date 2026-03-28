@@ -93,7 +93,6 @@
 
         input:focus { border-color: var(--gold); background: #080808; }
 
-        /* ИСПРАВЛЕННАЯ СЕТКА ДАТЫ */
         .date-grid {
             display: grid;
             grid-template-columns: 1fr 1fr 1.5fr;
@@ -135,6 +134,7 @@
             position: relative;
             font-size: 0.9rem;
             line-height: 1.7;
+            transition: 0.4s ease;
         }
 
         .box h3 {
@@ -149,6 +149,58 @@
             margin-bottom: 15px;
         }
 
+        /* --- МАГИЧЕСКИЙ СВИТОК ДХАРМЫ --- */
+        .dharma-scroll {
+            border: 1px solid var(--gold);
+            background: linear-gradient(to bottom, rgba(197, 160, 89, 0.08), transparent);
+            cursor: pointer;
+            overflow: hidden;
+            max-height: 70px; /* Свернут */
+            transition: max-height 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 15px rgba(197, 160, 89, 0.1);
+        }
+
+        .dharma-scroll.open {
+            max-height: 2000px; /* Развернут */
+            background: rgba(197, 160, 89, 0.12);
+            box-shadow: 0 0 40px rgba(197, 160, 89, 0.2);
+        }
+
+        .dharma-scroll .scroll-trigger {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dharma-badge {
+            background: var(--gold);
+            color: #000;
+            padding: 2px 12px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            border-radius: 20px;
+            box-shadow: 0 0 10px var(--gold-glow);
+        }
+
+        .arrow-icon {
+            color: var(--gold);
+            transition: 0.5s;
+            font-size: 0.8rem;
+        }
+
+        .open .arrow-icon { transform: rotate(180deg); }
+
+        .dharma-warning {
+            color: #ff4d4d;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            font-weight: 600;
+            display: block;
+        }
+
+        /* --- ГРИДЫ И КАРЬЕРА --- */
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
 
         .job-item {
@@ -217,6 +269,22 @@
             <h1 style="font-family: 'Almendra'; font-size: 3rem; margin: 5px 0; color: #fff;">{{ result.title }}</h1>
         </div>
 
+        {% if dharma_data %}
+        <div class="box dharma-scroll" onclick="this.classList.toggle('open')">
+            <div class="scroll-trigger">
+                <h3 style="margin:0; border:none; padding:0;">Дхарма Души <span class="dharma-badge">№{{ dharma_data.number }}</span></h3>
+                <span class="arrow-icon">▼</span>
+            </div>
+
+            <div style="margin-top: 30px; border-top: 1px solid rgba(197,160,89,0.2); padding-top: 20px;">
+                <span class="dharma-warning">Критический порог: 33 года</span>
+                <div style="font-size: 1.1rem; line-height: 1.8; color: #fff;">
+                    {{ dharma_data.dharma | safe }}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
         <div class="box">
             <h3>Потенциал Разума</h3>
             <div>{{ result.mind_power|safe }}</div>
@@ -246,11 +314,6 @@
             <div class="box" style="border-bottom: 2px solid rgba(0,255,0,0.2);"><h3>Точка Роста</h3>{{ result.growth_point|safe }}</div>
         </div>
 
-        <div class="box" style="background: rgba(197, 160, 89, 0.03); border: 1px solid var(--gold);">
-            <h3>Дхарма</h3>
-            <div style="font-size: 1.1rem; font-style: italic; color: #fff;">{{ result.dharma|safe }}</div>
-        </div>
-
         <div class="box"><h3>Итог жизни</h3><div>{{ result.life_result|safe }}</div></div>
     </div>
     {% else %}
@@ -277,6 +340,7 @@
 </div>
 
 <script>
+    // Поля теперь включают Дхарму
     const FIELDS = {
         'title': 'Заголовок',
         'mind_power': 'Потенциал Разума',
@@ -285,7 +349,7 @@
         'shadow_trap': 'Ловушка Тени',
         'growth_point': 'Точка Роста',
         'karmic_tasks': 'Кармические задачи',
-        'dharma': 'Дхарма',
+        'dharma': 'Дхарма (Долг Души)',
         'life_result': 'Итог жизни'
     };
 
@@ -302,7 +366,7 @@
                 l.innerText = label;
                 const t = document.createElement('textarea');
                 t.id = `edit-${key}`;
-                t.style = "width:100%; height:100px; background:#050505; color:#fff; border:1px solid #222; padding:10px;";
+                t.style = "width:100%; height:120px; background:#050505; color:#fff; border:1px solid #222; padding:10px; font-family:sans-serif; line-height:1.5;";
                 t.value = res.data[key] || '';
                 container.appendChild(l);
                 container.appendChild(t);

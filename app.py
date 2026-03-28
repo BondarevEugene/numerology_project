@@ -1,19 +1,21 @@
 import os
 from flask import Flask, render_template, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate  # 1. Импорт здесь
-from services import CareerService # импорт сервиса карьеры из основного файла. пока так.
+from flask_migrate import Migrate
+from services import CareerService
 
-app = Flask(__name__) # 2. Сначала создаем app
+app = Flask(__name__)
 
 # Настройки базы данных
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'genesis_v2.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db = SQLAlchemy(app) # 3. Потом создаем db
-migrate = Migrate(app, db) # 4. И только ТЕПЕРЬ создаем migrate
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
+
+# --- МОДЕЛИ ДАННЫХ ---
 class ArchetypeContent(db.Model):
     __tablename__ = 'archetype_content'
     id = db.Column(db.Integer, primary_key=True)
@@ -28,9 +30,8 @@ class ArchetypeContent(db.Model):
     growth_point = db.Column(db.Text)
     cycle = db.Column(db.Text)
     karmic_tasks = db.Column(db.Text)
-    dharma = db.Column(db.Text)
+    dharma = db.Column(db.Text)  # Здесь храним тот самый текст про долг души
     life_result = db.Column(db.Text)
-    # Поля для умного поиска и совместимости
     search_keywords = db.Column(db.Text)
     full_text = db.Column(db.Text)
     shadow_side = db.Column(db.Text)
@@ -49,45 +50,64 @@ class ProfessionContent(db.Model):
     number = db.Column(db.String(10))
     name = db.Column(db.String(200))
     description = db.Column(db.Text)
-    list_csv = db.Column(db.Text)  # <--- Добавляем это поле для скрипта
+    list_csv = db.Column(db.Text)
 
 
+# --- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ---
 def get_group(d):
+    """Определяет базовый архетип по дню (1-9)"""
     try:
-        return str((int(d) - 1) % 9 + 1)
+        val = int(d)
+        return str((val - 1) % 9 + 1)
     except:
         return "1"
 
 
+def sum_digits(n):
+    """Редукция числа до однозначного (1-9) для Дхармы"""
+    res = sum(int(d) for d in str(n) if d.isdigit())
+    return res if res <= 9 else sum_digits(res)
+
+
+# --- РОУТЫ ---
 @app.route('/', methods=['GET', 'POST'])
 def index():
     result = None
+    dharma_data = None
     matrix_raw = None
     jobs = []
-    country = request.form.get('country', 'ua') # 'ua' теперь значение по умолчанию, если вдруг придет пустой запрос
 
     if request.method == 'POST':
-        # Собираем все пришедшие данные
-        user_name = request.form.get('user_name')
-        user_email = request.form.get('user_email')
         day = request.form.get('day')
         month = request.form.get('month')
         year = request.form.get('year')
-        partner_date = request.form.get('partner_date')
+        country = request.form.get('country', 'ua')
 
-        # Основная логика поиска архетипа
+        # 1. Расчет Основного Архетипа (по дню)
         group_num = get_group(day)
         result = ArchetypeContent.query.filter_by(number=group_num).first()
 
-        # Матрица
+        # 2. Расчет Дхармы (День + Месяц)
+        try:
+            d_val = int(day)
+            m_val = int(month)
+            dharma_num = str(sum_digits(d_val + m_val))
+            # Загружаем контент Дхармы из записи с соответствующим номером
+            dharma_data = ArchetypeContent.query.filter_by(number=dharma_num).first()
+        except:
+            dharma_data = None
+
+        # 3. Матрица (визуальный ряд)
         s = f"{day}{month}{year}"
         matrix_raw = {f"c{i + 1}": s[i] if i < len(s) else "?" for i in range(9)}
 
+        # 4. Вакансии (по основному архетипу)
         if result:
             jobs = CareerService.get_vacancies(result, country=country)
 
     return render_template('index.html',
                            result=result,
+                           dharma_data=dharma_data,  # Передаем объект Дхармы
                            matrix_raw=matrix_raw,
                            jobs=jobs)
 
@@ -96,7 +116,7 @@ def index():
 def admin_get(num):
     content = ArchetypeContent.query.filter_by(number=num).first()
     if content:
-        cols = content.__table__.columns.keys()
+        cols = [c.name for c in ArchetypeContent.__table__.columns]
         return jsonify({'status': 'success', 'data': {c: getattr(content, c) for c in cols}})
     return jsonify({'status': 'error'})
 
@@ -104,16 +124,21 @@ def admin_get(num):
 @app.route('/admin/update', methods=['POST'])
 def admin_update():
     data = request.json
-    content = ArchetypeContent.query.filter_by(number=data.get('number')).first()
+    num = data.get('number')
+    content = ArchetypeContent.query.filter_by(number=num).first()
     if not content:
-        content = ArchetypeContent(number=data.get('number'))
+        content = ArchetypeContent(number=num)
         db.session.add(content)
+
     for key, value in data.items():
-        if hasattr(content, key): setattr(content, key, value)
+        if hasattr(content, key):
+            setattr(content, key, value)
+
     db.session.commit()
     return jsonify({'status': 'success'})
 
 
 if __name__ == '__main__':
-    with app.app_context(): db.create_all()
+    with app.app_context():
+        db.create_all()
     app.run(debug=True)
