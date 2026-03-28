@@ -10,11 +10,10 @@
             --bg: #050505;
             --panel: #0a0a0a;
             --gold: #c5a059;
-            --gold-glow: rgba(197, 160, 89, 0.3);
+            --gold-glow: rgba(197, 160, 89, 0.4);
             --border: #1a1a1a;
-            --text: #d0d0d0;
+            --text: #b8b8b8;
             --blue: #00b4d8;
-            --blue-glow: rgba(0, 180, 216, 0.3);
         }
 
         body {
@@ -25,246 +24,153 @@
             display: flex;
             height: 100vh;
             overflow: hidden;
-            background-image:
-                radial-gradient(circle at 50% 50%, #111 0%, #050505 100%),
-                url('https://www.transparenttextures.com/patterns/stardust.png');
+            background-image: radial-gradient(circle at 50% 50%, #111 0%, #050505 100%);
         }
 
-        /* АНИМИРОВАННЫЙ ФОН С РУНАМИ */
+        /* МАГИЧЕСКИЙ ФОН */
         body::before {
             content: "ᚠ ᚢ ᚦ ᚨ ᚱ ᚲ ᚷ ᚹ ᚺ ᚻ ᛁ ᛃ ᛈ ᛉ ᛋ ᛏ ᛒ ᛖ ᛗ ᛚ ᛜ ᛞ ᛟ";
             position: fixed;
-            width: 200%;
-            height: 200%;
-            top: -50%;
-            left: -50%;
-            z-index: -1;
-            color: rgba(197, 160, 89, 0.03);
-            font-size: 5rem;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 50px;
-            transform: rotate(-15deg);
-            animation: backgroundScroll 120s linear infinite;
-            pointer-events: none;
+            width: 200%; height: 200%; top: -50%; left: -50%;
+            z-index: -1; color: rgba(197, 160, 89, 0.02);
+            font-size: 4rem; display: flex; flex-wrap: wrap; gap: 60px;
+            transform: rotate(-10deg); animation: backgroundScroll 180s linear infinite;
+            pointer-events: none; filter: blur(1px);
         }
 
         @keyframes backgroundScroll {
-            from { transform: rotate(-15deg) translateY(0); }
-            to { transform: rotate(-15deg) translateY(500px); }
+            from { transform: rotate(-10deg) translateY(0); }
+            to { transform: rotate(-10deg) translateY(1000px); }
         }
 
-        /* ЛЕВАЯ ПАНЕЛЬ */
+        /* БОКОВАЯ ПАНЕЛЬ */
         aside {
             width: 320px;
+            min-width: 320px;
             background: var(--panel);
             border-right: 1px solid var(--border);
-            padding: 30px;
+            padding: 25px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             box-sizing: border-box;
-            box-shadow: 10px 0 30px rgba(0,0,0,0.5);
             z-index: 10;
+            box-shadow: 10px 0 30px rgba(0,0,0,0.5);
         }
 
         .logo {
             font-family: 'Almendra', serif;
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             color: var(--gold);
-            letter-spacing: 5px;
-            text-shadow: 0 0 15px var(--gold-glow);
+            letter-spacing: 6px;
             text-align: center;
             margin-bottom: 30px;
+            text-shadow: 0 0 15px var(--gold-glow);
         }
 
         .calc-form { display: flex; flex-direction: column; gap: 12px; }
 
-        .calc-form input, .calc-form select {
-            background: #0f0f0f;
+        .label-sm {
+            font-size: 0.65rem;
+            color: #555;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        input, select {
+            background: #000;
             border: 1px solid var(--border);
             color: #fff;
             padding: 12px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             border-radius: 4px;
-            transition: 0.4s;
+            transition: 0.3s;
             outline: none;
+            width: 100%;
+            box-sizing: border-box;
         }
 
-        .calc-form input:focus {
-            border-color: var(--gold);
-            box-shadow: 0 0 10px var(--gold-glow);
+        input:focus { border-color: var(--gold); background: #080808; }
+
+        /* ИСПРАВЛЕННАЯ СЕТКА ДАТЫ */
+        .date-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1.5fr;
+            gap: 8px;
         }
 
         button {
-            background: linear-gradient(135deg, #c5a059 0%, #947a44 100%);
+            background: linear-gradient(135deg, #c5a059 0%, #8a6d35 100%);
             color: #000;
             border: none;
-            padding: 14px;
+            padding: 15px;
             font-weight: 700;
-            font-size: 0.8rem;
-            letter-spacing: 1px;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
             cursor: pointer;
             border-radius: 4px;
-            transition: 0.3s;
             text-transform: uppercase;
             margin-top: 10px;
+            transition: 0.3s;
         }
 
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px var(--gold-glow);
-        }
+        button:hover { transform: translateY(-2px); box-shadow: 0 5px 20px var(--gold-glow); }
 
-        /* ПРАВАЯ ЧАСТЬ */
+        /* КОНТЕНТ */
         main {
             flex-grow: 1;
             padding: 50px 80px;
             overflow-y: auto;
             scroll-behavior: smooth;
-            position: relative;
         }
 
-        .archetype-header {
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 25px;
-            margin-bottom: 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-        }
-
-        .archetype-header h1 {
-            font-family: 'Almendra', serif;
-            font-size: 2.8rem;
-            margin: 0;
-            color: #fff;
-            letter-spacing: 2px;
-            text-shadow: 0 0 20px rgba(255,255,255,0.1);
-        }
-
-        /* КАРТОЧКИ С ОГНЕННОЙ АНИМАЦИЕЙ */
         .box {
-            background: rgba(15, 15, 15, 0.6);
+            background: rgba(10, 10, 10, 0.5);
             backdrop-filter: blur(10px);
             border: 1px solid var(--border);
             padding: 25px;
             margin-bottom: 25px;
-            border-radius: 8px;
+            border-radius: 4px;
             position: relative;
-            font-size: 0.95rem;
-            line-height: 1.6;
-        }
-
-        /* Эффект пульсации рамок */
-        .box::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            border: 1px solid transparent;
-            border-radius: 8px;
-            background: linear-gradient(90deg, var(--gold), transparent, var(--gold)) border-box;
-            -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
-            mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: destination-out;
-            mask-composite: exclude;
-            opacity: 0.1;
-            animation: borderGlow 4s infinite alternate;
-            pointer-events: none;
-        }
-
-        @keyframes borderGlow {
-            from { opacity: 0.1; }
-            to { opacity: 0.4; filter: drop-shadow(0 0 5px var(--gold)); }
+            font-size: 0.9rem;
+            line-height: 1.7;
         }
 
         .box h3 {
             font-family: 'Almendra';
             color: var(--gold);
             margin-top: 0;
-            font-size: 1.2rem;
-            text-transform: uppercase;
+            font-size: 1.1rem;
             letter-spacing: 2px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .box h3::before { content: "✧"; font-size: 0.8rem; opacity: 0.5; }
-
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
+            text-transform: uppercase;
+            border-bottom: 1px solid rgba(197,160,89,0.1);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
         }
 
-        /* ВАКАНСИИ */
-        .jobs-container {
-            border-left: 3px solid var(--blue);
-            background: linear-gradient(90deg, rgba(0,180,216,0.05), transparent);
-        }
-        .jobs-container::after {
-            background: linear-gradient(90deg, var(--blue), transparent, var(--blue)) border-box;
-        }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
 
         .job-item {
-            display: block;
-            text-decoration: none;
-            padding: 15px;
-            border: 1px solid rgba(0,180,216,0.1);
-            border-radius: 6px;
-            margin-top: 10px;
-            transition: 0.3s;
-            background: rgba(0,0,0,0.2);
+            display: block; text-decoration: none; padding: 15px;
+            border: 1px solid #1a1a1a; margin-top: 10px; border-radius: 4px;
+            transition: 0.3s; background: rgba(0,0,0,0.2);
         }
-        .job-item:hover {
-            border-color: var(--blue);
-            background: rgba(0,180,216,0.1);
-            transform: translateX(5px);
-        }
-        .job-title { color: #fff; font-weight: 600; font-size: 0.9rem; }
-        .job-salary { color: var(--blue); font-size: 0.85rem; margin-top: 5px; }
+        .job-item:hover { border-color: var(--blue); transform: translateX(5px); }
 
-        /* СКРЫТАЯ АДМИНКА */
-        #admin-trigger {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            opacity: 0.2;
-            cursor: pointer;
-            z-index: 10000;
-            color: var(--gold);
-            font-size: 1.2rem;
-            transition: 0.3s;
-        }
-        #admin-trigger:hover { opacity: 1; transform: rotate(90deg); }
-
-        #admin-panel {
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95);
-            backdrop-filter: blur(20px); z-index: 99999; padding: 50px; overflow-y: auto;
+        .footer-info {
+            font-size: 0.6rem; color: #444; text-align: center;
+            border-top: 1px solid #1a1a1a; padding-top: 20px;
+            letter-spacing: 1px; line-height: 1.5;
         }
 
-        /* АНИМАЦИЯ КОНТЕНТА */
-        @keyframes magicFade {
+        .animate { animation: magicEntrance 1s ease-out forwards; }
+        @keyframes magicEntrance {
             from { opacity: 0; filter: blur(10px); transform: translateY(20px); }
             to { opacity: 1; filter: blur(0); transform: translateY(0); }
         }
-        .animate { animation: magicFade 1s ease-out forwards; }
 
-        .footer-info {
-            font-size: 0.65rem;
-            color: #444;
-            text-align: center;
-            border-top: 1px solid #1a1a1a;
-            padding-top: 20px;
-            letter-spacing: 1px;
-            line-height: 1.5;
-        }
-
-        /* Скроллбар */
-        main::-webkit-scrollbar { width: 4px; }
-        main::-webkit-scrollbar-track { background: transparent; }
-        main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
-        main::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+        #admin-trigger { position: fixed; bottom: 20px; right: 20px; opacity: 0.1; cursor: pointer; color: var(--gold); }
     </style>
 </head>
 <body>
@@ -273,31 +179,31 @@
     <div>
         <div class="logo">GENESIS</div>
         <form class="calc-form" method="POST">
-            <div style="margin-bottom: 5px; font-size: 0.7rem; color: var(--gold); letter-spacing: 1px;">ЛИЧНЫЕ ДАННЫЕ</div>
+            <div class="label-sm">Identification</div>
             <input type="text" name="user_name" placeholder="Ваше имя" required>
-            <input type="email" name="user_email" placeholder="Email для отчета" required>
+            <input type="email" name="user_email" placeholder="Email" required>
 
-            <div style="margin-top: 10px; margin-bottom: 5px; font-size: 0.7rem; color: var(--gold); letter-spacing: 1px;">ДАТА РОЖДЕНИЯ</div>
-            <div style="display: flex; gap: 5px;">
-                <input type="text" name="day" placeholder="ДД" style="width: 100%;" required>
-                <input type="text" name="month" placeholder="ММ" style="width: 100%;" required>
-                <input type="text" name="year" placeholder="ГГГГ" style="width: 100%;" required>
+            <div class="label-sm" style="margin-top: 10px;">Birth Date</div>
+            <div class="date-grid">
+                <input type="text" name="day" placeholder="ДД" maxlength="2" required>
+                <input type="text" name="month" placeholder="ММ" maxlength="2" required>
+                <input type="text" name="year" placeholder="ГГГГ" maxlength="4" required>
             </div>
 
-            <div style="margin-top: 10px; margin-bottom: 5px; font-size: 0.7rem; color: var(--gold); letter-spacing: 1px;">СТРАНА</div>
+            <div class="label-sm" style="margin-top: 10px;">Location</div>
             <select name="country">
-                <option value="ua" selected>Украина</option>
-                <option value="ru">🌍 Другие страны</option>
+                <option value="ua" selected>Украина (UA)</option>
+                <option value="ru">International</option>
             </select>
 
-            <div style="margin-top: 10px; margin-bottom: 5px; font-size: 0.7rem; color: var(--gold); letter-spacing: 1px;">РЕЗОНАНС ПАРТНЕРА</div>
-            <input type="text" name="partner_date" placeholder="ДД.ММ.ГГГГ">
+            <div class="label-sm" style="margin-top: 10px;">Partner Resonance</div>
+            <input type="text" name="partner_date" placeholder="ДД.ММ.ГГГГ партнера">
 
             <button type="submit">Рассчитать</button>
         </form>
     </div>
     <div class="footer-info">
-        <div style="color: #666; margin-bottom: 4px;">SYSTEM STATUS: ONLINE</div>
+        SYSTEM STATUS: ONLINE<br>
         © 2026 GENESIS PSYCHOLOGY<br>
         <span style="color: var(--gold);">v2.1 Stable Edition</span>
     </div>
@@ -306,12 +212,9 @@
 <main>
     {% if result %}
     <div class="animate">
-        <div class="archetype-header">
-            <div>
-                <span style="color: var(--gold); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px;">Анализ для: {{ request.form.get('user_name') }}</span>
-                <h1>{{ result.title }}</h1>
-            </div>
-            <div style="color: var(--gold); font-family: 'Almendra'; font-size: 1.5rem;">№ {{ result.number }}</div>
+        <div style="margin-bottom: 40px; border-bottom: 1px solid #222; padding-bottom: 20px;">
+            <span style="color: var(--gold); font-size: 0.7rem; letter-spacing: 2px;">SUBJECT: {{ request.form.get('user_name') }}</span>
+            <h1 style="font-family: 'Almendra'; font-size: 3rem; margin: 5px 0; color: #fff;">{{ result.title }}</h1>
         </div>
 
         <div class="box">
@@ -325,18 +228,13 @@
         </div>
 
         {% if jobs %}
-        <div class="box jobs-container">
-            <h3 style="color: var(--blue);">Профессиональная реализация</h3>
+        <div class="box" style="border-left: 3px solid var(--blue);">
+            <h3 style="color: var(--blue);">Профессиональный вектор</h3>
             {% for job in jobs %}
             <a href="{{ job.alternate_url }}" target="_blank" class="job-item">
-                <div class="job-title">{{ job.name }}</div>
-                <div class="job-meta" style="font-size: 0.75rem; color: #888;">{{ job.employer.name }}</div>
-                <div class="job-salary">
-                    {% if job.salary and job.salary.from %}
-                        {{ job.salary.from }} {{ job.salary.currency if job.salary.currency else '' }}
-                    {% else %}
-                        З/П по результатам собеседования
-                    {% endif %}
+                <div style="color: #fff; font-weight: 600;">{{ job.name }}</div>
+                <div style="color: var(--blue); font-size: 0.8rem; margin-top: 5px;">
+                    {{ job.salary.from if job.salary and job.salary.from else 'По результатам' }} {{ job.salary.currency if job.salary and job.salary.currency else '' }}
                 </div>
             </a>
             {% endfor %}
@@ -344,44 +242,35 @@
         {% endif %}
 
         <div class="grid-2">
-            <div class="box" style="border-color: rgba(255, 77, 77, 0.3);"><h3>Ловушка Тени</h3>{{ result.shadow_trap|safe }}</div>
-            <div class="box" style="border-color: rgba(77, 255, 77, 0.3);"><h3>Точка Роста</h3>{{ result.growth_point|safe }}</div>
+            <div class="box" style="border-bottom: 2px solid rgba(255,0,0,0.2);"><h3>Ловушка Тени</h3>{{ result.shadow_trap|safe }}</div>
+            <div class="box" style="border-bottom: 2px solid rgba(0,255,0,0.2);"><h3>Точка Роста</h3>{{ result.growth_point|safe }}</div>
         </div>
 
-        <div class="box">
-            <h3>Кармические задачи</h3>
-            <div>{{ result.karmic_tasks|safe }}</div>
-        </div>
-
-        <div class="box" style="background: rgba(197, 160, 89, 0.05); border-top: 2px solid var(--gold);">
+        <div class="box" style="background: rgba(197, 160, 89, 0.03); border: 1px solid var(--gold);">
             <h3>Дхарма</h3>
-            <div style="font-size: 1.1rem; font-style: italic;">{{ result.dharma|safe }}</div>
+            <div style="font-size: 1.1rem; font-style: italic; color: #fff;">{{ result.dharma|safe }}</div>
         </div>
 
-        <div class="box">
-            <h3>Итог жизни</h3>
-            <div>{{ result.life_result|safe }}</div>
-        </div>
+        <div class="box"><h3>Итог жизни</h3><div>{{ result.life_result|safe }}</div></div>
     </div>
     {% else %}
     <div style="display: flex; height: 100%; align-items: center; justify-content: center; opacity: 0.05;">
-        <h2 style="font-size: 5rem; font-family: 'Almendra'; letter-spacing: 25px;">GENESIS</h2>
+        <h2 style="font-size: 5rem; font-family: 'Almendra'; letter-spacing: 30px;">GENESIS</h2>
     </div>
     {% endif %}
 </main>
 
 <div id="admin-trigger" onclick="document.getElementById('admin-panel').style.display='block'">✺</div>
-
-<div id="admin-panel">
+<div id="admin-panel" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 99999; padding: 50px; overflow-y: auto;">
     <div style="max-width: 800px; margin: 0 auto;">
-        <h2 style="color: var(--gold); font-family: 'Almendra';">Редактор данных Archetypes</h2>
-        <select id="group-select" onchange="loadGroupData()" style="width: 100%; padding: 10px; margin-bottom: 20px; background: #222; color: #fff; border: 1px solid var(--border);">
-            <option value="">Выберите группу...</option>
-            {% for i in range(1, 10) %}<option value="{{ i }}">Группа {{ i }}</option>{% endfor %}
+        <h2 style="color: var(--gold); font-family: 'Almendra';">DATABASE ACCESS</h2>
+        <select id="group-select" onchange="loadGroupData()" style="width: 100%; padding: 10px; margin-bottom: 20px; background: #111; color: #fff;">
+            <option value="">Выберите архетип...</option>
+            {% for i in range(1, 10) %}<option value="{{ i }}">Архетип {{ i }}</option>{% endfor %}
         </select>
         <div id="editor-fields"></div>
         <div style="display: flex; gap: 10px; margin-top: 20px;">
-            <button onclick="saveAdminData()" style="flex: 2;">Сохранить все данные</button>
+            <button onclick="saveAdminData()" style="flex: 2;">Сохранить</button>
             <button onclick="document.getElementById('admin-panel').style.display='none'" style="flex: 1; background:#333; color:#fff;">Отмена</button>
         </div>
     </div>
@@ -397,51 +286,41 @@
         'growth_point': 'Точка Роста',
         'karmic_tasks': 'Кармические задачи',
         'dharma': 'Дхарма',
-        'life_result': 'Итог жизни',
-        'search_keywords': 'Ключевые слова для вакансий'
+        'life_result': 'Итог жизни'
     };
 
     async function loadGroupData() {
         const num = document.getElementById('group-select').value;
         if(!num) return;
-        try {
-            const res = await fetch(`/admin/get/${num}`).then(r => r.json());
-            const container = document.getElementById('editor-fields');
-            container.innerHTML = '';
-            if(res.status === 'success') {
-                Object.entries(FIELDS).forEach(([key, label]) => {
-                    const labelEl = document.createElement('label');
-                    labelEl.style = "color:var(--gold); display:block; margin-top:15px; font-size: 0.7rem; text-transform: uppercase; letter-spacing:1px;";
-                    labelEl.innerText = label;
-                    const txt = document.createElement('textarea');
-                    txt.id = `edit-${key}`;
-                    txt.style = "width:100%; height:120px; background:#111; color:#fff; border:1px solid #333; padding:10px; border-radius: 4px; font-family: sans-serif; outline:none;";
-                    txt.value = res.data[key] || '';
-                    container.appendChild(labelEl);
-                    container.appendChild(txt);
-                });
-            }
-        } catch (e) { alert('Ошибка загрузки!'); }
+        const res = await fetch(`/admin/get/${num}`).then(r => r.json());
+        const container = document.getElementById('editor-fields');
+        container.innerHTML = '';
+        if(res.status === 'success') {
+            Object.entries(FIELDS).forEach(([key, label]) => {
+                const l = document.createElement('label');
+                l.style = "display:block; color:var(--gold); font-size:0.7rem; margin-top:10px;";
+                l.innerText = label;
+                const t = document.createElement('textarea');
+                t.id = `edit-${key}`;
+                t.style = "width:100%; height:100px; background:#050505; color:#fff; border:1px solid #222; padding:10px;";
+                t.value = res.data[key] || '';
+                container.appendChild(l);
+                container.appendChild(t);
+            });
+        }
     }
 
     async function saveAdminData() {
         const num = document.getElementById('group-select').value;
-        if(!num) return alert('Выберите группу!');
         const data = { number: num };
-        Object.keys(FIELDS).forEach(key => {
-            data[key] = document.getElementById(`edit-${key}`).value;
+        Object.keys(FIELDS).forEach(key => data[key] = document.getElementById(`edit-${key}`).value);
+        await fetch('/admin/update', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
         });
-        try {
-            const res = await fetch('/admin/update', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(data)
-            }).then(r => r.json());
-            if(res.status === 'success') {
-                alert('Данные обновлены!');
-                location.reload();
-            }
-        } catch (e) { alert('Ошибка сохранения!'); }
+        alert('Данные сохранены');
+        location.reload();
     }
 </script>
 
