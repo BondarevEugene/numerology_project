@@ -7,189 +7,277 @@
     <link href="https://fonts.googleapis.com/css2?family=Almendra&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0a0a0a;
+            --bg: #050505;
+            --panel: #0d0d0d;
             --gold: #c5a059;
-            --border: #2a2a2a;
-            --action: #00b4d8;
-            --dharma: #7209b7;
+            --border: #222;
+            --text: #e0e0e0;
+            --blue: #00b4d8;
         }
 
         body {
             background: var(--bg);
-            color: #e0e0e0;
+            color: var(--text);
             font-family: 'Inter', sans-serif;
             margin: 0;
-            padding: 20px;
-            line-height: 1.6;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
         }
 
-        header {
-            text-align: center;
-            padding: 40px 0;
-            border-bottom: 1px solid var(--border);
+        /* ЛЕВАЯ ПАНЕЛЬ */
+        aside {
+            width: 350px;
+            background: var(--panel);
+            border-right: 1px solid var(--border);
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-sizing: border-box;
         }
 
         .logo {
             font-family: 'Almendra', serif;
-            font-size: 2.5rem;
+            font-size: 1.8rem;
             color: var(--gold);
-            text-transform: uppercase;
-            letter-spacing: 5px;
+            letter-spacing: 3px;
+            text-align: center;
+            margin-bottom: 40px;
         }
 
-        .calc-form {
-            max-width: 500px;
-            margin: 40px auto;
-            display: flex;
-            gap: 10px;
-        }
-
-        input {
-            background: transparent;
+        .calc-form { display: flex; flex-direction: column; gap: 15px; }
+        input, select {
+            background: #1a1a1a;
             border: 1px solid var(--border);
             color: white;
-            padding: 12px;
-            border-radius: 4px;
-            width: 100%;
+            padding: 15px;
+            border-radius: 8px;
             outline: none;
+            transition: 0.3s;
+            width: 100%;
+            box-sizing: border-box;
         }
+        input:focus, select:focus { border-color: var(--gold); }
 
         button {
             background: var(--gold);
             color: black;
             border: none;
-            padding: 12px 25px;
-            font-weight: 600;
+            padding: 15px;
+            font-weight: 700;
             cursor: pointer;
-            border-radius: 4px;
-            transition: 0.3s;
+            border-radius: 8px;
+            margin-top: 10px;
+            text-transform: uppercase;
         }
 
-        button:hover { opacity: 0.8; }
+        /* ПРАВАЯ ЧАСТЬ (КОНТЕНТ) */
+        main {
+            flex-grow: 1;
+            padding: 60px;
+            overflow-y: auto;
+            background: radial-gradient(circle at top right, #111, #050505);
+        }
 
-        main { max-width: 900px; margin: 0 auto; }
+        .archetype-header {
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 30px;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .archetype-header h1 {
+            font-family: 'Almendra', serif;
+            font-size: 3.5rem;
+            margin: 0;
+            color: #fff;
+        }
 
         .box {
             background: rgba(255,255,255,0.02);
             border: 1px solid var(--border);
-            padding: 25px;
-            margin-bottom: 25px;
-            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 12px;
+            position: relative;
         }
 
-        .box h3, .box h4 { margin-top: 0; font-family: 'Almendra'; letter-spacing: 2px; }
+        .box h3 {
+            font-family: 'Almendra';
+            color: var(--gold);
+            margin-top: 0;
+            font-size: 1.4rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
 
-        .box-gold { border-top: 3px solid var(--gold); }
-        .box-action { border-top: 3px solid var(--action); }
-        .box-dharma { border-top: 3px solid var(--dharma); text-align: center; }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
 
-        /* Вакансии */
-        .job-list { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; }
-        .job-card {
-            padding: 15px;
-            border: 1px solid rgba(0,180,216,0.15);
-            border-radius: 6px;
-            transition: 0.2s;
-            text-decoration: none;
+        /* ВАКАНСИИ */
+        .jobs-container {
+            border-left: 3px solid var(--blue);
+            background: linear-gradient(90deg, rgba(0,180,216,0.05), transparent);
+        }
+        .job-item {
             display: block;
+            text-decoration: none;
+            padding: 15px;
+            border: 1px solid rgba(0,180,216,0.1);
+            border-radius: 8px;
+            margin-top: 10px;
+            transition: 0.3s;
         }
-        .job-card:hover { background: rgba(0,180,216,0.05); border-color: var(--action); }
-        .job-title { color: #fff; font-weight: 600; margin-bottom: 4px; }
-        .job-meta { font-size: 0.85rem; color: #888; }
+        .job-item:hover { border-color: var(--blue); background: rgba(0,180,216,0.1); }
+        .job-title { color: #fff; font-weight: 600; }
+        .job-salary { color: var(--blue); font-size: 0.9rem; margin-top: 5px; }
 
-        /* Админка */
-        #admin-btn { position: fixed; bottom: 20px; right: 20px; opacity: 0.3; cursor: pointer; font-size: 1.5rem; }
+        /* СКРЫТАЯ АДМИНКА */
+        #admin-trigger {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            opacity: 0.3;
+            cursor: pointer;
+            z-index: 10000;
+            color: var(--gold);
+            font-size: 1.5rem;
+        }
+        #admin-trigger:hover { opacity: 1; }
+
         #admin-panel {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95); z-index: 1000; overflow-y: auto; padding: 40px;
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98);
+            z-index: 99999; padding: 50px; overflow-y: auto;
         }
 
-        @keyframes breath { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate { animation: fadeIn 0.8s ease forwards; }
+
     </style>
 </head>
 <body>
 
-<header>
-    <div class="logo">Genesis Psychology</div>
-</header>
+<aside>
+    <div>
+        <div class="logo">GENESIS</div>
+        <form class="calc-form" method="POST">
+            <div style="margin-bottom: 10px; font-size: 0.8rem; color: var(--gold);">ЛИЧНЫЕ ДАННЫЕ</div>
+            <input type="text" name="user_name" placeholder="Ваше имя" required>
+            <input type="email" name="user_email" placeholder="Email для отчета" required>
 
-<form class="calc-form" method="POST">
-    <input type="text" name="day" placeholder="День (ДД)" required>
-    <input type="text" name="month" placeholder="Месяц (ММ)" required>
-    <input type="text" name="year" placeholder="Год (ГГГГ)" required>
-    <button type="submit">РАСКРЫТЬ</button>
-</form>
+            <div style="margin-top: 10px; margin-bottom: 5px; font-size: 0.8rem; color: var(--gold);">ДАТА РОЖДЕНИЯ</div>
+            <div style="display: flex; gap: 5px;">
+                <input type="text" name="day" placeholder="ДД" style="width: 60px;" required>
+                <input type="text" name="month" placeholder="ММ" style="width: 60px;" required>
+                <input type="text" name="year" placeholder="ГГГГ" required>
+            </div>
+
+            <div style="margin-top: 15px; margin-bottom: 5px; font-size: 0.8rem; color: var(--gold); letter-spacing: 1px;">СТРАНА</div>
+            <select name="country">
+                <option value="ua" selected>Украина </option> #🇺🇦 Украина (Jooble)
+                <option value="ru">🌍 Другие страны </option> # (HH.ru)
+            </select>
+
+            <div style="margin-top: 15px; margin-bottom: 5px; font-size: 0.8rem; color: var(--gold);">РЕЗОНАНС ПАРТНЕРА (ОПЦИОНАЛЬНО)</div>
+            <input type="text" name="partner_date" placeholder="ДД.ММ.ГГГГ партнера">
+
+            <button type="submit">Рассчитать</button>
+        </form>
+    </div>
+    <div style="font-size: 0.7rem; color: #444; text-align: center; margin-top: 20px;">
+        © 2026 GENESIS PSYCHOLOGY<br>v2.1 Stable
+    </div>
+</aside>
 
 <main>
     {% if result %}
-        <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid var(--gold); margin-bottom: 30px;">
-            <h1 style="font-family: 'Almendra'; font-size: 3rem; margin: 0;">{{ result.title }}</h1>
-            <span style="color: var(--gold); font-size: 1.2rem;">Группа {{ result.number }}</span>
+    <div class="animate">
+        <div class="archetype-header">
+            <div>
+                <span style="color: var(--gold); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px;">Анализ для: {{ request.form.get('user_name') }}</span>
+                <h1>{{ result.title }}</h1>
+            </div>
+            <div style="color: var(--gold); font-family: 'Almendra'; font-size: 1.5rem;">№ {{ result.number }}</div>
         </div>
 
-        <div class="box box-gold">
-            <h3>ПОТЕНЦИАЛ РАЗУМА</h3>
+        <div class="box">
+            <h3>Потенциал Разума</h3>
             <div>{{ result.mind_power|safe }}</div>
         </div>
 
+        <div class="grid-2">
+            <div class="box"><h3>Сила Действия</h3>{{ result.action_power|safe }}</div>
+            <div class="box"><h3>Реализация</h3>{{ result.realization|safe }}</div>
+        </div>
+
         {% if jobs %}
-        <div class="box" style="border-left: 4px solid var(--action);">
-            <h4 style="color: var(--action); margin-bottom: 5px;">💼 РЕКОМЕНДОВАННЫЕ ВАКАНСИИ</h4>
-            <p style="font-size: 0.8rem; color: #666; margin-bottom: 15px;">На основе ваших талантов и текущего рынка</p>
-            <div class="job-list">
-                {% for job in jobs %}
-                <a href="{{ job.alternate_url }}" target="_blank" class="job-card">
-                    <div class="job-title">{{ job.name }}</div>
-                    <div class="job-meta">
-                        {{ job.employer.name }} •
-                        {% if job.salary %}
-                            {{ job.salary.from or 'от' }} {{ job.salary.to or '' }} {{ job.salary.currency }}
-                        {% else %}
-                            з/п не указана
-                        {% endif %}
-                    </div>
-                </a>
-                {% endfor %}
-            </div>
+        <div class="box jobs-container">
+            <h3 style="color: var(--blue);">Профессиональная реализация</h3>
+            {% for job in jobs %}
+            <a href="{{ job.alternate_url }}" target="_blank" class="job-item">
+                <div class="job-title">{{ job.name }}</div>
+                <div class="job-meta" style="font-size: 0.8rem; color: #888;">{{ job.employer.name }}</div>
+                <div class="job-salary">
+                    {% if job.salary and job.salary.from %}
+                        {{ job.salary.from }} {{ job.salary.currency if job.salary.currency else '' }}
+                    {% else %}
+                        З/П по результатам собеседования
+                    {% endif %}
+                </div>
+            </a>
+            {% endfor %}
         </div>
         {% endif %}
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-            <div class="box box-action">
-                <h4>ДЕЙСТВИЕ</h4>
-                {{ result.action_power|safe }}
-            </div>
-            <div class="box box-action">
-                <h4>РЕАЛИЗАЦИЯ</h4>
-                {{ result.realization|safe }}
-            </div>
+        <div class="grid-2">
+            <div class="box" style="border-color: #ff4d4d;"><h3>Ловушка Тени</h3>{{ result.shadow_trap|safe }}</div>
+            <div class="box" style="border-color: #4dff4d;"><h3>Точка Роста</h3>{{ result.growth_point|safe }}</div>
         </div>
 
-        <div class="box box-dharma">
-            <h3>ДХАРМА</h3>
-            <div style="font-style: italic; font-size: 1.2rem; margin-top: 15px;">{{ result.dharma|safe }}</div>
+        <div class="box">
+            <h3>Кармические задачи</h3>
+            <div>{{ result.karmic_tasks|safe }}</div>
         </div>
+
+        <div class="box" style="background: rgba(114, 9, 183, 0.05); border-top: 2px solid var(--gold);">
+            <h3>Дхарма</h3>
+            <div style="font-size: 1.2rem; font-style: italic;">{{ result.dharma|safe }}</div>
+        </div>
+
+        <div class="box">
+            <h3>Итог жизни</h3>
+            <div>{{ result.life_result|safe }}</div>
+        </div>
+    </div>
     {% else %}
-        <div style="text-align: center; margin-top: 100px; opacity: 0.2; letter-spacing: 10px; animation: breath 4s infinite;">
-            ВВЕДИТЕ ДАННЫЕ ДЛЯ РАСЧЕТА
-        </div>
+    <div style="display: flex; height: 100%; align-items: center; justify-content: center; opacity: 0.1;">
+        <h2 style="font-size: 4rem; font-family: 'Almendra'; letter-spacing: 20px;">GENESIS</h2>
+    </div>
     {% endif %}
 </main>
 
-<div id="admin-btn" onclick="openAdmin()">✺</div>
+<div id="admin-trigger" onclick="document.getElementById('admin-panel').style.display='block'">✺</div>
 
 <div id="admin-panel">
-    <div style="max-width: 600px; margin: 0 auto;">
-        <h2 style="color: var(--gold);">Редактор Контента</h2>
-        <select id="group-select" onchange="loadGroup()" style="width: 100%; padding: 10px; margin-bottom: 20px; background: #222; color: white;">
+    <div style="max-width: 800px; margin: 0 auto;">
+        <h2 style="color: var(--gold); font-family: 'Almendra';">Редактор данных Archetypes</h2>
+        <select id="group-select" onchange="loadGroupData()" style="width: 100%; padding: 10px; margin-bottom: 20px; background: #222; color: #fff;">
             <option value="">Выберите группу...</option>
             {% for i in range(1, 10) %}<option value="{{ i }}">Группа {{ i }}</option>{% endfor %}
         </select>
-        <input type="password" id="admin-key" placeholder="Ключ доступа" style="margin-bottom: 20px;">
 
-        <div id="fields"></div>
-        <button onclick="saveData()" style="width: 100%; margin-top: 20px;">СОХРАНИТЬ ИЗМЕНЕНИЯ</button>
-        <button onclick="closeAdmin()" style="background: transparent; color: #666; margin-top: 10px;">ЗАКРЫТЬ</button>
+        <div id="editor-fields"></div>
+
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <button onclick="saveAdminData()" style="flex: 2;">Сохранить все данные</button>
+            <button onclick="document.getElementById('admin-panel').style.display='none'" style="flex: 1; background:#333; color:#fff;">Отмена</button>
+        </div>
     </div>
 </div>
 
@@ -197,51 +285,67 @@
     const FIELDS = {
         'title': 'Заголовок',
         'mind_power': 'Потенциал Разума',
-        'action_power': 'Действие',
+        'action_power': 'Сила Действия',
         'realization': 'Реализация',
+        'shadow_trap': 'Ловушка Тени',
+        'growth_point': 'Точка Роста',
+        'karmic_tasks': 'Кармические задачи',
         'dharma': 'Дхарма',
-        'search_keywords': 'Ключевые слова для HH (через пробел)'
+        'life_result': 'Итог жизни',
+        'search_keywords': 'Ключевые слова для вакансий'
     };
 
-    function openAdmin() { document.getElementById('admin-panel').style.display = 'block'; }
-    function closeAdmin() { document.getElementById('admin-panel').style.display = 'none'; }
-
-    async function loadGroup() {
+    async function loadGroupData() {
         const num = document.getElementById('group-select').value;
-        if (!num) return;
-        const res = await fetch(`/admin/get/${num}`).then(r => r.json());
-        const container = document.getElementById('fields');
-        container.innerHTML = '';
+        if(!num) return;
 
-        if (res.status === 'success') {
-            for (let [key, label] of Object.entries(FIELDS)) {
-                container.innerHTML += `
-                    <label style="display:block; margin: 15px 0 5px; color: var(--gold);">${label}</label>
-                    <textarea id="edit-${key}" style="width:100%; height:80px; background:#111; color:white; border:1px solid #333; padding:10px;">${res.data[key] || ''}</textarea>
-                `;
+        try {
+            const res = await fetch(`/admin/get/${num}`).then(r => r.json());
+            const container = document.getElementById('editor-fields');
+            container.innerHTML = '';
+
+            if(res.status === 'success') {
+                Object.entries(FIELDS).forEach(([key, label]) => {
+                    const labelEl = document.createElement('label');
+                    labelEl.style = "color:var(--gold); display:block; margin-top:15px; font-size: 0.8rem; text-transform: uppercase;";
+                    labelEl.innerText = label;
+
+                    const txt = document.createElement('textarea');
+                    txt.id = `edit-${key}`;
+                    txt.style = "width:100%; height:100px; background:#111; color:#fff; border:1px solid #333; padding:10px; border-radius: 4px; font-family: sans-serif;";
+                    txt.value = res.data[key] || '';
+
+                    container.appendChild(labelEl);
+                    container.appendChild(txt);
+                });
             }
+        } catch (e) {
+            alert('Ошибка загрузки данных!');
         }
     }
 
-    async function saveData() {
-        const key = document.getElementById('admin-key').value;
-        if (key !== '0602') return alert('Неверный ключ');
-
+    async function saveAdminData() {
         const num = document.getElementById('group-select').value;
-        const payload = { number: num };
-        for (let key in FIELDS) {
-            payload[key] = document.getElementById(`edit-${key}`).value;
-        }
+        if(!num) return alert('Выберите группу!');
 
-        const res = await fetch('/admin/update', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(payload)
-        }).then(r => r.json());
+        const data = { number: num };
+        Object.keys(FIELDS).forEach(key => {
+            data[key] = document.getElementById(`edit-${key}`).value;
+        });
 
-        if (res.status === 'success') {
-            alert('Данные обновлены!');
-            location.reload();
+        try {
+            const res = await fetch('/admin/update', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            }).then(r => r.json());
+
+            if(res.status === 'success') {
+                alert('Данные архетипа ' + num + ' успешно обновлены!');
+                location.reload();
+            }
+        } catch (e) {
+            alert('Ошибка при сохранении!');
         }
     }
 </script>

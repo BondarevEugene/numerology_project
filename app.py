@@ -1,15 +1,18 @@
 import os
 from flask import Flask, render_template, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from services import CareerService
+from flask_migrate import Migrate  # 1. Импорт здесь
+from services import CareerService # импорт сервиса карьеры из основного файла. пока так.
 
-app = Flask(__name__)
+app = Flask(__name__) # 2. Сначала создаем app
 
+# Настройки базы данных
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'genesis_v2.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
 
+db = SQLAlchemy(app) # 3. Потом создаем db
+migrate = Migrate(app, db) # 4. И только ТЕПЕРЬ создаем migrate
 
 class ArchetypeContent(db.Model):
     __tablename__ = 'archetype_content'
@@ -60,13 +63,19 @@ def get_group(d):
 def index():
     result = None
     matrix_raw = None
-    jobs = []  # Инициализируем пустым списком
+    jobs = []
+    country = request.form.get('country', 'ua') # 'ua' теперь значение по умолчанию, если вдруг придет пустой запрос
 
     if request.method == 'POST':
+        # Собираем все пришедшие данные
+        user_name = request.form.get('user_name')
+        user_email = request.form.get('user_email')
         day = request.form.get('day')
         month = request.form.get('month')
         year = request.form.get('year')
+        partner_date = request.form.get('partner_date')
 
+        # Основная логика поиска архетипа
         group_num = get_group(day)
         result = ArchetypeContent.query.filter_by(number=group_num).first()
 
@@ -74,11 +83,13 @@ def index():
         s = f"{day}{month}{year}"
         matrix_raw = {f"c{i + 1}": s[i] if i < len(s) else "?" for i in range(9)}
 
-        # Вызов сервиса вакансий ТОЛЬКО если найден результат
         if result:
-            jobs = CareerService.get_vacancies(result)
+            jobs = CareerService.get_vacancies(result, country=country)
 
-    return render_template('index.html', result=result, matrix_raw=matrix_raw, jobs=jobs)
+    return render_template('index.html',
+                           result=result,
+                           matrix_raw=matrix_raw,
+                           jobs=jobs)
 
 
 @app.route('/admin/get/<num>')
