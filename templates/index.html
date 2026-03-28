@@ -5,37 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Genesis Psychology | Архетипы</title>
     <link href="https://fonts.googleapis.com/css2?family=Almendra&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://js.nicedit.com/nicEdit-latest.js" type="text/javascript"></script>
     <style>
         :root {
-            --bg: #050505;
-            --panel: #0a0a0a;
-            --gold: #c5a059;
-            --gold-glow: rgba(197, 160, 89, 0.4);
-            --border: #1a1a1a;
-            --text: #b8b8b8;
-            --blue: #00b4d8;
+            --bg: #050505; --panel: rgba(10, 10, 10, 0.9); --gold: #c5a059;
+            --gold-glow: rgba(197, 160, 89, 0.4); --border: rgba(197, 160, 89, 0.15);
+            --text: #b8b8b8; --blue: #00b4d8;
         }
 
         body {
-            background: var(--bg);
-            color: var(--text);
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
+            background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif;
+            margin: 0; display: flex; height: 100vh; overflow: hidden;
             background-image: radial-gradient(circle at 50% 50%, #111 0%, #050505 100%);
         }
 
         /* МАГИЧЕСКИЙ ФОН */
         body::before {
             content: "ᚠ ᚢ ᚦ ᚨ ᚱ ᚲ ᚷ ᚹ ᚺ ᚻ ᛁ ᛃ ᛈ ᛉ ᛋ ᛏ ᛒ ᛖ ᛗ ᛚ ᛜ ᛞ ᛟ";
-            position: fixed;
-            width: 200%; height: 200%; top: -50%; left: -50%;
-            z-index: -1; color: rgba(197, 160, 89, 0.02);
-            font-size: 4rem; display: flex; flex-wrap: wrap; gap: 60px;
-            transform: rotate(-10deg); animation: backgroundScroll 180s linear infinite;
-            pointer-events: none; filter: blur(1px);
+            position: fixed; width: 200%; height: 200%; top: -50%; left: -50%;
+            z-index: -1; color: rgba(197, 160, 89, 0.02); font-size: 4rem;
+            display: flex; flex-wrap: wrap; gap: 60px; transform: rotate(-10deg);
+            animation: backgroundScroll 180s linear infinite; pointer-events: none;
         }
 
         @keyframes backgroundScroll {
@@ -43,278 +33,176 @@
             to { transform: rotate(-10deg) translateY(1000px); }
         }
 
-        /* БОКОВАЯ ПАНЕЛЬ */
         aside {
-            width: 320px;
-            min-width: 320px;
-            background: var(--panel);
-            border-right: 1px solid var(--border);
-            padding: 25px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            box-sizing: border-box;
-            z-index: 10;
-            box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+            width: 340px; min-width: 340px; background: var(--panel); backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border); padding: 25px;
+            display: flex; flex-direction: column; z-index: 10; box-shadow: 10px 0 30px rgba(0,0,0,0.5);
         }
 
         .logo {
-            font-family: 'Almendra', serif;
-            font-size: 1.6rem;
-            color: var(--gold);
-            letter-spacing: 6px;
-            text-align: center;
-            margin-bottom: 30px;
+            font-family: 'Almendra', serif; font-size: 1.6rem; color: var(--gold);
+            letter-spacing: 6px; text-align: center; margin-bottom: 30px;
             text-shadow: 0 0 15px var(--gold-glow);
         }
 
-        .calc-form { display: flex; flex-direction: column; gap: 12px; }
+        .label-sm { font-size: 0.65rem; color: #555; letter-spacing: 2px; text-transform: uppercase; margin: 15px 0 5px; }
 
-        .label-sm {
-            font-size: 0.65rem;
-            color: #555;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin-bottom: 4px;
+        input, select, button {
+            background: #000; border: 1px solid var(--border); color: #fff;
+            padding: 12px; font-size: 0.8rem; border-radius: 4px; transition: 0.3s;
+            outline: none; width: 100%; box-sizing: border-box; margin-bottom: 8px;
         }
-
-        input, select {
-            background: #000;
-            border: 1px solid var(--border);
-            color: #fff;
-            padding: 12px;
-            font-size: 0.8rem;
-            border-radius: 4px;
-            transition: 0.3s;
-            outline: none;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        input:focus { border-color: var(--gold); background: #080808; }
-
-        .date-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1.5fr;
-            gap: 8px;
-        }
-
         button {
             background: linear-gradient(135deg, #c5a059 0%, #8a6d35 100%);
-            color: #000;
-            border: none;
-            padding: 15px;
-            font-weight: 700;
-            font-size: 0.75rem;
-            letter-spacing: 2px;
-            cursor: pointer;
-            border-radius: 4px;
-            text-transform: uppercase;
-            margin-top: 10px;
-            transition: 0.3s;
+            color: #000; font-weight: 700; cursor: pointer; text-transform: uppercase; border: none; margin-top: 10px;
         }
+        button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px var(--gold-glow); }
 
-        button:hover { transform: translateY(-2px); box-shadow: 0 5px 20px var(--gold-glow); }
+        .date-grid { display: grid; grid-template-columns: 1fr 1fr 1.5fr; gap: 8px; }
 
-        /* КОНТЕНТ */
-        main {
-            flex-grow: 1;
-            padding: 50px 80px;
-            overflow-y: auto;
-            scroll-behavior: smooth;
+        main { flex-grow: 1; padding: 50px 80px; overflow-y: auto; scroll-behavior: smooth; }
+
+        /* МАТРИЦА (ПИКТОГРАММА) */
+        .matrix-wrapper {
+            width: 160px; height: 220px; margin: 0 auto 40px;
+            background: url('https://cdn-icons-png.flaticon.com/512/743/743232.png') no-repeat center;
+            background-size: contain; position: relative; opacity: 0.5; filter: sepia(1) brightness(1.2);
         }
-
-        .box {
-            background: rgba(10, 10, 10, 0.5);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border);
-            padding: 25px;
-            margin-bottom: 25px;
-            border-radius: 4px;
-            position: relative;
-            font-size: 0.9rem;
-            line-height: 1.7;
-            transition: 0.4s ease;
-        }
-
-        .box h3 {
-            font-family: 'Almendra';
-            color: var(--gold);
-            margin-top: 0;
-            font-size: 1.1rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            border-bottom: 1px solid rgba(197,160,89,0.1);
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-        }
-
-        /* --- МАГИЧЕСКИЙ СВИТОК ДХАРМЫ --- */
-        .dharma-scroll {
-            border: 1px solid var(--gold);
-            background: linear-gradient(to bottom, rgba(197, 160, 89, 0.08), transparent);
-            cursor: pointer;
-            overflow: hidden;
-            max-height: 70px; /* Свернут */
-            transition: max-height 1.2s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 0 15px rgba(197, 160, 89, 0.1);
-        }
-
-        .dharma-scroll.open {
-            max-height: 2000px; /* Развернут */
-            background: rgba(197, 160, 89, 0.12);
-            box-shadow: 0 0 40px rgba(197, 160, 89, 0.2);
-        }
-
-        .dharma-scroll .scroll-trigger {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .dharma-badge {
-            background: var(--gold);
-            color: #000;
-            padding: 2px 12px;
-            font-size: 0.75rem;
-            font-weight: 800;
-            border-radius: 20px;
+        .m-dot {
+            position: absolute; background: var(--gold); color: #000;
+            width: 22px; height: 22px; border-radius: 50%;
+            font-size: 0.7rem; font-weight: 900; display: flex; align-items: center; justify-content: center;
             box-shadow: 0 0 10px var(--gold-glow);
         }
 
-        .arrow-icon {
-            color: var(--gold);
-            transition: 0.5s;
-            font-size: 0.8rem;
+        /* БЛОКИ КОНТЕНТА */
+        .box {
+            background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px);
+            border: 1px solid var(--border); padding: 25px; margin-bottom: 25px;
+            border-radius: 8px; position: relative; font-size: 0.9rem; line-height: 1.7;
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .box:hover { border-color: var(--gold); transform: translateY(-3px); background: rgba(255, 255, 255, 0.05); }
+
+        .box h3 {
+            font-family: 'Almendra'; color: var(--gold); margin-top: 0;
+            font-size: 1.1rem; letter-spacing: 2px; text-transform: uppercase;
+            border-bottom: 1px solid rgba(197,160,89,0.1); padding-bottom: 10px; margin-bottom: 15px;
         }
 
-        .open .arrow-icon { transform: rotate(180deg); }
-
-        .dharma-warning {
-            color: #ff4d4d;
-            font-size: 0.75rem;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin-bottom: 15px;
-            font-weight: 600;
-            display: block;
+        /* ДХАРМА СВИTOK */
+        .dharma-scroll {
+            border: 1px solid var(--gold);
+            background: linear-gradient(to bottom, rgba(197, 160, 89, 0.08), transparent);
+            cursor: pointer; overflow: hidden; max-height: 75px;
+            transition: max-height 0.8s ease;
         }
+        .dharma-scroll.open { max-height: 2000px; background: rgba(197, 160, 89, 0.12); }
 
-        /* --- ГРИДЫ И КАРЬЕРА --- */
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+        .animate { opacity: 0; transform: translateY(30px); animation: magicEntrance 0.8s ease forwards; }
+        @keyframes magicEntrance { to { opacity: 1; transform: translateY(0); } }
+        .delay-1 { animation-delay: 0.2s; }
+        .delay-2 { animation-delay: 0.4s; }
 
-        .job-item {
-            display: block; text-decoration: none; padding: 15px;
-            border: 1px solid #1a1a1a; margin-top: 10px; border-radius: 4px;
-            transition: 0.3s; background: rgba(0,0,0,0.2);
-        }
-        .job-item:hover { border-color: var(--blue); transform: translateX(5px); }
+        #admin-trigger { position: fixed; bottom: 20px; right: 20px; opacity: 0.2; cursor: pointer; color: var(--gold); font-size: 1.5rem; transition: 0.3s; }
+        #admin-trigger:hover { opacity: 1; transform: rotate(90deg); }
 
-        .footer-info {
-            font-size: 0.6rem; color: #444; text-align: center;
-            border-top: 1px solid #1a1a1a; padding-top: 20px;
-            letter-spacing: 1px; line-height: 1.5;
-        }
-
-        .animate { animation: magicEntrance 1s ease-out forwards; }
-        @keyframes magicEntrance {
-            from { opacity: 0; filter: blur(10px); transform: translateY(20px); }
-            to { opacity: 1; filter: blur(0); transform: translateY(0); }
-        }
-
-        #admin-trigger { position: fixed; bottom: 20px; right: 20px; opacity: 0.1; cursor: pointer; color: var(--gold); }
+        .nicEdit-main { background: #111 !important; color: white !important; padding: 10px !important; }
     </style>
 </head>
 <body>
 
 <aside>
-    <div>
-        <div class="logo">GENESIS</div>
-        <form class="calc-form" method="POST">
-            <div class="label-sm">Identification</div>
-            <input type="text" name="user_name" placeholder="Ваше имя" required>
-            <input type="email" name="user_email" placeholder="Email" required>
+    <div class="logo">GENESIS</div>
+    <form method="POST">
+        <div class="label-sm">Identification</div>
+        <input type="text" name="user_name" placeholder="Ваше имя" required>
+        <input type="email" name="user_email" placeholder="Email" required>
 
-            <div class="label-sm" style="margin-top: 10px;">Birth Date</div>
-            <div class="date-grid">
-                <input type="text" name="day" placeholder="ДД" maxlength="2" required>
-                <input type="text" name="month" placeholder="ММ" maxlength="2" required>
-                <input type="text" name="year" placeholder="ГГГГ" maxlength="4" required>
-            </div>
+        <div class="label-sm">Subject Birth Date</div>
+        <div class="date-grid">
+            <input type="text" name="day" placeholder="ДД" maxlength="2" required>
+            <input type="text" name="month" placeholder="ММ" maxlength="2" required>
+            <input type="text" name="year" placeholder="ГГГГ" maxlength="4" required>
+        </div>
 
-            <div class="label-sm" style="margin-top: 10px;">Location</div>
-            <select name="country">
-                <option value="ua" selected>Украина (UA)</option>
-                <option value="ru">International</option>
-            </select>
+        <div class="label-sm">Partner Birth Date</div>
+        <div class="date-grid">
+            <input type="text" name="p_day" placeholder="ДД" maxlength="2">
+            <input type="text" name="p_month" placeholder="ММ" maxlength="2">
+            <input type="text" name="p_year" placeholder="ГГГГ" maxlength="4">
+        </div>
 
-            <div class="label-sm" style="margin-top: 10px;">Partner Resonance</div>
-            <input type="text" name="partner_date" placeholder="ДД.ММ.ГГГГ партнера">
-
-            <button type="submit">Рассчитать</button>
-        </form>
-    </div>
-    <div class="footer-info">
-        SYSTEM STATUS: ONLINE<br>
-        © 2026 GENESIS PSYCHOLOGY<br>
-        <span style="color: var(--gold);">v2.1 Stable Edition</span>
-    </div>
+        <select name="country" style="margin-top: 10px;">
+            <option value="ua">Украина (UA)</option>
+            <option value="ru">International</option>
+        </select>
+        <button type="submit">Открыть Хроники</button>
+    </form>
 </aside>
 
 <main>
     {% if result %}
     <div class="animate">
-        <div style="margin-bottom: 40px; border-bottom: 1px solid #222; padding-bottom: 20px;">
-            <span style="color: var(--gold); font-size: 0.7rem; letter-spacing: 2px;">SUBJECT: {{ request.form.get('user_name') }}</span>
-            <h1 style="font-family: 'Almendra'; font-size: 3rem; margin: 5px 0; color: #fff;">{{ result.title }}</h1>
+        <div style="text-align: center; margin-bottom: 40px; border-bottom: 1px solid #222; padding-bottom: 20px;">
+            <span style="color: var(--gold); font-size: 0.7rem; letter-spacing: 3px; text-transform: uppercase;">Subject: {{ request.form.get('user_name') }}</span>
+            <h1 style="font-family: 'Almendra'; font-size: 3.5rem; margin: 5px 0; color: #fff; text-shadow: 0 0 20px var(--gold-glow);">
+                {{ result.title | striptags }}
+            </h1>
         </div>
 
-        {% if dharma_data %}
-        <div class="box dharma-scroll" onclick="this.classList.toggle('open')">
-            <div class="scroll-trigger">
-                <h3 style="margin:0; border:none; padding:0;">Дхарма Души <span class="dharma-badge">№{{ dharma_data.number }}</span></h3>
-                <span class="arrow-icon">▼</span>
-            </div>
+        {% if matrix_raw %}
+        <div class="matrix-wrapper">
+            <div class="m-dot" style="top: 5%; left: 45%;">{{ matrix_raw.c1 }}</div>
+            <div class="m-dot" style="top: 25%; left: 15%;">{{ matrix_raw.c2 }}</div>
+            <div class="m-dot" style="top: 25%; left: 75%;">{{ matrix_raw.c3 }}</div>
+            <div class="m-dot" style="top: 45%; left: 45%;">{{ matrix_raw.c4 }}</div>
+            <div class="m-dot" style="top: 65%; left: 15%;">{{ matrix_raw.c5 }}</div>
+            <div class="m-dot" style="top: 65%; left: 75%;">{{ matrix_raw.c6 }}</div>
+            <div class="m-dot" style="bottom: 0%; left: 45%;">{{ matrix_raw.c7 }}</div>
+        </div>
+        {% endif %}
 
-            <div style="margin-top: 30px; border-top: 1px solid rgba(197,160,89,0.2); padding-top: 20px;">
-                <span class="dharma-warning">Критический порог: 33 года</span>
-                <div style="font-size: 1.1rem; line-height: 1.8; color: #fff;">
-                    {{ dharma_data.dharma | safe }}
-                </div>
+        {% if dharma_data %}
+        <div class="box dharma-scroll animate delay-1" onclick="this.classList.toggle('open')">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="margin:0; border:none; padding:0;">Вектор Дхармы №{{ dharma_data.number }}</h3>
+                <span style="color:var(--gold)">▼</span>
+            </div>
+            <div style="margin-top: 30px; border-top: 1px solid var(--border); padding-top: 20px; color:#fff; font-size:1.1rem;">
+                {{ dharma_data.dharma | safe }}
             </div>
         </div>
         {% endif %}
 
-        <div class="box">
-            <h3>Потенциал Разума</h3>
-            <div>{{ result.mind_power|safe }}</div>
-        </div>
+        <div class="box animate delay-1"><h3>Потенциал Разума</h3>{{ result.mind_power|safe }}</div>
 
-        <div class="grid-2">
-            <div class="box"><h3>Сила Действия</h3>{{ result.action_power|safe }}</div>
-            <div class="box"><h3>Реализация</h3>{{ result.realization|safe }}</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+            <div class="box animate delay-2"><h3>Сила Действия</h3>{{ result.action_power|safe }}</div>
+            <div class="box animate delay-2"><h3>Точка Роста</h3>{{ result.growth_point|safe }}</div>
         </div>
 
         {% if jobs %}
-        <div class="box" style="border-left: 3px solid var(--blue);">
+        <div class="box animate delay-2" style="border-left: 4px solid var(--blue);">
             <h3 style="color: var(--blue);">Профессиональный вектор</h3>
             {% for job in jobs %}
-            <a href="{{ job.alternate_url }}" target="_blank" class="job-item">
+            <a href="{{ job.alternate_url }}" target="_blank" style="display:block; text-decoration:none; padding:12px; border:1px solid rgba(0,180,216,0.1); margin-top:8px; border-radius:4px; transition:0.3s;" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='transparent'">
                 <div style="color: #fff; font-weight: 600;">{{ job.name }}</div>
-                <div style="color: var(--blue); font-size: 0.8rem; margin-top: 5px;">
-                    {{ job.salary.from if job.salary and job.salary.from else 'По результатам' }} {{ job.salary.currency if job.salary and job.salary.currency else '' }}
-                </div>
+                <div style="color: var(--blue); font-size: 0.8rem;">{{ job.employer.name }}</div>
             </a>
             {% endfor %}
         </div>
         {% endif %}
 
-        <div class="grid-2">
-            <div class="box" style="border-bottom: 2px solid rgba(255,0,0,0.2);"><h3>Ловушка Тени</h3>{{ result.shadow_trap|safe }}</div>
-            <div class="box" style="border-bottom: 2px solid rgba(0,255,0,0.2);"><h3>Точка Роста</h3>{{ result.growth_point|safe }}</div>
+        {% if compatibility_result %}
+        <div class="box animate delay-2" style="border: 1px double var(--gold); margin-top: 25px;">
+            <h3 style="color: var(--gold);">Совместимость с партнером</h3>
+            <p>Ваше общее число союза: <strong>{{ compatibility_result.number }}</strong></p>
+            {{ compatibility_result.partner_type | safe }}
         </div>
+        {% endif %}
 
-        <div class="box"><h3>Итог жизни</h3><div>{{ result.life_result|safe }}</div></div>
+        <div class="box animate delay-2"><h3>Итог жизни</h3>{{ result.life_result|safe }}</div>
     </div>
     {% else %}
     <div style="display: flex; height: 100%; align-items: center; justify-content: center; opacity: 0.05;">
@@ -324,69 +212,82 @@
 </main>
 
 <div id="admin-trigger" onclick="document.getElementById('admin-panel').style.display='block'">✺</div>
-<div id="admin-panel" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 99999; padding: 50px; overflow-y: auto;">
-    <div style="max-width: 800px; margin: 0 auto;">
-        <h2 style="color: var(--gold); font-family: 'Almendra';">DATABASE ACCESS</h2>
-        <select id="group-select" onchange="loadGroupData()" style="width: 100%; padding: 10px; margin-bottom: 20px; background: #111; color: #fff;">
-            <option value="">Выберите архетип...</option>
-            {% for i in range(1, 10) %}<option value="{{ i }}">Архетип {{ i }}</option>{% endfor %}
+
+<div id="admin-panel" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 99999; padding: 40px; overflow-y: auto;">
+    <div style="max-width: 900px; margin: 0 auto;">
+        <h2 style="color: var(--gold); font-family: 'Almendra';">DATABASE EDITOR</h2>
+        <select id="group-select" onchange="loadGroupData()" style="width: 100%; padding: 12px; margin-bottom: 20px; background: #111; color: #fff; border: 1px solid var(--gold);">
+            <option value="">Выберите число...</option>
+            {% for i in range(1, 10) %}<option value="{{ i }}">Число {{ i }}</option>{% endfor %}
         </select>
         <div id="editor-fields"></div>
-        <div style="display: flex; gap: 10px; margin-top: 20px;">
-            <button onclick="saveAdminData()" style="flex: 2;">Сохранить</button>
-            <button onclick="document.getElementById('admin-panel').style.display='none'" style="flex: 1; background:#333; color:#fff;">Отмена</button>
+        <div style="margin-top: 30px; padding: 20px; border: 1px solid var(--blue);">
+            <label style="color: var(--blue); text-transform: uppercase; font-size: 0.7rem;">Список профессий (через запятую)</label>
+            <textarea id="edit-profs" style="width: 100%; height: 80px; background: #000; color: #fff; border: 1px solid #333; margin-top: 10px;"></textarea>
+        </div>
+        <div style="display: flex; gap: 15px; margin-top: 30px;">
+            <button onclick="saveAdminData()" style="flex: 2;">Сохранить всё</button>
+            <button onclick="document.getElementById('admin-panel').style.display='none'" style="flex: 1; background:#333; color:#fff;">Закрыть</button>
         </div>
     </div>
 </div>
 
 <script>
-    // Поля теперь включают Дхарму
     const FIELDS = {
-        'title': 'Заголовок',
-        'mind_power': 'Потенциал Разума',
-        'action_power': 'Сила Действия',
-        'realization': 'Реализация',
-        'shadow_trap': 'Ловушка Тени',
-        'growth_point': 'Точка Роста',
-        'karmic_tasks': 'Кармические задачи',
-        'dharma': 'Дхарма (Долг Души)',
-        'life_result': 'Итог жизни'
+        'title': 'Заголовок Архетипа', 'mind_power': 'Разум', 'action_power': 'Действие',
+        'growth_point': 'Точка Роста', 'dharma': 'Дхарма', 'life_result': 'Итог жизни'
     };
+    let activeEditors = {};
 
     async function loadGroupData() {
         const num = document.getElementById('group-select').value;
         if(!num) return;
+        for (let id in activeEditors) { activeEditors[id].removeInstance(id); }
+        activeEditors = {};
         const res = await fetch(`/admin/get/${num}`).then(r => r.json());
         const container = document.getElementById('editor-fields');
         container.innerHTML = '';
         if(res.status === 'success') {
             Object.entries(FIELDS).forEach(([key, label]) => {
-                const l = document.createElement('label');
-                l.style = "display:block; color:var(--gold); font-size:0.7rem; margin-top:10px;";
-                l.innerText = label;
-                const t = document.createElement('textarea');
-                t.id = `edit-${key}`;
-                t.style = "width:100%; height:120px; background:#050505; color:#fff; border:1px solid #222; padding:10px; font-family:sans-serif; line-height:1.5;";
+                const wrap = document.createElement('div');
+                wrap.innerHTML = `<label style="display:block; color:var(--gold); font-size:0.7rem; margin:15px 0 5px; text-transform:uppercase;">${label}</label>`;
+                const t = document.createElement('textarea'); t.id = `edit-${key}`; t.style = "width:100%; height:150px;";
                 t.value = res.data[key] || '';
-                container.appendChild(l);
-                container.appendChild(t);
+                wrap.appendChild(t); container.appendChild(wrap);
+                activeEditors[t.id] = new nicEditor({fullPanel: true}).panelInstance(t.id);
             });
         }
+        const pRes = await fetch(`/admin/get_profs/${num}`).then(r => r.json());
+        document.getElementById('edit-profs').value = pRes.list_csv || '';
     }
 
     async function saveAdminData() {
         const num = document.getElementById('group-select').value;
+        if(!num) return;
+
         const data = { number: num };
-        Object.keys(FIELDS).forEach(key => data[key] = document.getElementById(`edit-${key}`).value);
+        Object.keys(FIELDS).forEach(key => {
+            data[key] = nicEditors.findEditor(`edit-${key}`).getContent();
+        });
+
         await fetch('/admin/update', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(data)
         });
-        alert('Данные сохранены');
+
+        await fetch('/admin/update_profs', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                number: num,
+                list_csv: document.getElementById('edit-profs').value
+            })
+        });
+
+        alert('Хроники Genesis обновлены!');
         location.reload();
     }
 </script>
-
 </body>
 </html>
