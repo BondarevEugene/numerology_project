@@ -46,6 +46,7 @@ class ProfessionContent(db.Model):
     number = db.Column(db.String(10))
     name = db.Column(db.String(200))
     description = db.Column(db.Text)
+    list_csv = db.Column(db.Text)  # <--- Добавляем это поле для скрипта
 
 
 def get_group(d):
