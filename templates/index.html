@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Genesis Psychology | Архетипы</title>
+    <title>Genesis Psychology | Digital Analysis</title>
     <link href="https://fonts.googleapis.com/css2?family=Almendra&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://js.nicedit.com/nicEdit-latest.js" type="text/javascript"></script>
     <style>
         :root {
             --bg: #050505; --panel: rgba(10, 10, 10, 0.9); --gold: #c5a059;
             --gold-glow: rgba(197, 160, 89, 0.4); --border: rgba(197, 160, 89, 0.15);
-            --text: #b8b8b8; --blue: #00b4d8;
+            --text: #b8b8b8; --blue: #00b4d8; --red: #e63946; --purple: #9b59b6;
         }
 
         body {
@@ -43,7 +43,7 @@
         .logo {
             font-family: 'Almendra', serif; font-size: 1.6rem; color: var(--gold);
             letter-spacing: 6px; text-align: center; margin-bottom: 30px;
-            text-shadow: 0 0 15px var(--gold-glow);
+            text-shadow: 0 0 15px var(--gold-glow); cursor: pointer; user-select: none;
         }
 
         .label-sm { font-size: 0.65rem; color: #555; letter-spacing: 2px; text-transform: uppercase; margin: 15px 0 5px; }
@@ -63,12 +63,11 @@
 
         main { flex-grow: 1; padding: 50px 80px; overflow-y: auto; scroll-behavior: smooth; }
 
-        /* МАТРИЦА ДА ВИНЧИ */
+        /* МАТРИЦА ВИНЧИ */
         .vinci-matrix-wrapper {
-            width: 100%; max-width: 800px; min-height: 650px; height: auto; margin: 30px auto 60px;
+            width: 100%; max-width: 800px; min-height: 650px; height: auto; margin: 30px auto 20px;
             position: relative; border: 1px solid var(--border);
             background: rgba(10, 10, 10, 0.5); backdrop-filter: blur(5px); border-radius: 8px;
-            overflow: hidden;
         }
 
         .human-figure { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 1; padding: 40px; }
@@ -90,19 +89,26 @@
             font-size: 1.1rem; font-weight: 900; display: flex; align-items: center; justify-content: center;
             box-shadow: 0 0 15px var(--gold-glow); margin-bottom: 8px; transition: 0.3s;
         }
+        .zone-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
+
+        /* ЛЕГЕНДА ПИКТОГРАММЫ */
+        .matrix-legend {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px; margin-bottom: 50px; text-align: center; border-top: 1px solid var(--border); padding-top: 20px;
+        }
+        .legend-item b { color: var(--gold); display: block; font-size: 0.7rem; text-transform: uppercase; margin-bottom: 4px; }
+        .legend-item span { font-size: 0.75rem; color: #777; }
 
         /* КАРТА СОЗНАНИЯ */
         .mind-map-section {
             background: #080808; border: 1px solid var(--border);
-            margin: 40px 0; padding: 20px; border-radius: 12px;
+            margin: 40px 0; padding: 25px; border-radius: 12px;
         }
         .map-toggle {
             width: 100%; padding: 15px; background: rgba(197, 160, 89, 0.05); border: 1px solid var(--border);
             color: var(--gold); font-family: 'Almendra'; letter-spacing: 3px; cursor: pointer;
-            display: flex; justify-content: center; gap: 15px; align-items: center; transition: 0.3s;
+            display: flex; justify-content: center; gap: 15px; align-items: center;
         }
-        .map-toggle:hover { background: rgba(197, 160, 89, 0.1); border-color: var(--gold); }
-
         .map-content { display: none; padding: 30px 0; grid-template-columns: 1fr 1.5fr; gap: 40px; }
         .map-content.active { display: grid; }
 
@@ -112,40 +118,49 @@
             padding: 15px; text-align: center; border-radius: 5px; transition: 0.4s;
         }
         .node-3x3.active { border-color: var(--gold); background: rgba(197, 160, 89, 0.05); box-shadow: 0 0 15px var(--gold-glow); }
-        .node-3x3 b { display: block; color: var(--gold); font-size: 1.2rem; letter-spacing: 2px; min-height: 1.4rem; }
+        .node-3x3 b { display: block; color: var(--gold); font-size: 1.2rem; min-height: 1.4rem; letter-spacing: 2px; }
         .node-3x3 span { font-size: 0.6rem; text-transform: uppercase; color: #666; display: block; margin-top: 5px; }
 
+        /* БЛОКИ И АНИМАЦИИ */
         .box {
             background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px);
             border: 1px solid var(--border); padding: 25px; margin-bottom: 25px;
-            border-radius: 8px; position: relative; font-size: 0.9rem; line-height: 1.7; transition: 0.4s;
+            border-radius: 8px; position: relative; font-size: 0.9rem; line-height: 1.7;
+            opacity: 0; transform: translateY(30px);
         }
         .box h3 { font-family: 'Almendra'; color: var(--gold); margin: 0 0 15px; font-size: 1.1rem; letter-spacing: 2px; }
 
-        /* --- МОБИЛЬНАЯ АДАПТАЦИЯ --- */
-        @media (max-width: 768px) {
-            body { flex-direction: column; height: auto; overflow-y: auto; overflow-x: hidden; }
-            aside { width: 100%; min-width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border); padding: 20px; box-sizing: border-box; }
-            main { padding: 30px 15px; width: 100%; box-sizing: border-box; }
-            .vinci-matrix-wrapper { min-height: 500px; zoom: 0.7; margin: 10px 0; }
-            div[style*="grid-template-columns: 1fr 1fr"] { grid-template-columns: 1fr !important; }
-            .map-content { grid-template-columns: 1fr; }
-            .matrix-3x3 { margin: 0 auto; }
-        }
+        /* Цветовые акценты триады */
+        .box-power { border-top: 3px solid var(--blue); background: rgba(0, 180, 216, 0.05); }
+        .box-shadow { border-top: 3px solid var(--red); background: rgba(230, 57, 70, 0.05); }
+        .box-growth { border-top: 3px solid var(--gold); background: rgba(197, 160, 89, 0.05); }
 
-        .animate { opacity: 0; transform: translateY(30px); animation: magicEntrance 0.8s ease forwards; }
-        @keyframes magicEntrance { to { opacity: 1; transform: translateY(0); } }
+        .animate-reveal { animation: revealEffect 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        @keyframes revealEffect { to { opacity: 1; transform: translateY(0); } }
+
         .delay-1 { animation-delay: 0.2s; }
         .delay-2 { animation-delay: 0.4s; }
+        .delay-3 { animation-delay: 0.6s; }
 
-        #admin-trigger { position: fixed; bottom: 20px; right: 20px; opacity: 0.2; cursor: pointer; color: var(--gold); font-size: 1.5rem; transition: 0.3s; z-index: 100; }
-        .nicEdit-main { background: #111 !important; color: white !important; padding: 10px !important; }
+        .badge { display: inline-block; padding: 4px 10px; background: var(--gold); color: #000; font-size: 0.7rem; font-weight: 700; border-radius: 3px; margin-bottom: 10px; text-transform: uppercase; }
+
+        /* АДАПТАЦИЯ */
+        @media (max-width: 768px) {
+            body { flex-direction: column; height: auto; overflow-y: auto; overflow-x: hidden; }
+            aside { width: 100%; min-width: 100%; height: auto; padding: 20px; border-right: none; border-bottom: 1px solid var(--border); }
+            main { padding: 30px 15px; width: 100%; }
+            .vinci-matrix-wrapper { zoom: 0.7; min-height: 500px; }
+            .map-content { grid-template-columns: 1fr; }
+            div[style*="grid-template-columns: 1fr 1fr 1fr"] { grid-template-columns: 1fr !important; }
+        }
+
+        #admin-trigger { position: fixed; bottom: 20px; right: 20px; opacity: 0.2; cursor: pointer; color: var(--gold); font-size: 1.5rem; z-index: 100; transition: 0.3s; }
     </style>
 </head>
 <body>
 
 <aside>
-    <div class="logo" onclick="checkLeelaSecret()" style="cursor: pointer; user-select: none;">GENESIS</div>
+    <div class="logo" onclick="checkLeelaSecret()">GENESIS</div>
     <form method="POST">
         <div class="label-sm">Identification</div>
         <input type="text" name="user_name" placeholder="Ваше имя" value="{{ request.form.get('user_name', '') }}" required>
@@ -158,7 +173,7 @@
             <input type="text" name="year" placeholder="ГГГГ" maxlength="4" value="{{ request.form.get('year', '') }}" required>
         </div>
 
-        <div class="label-sm">Partner Birth Date</div>
+        <div class="label-sm">Partner (Compatibility)</div>
         <div class="date-grid">
             <input type="text" name="p_day" placeholder="ДД" maxlength="2" value="{{ request.form.get('p_day', '') }}">
             <input type="text" name="p_month" placeholder="ММ" maxlength="2" value="{{ request.form.get('p_month', '') }}">
@@ -175,139 +190,148 @@
 
 <main>
     {% if result %}
-    <div class="animate">
+    <div class="animate-reveal">
         <div style="text-align: center; margin-bottom: 40px; border-bottom: 1px solid #222; padding-bottom: 20px;">
-            <span style="color: var(--gold); font-size: 0.7rem; letter-spacing: 3px; text-transform: uppercase;">Subject: {{ request.form.get('user_name') }}</span>
+            <span style="color: var(--gold); font-size: 0.7rem; letter-spacing: 3px; text-transform: uppercase;">Analysis for: {{ request.form.get('user_name') }}</span>
             <h1 style="font-family: 'Almendra'; font-size: 3.5rem; margin: 5px 0; color: #fff; text-shadow: 0 0 20px var(--gold-glow);">
                 {{ result.title | striptags }}
             </h1>
+            {% if result.planet %}<div class="badge">Планета: {{ result.planet }}</div>{% endif %}
         </div>
 
         {% if matrix_raw %}
-        <div class="vinci-matrix-wrapper animate delay-1">
-            <div class="human-figure">
-                <img src="{{ url_for('static', filename='img/vitruvian.png') }}" class="golden-vinci">
-                <svg viewBox="0 0 400 500" style="position: absolute; inset: 0; opacity: 0.25; pointer-events: none;">
-                    <circle cx="200" cy="220" r="185" stroke="#c5a059" stroke-width="0.5" fill="none" />
-                    <rect x="55" y="75" width="290" height="290" stroke="#c5a059" stroke-width="0.5" fill="none" />
-                </svg>
-            </div>
-            <div class="matrix-zone zone-head" style="top: 8%; left: 50%;"><div class="m-dot">{{ matrix_raw.c1 }}</div><div class="zone-label">Сознание</div></div>
-            <div class="matrix-zone zone-shoulder-l" style="top: 25%; left: 15%;"><div class="m-dot">{{ matrix_raw.c2 }}</div><div class="zone-label">Маска</div></div>
-            <div class="matrix-zone zone-shoulder-r" style="top: 25%; right: 15%; transform: translate(50%,-50%);"><div class="m-dot">{{ matrix_raw.c3 }}</div><div class="zone-label">Реализация</div></div>
-            <div class="matrix-zone zone-heart" style="top: 45%; left: 50%;"><div class="m-dot">{{ matrix_raw.c4 }}</div><div class="zone-label">Душа</div></div>
-            <div class="matrix-zone zone-power-l" style="top: 68%; left: 18%;"><div class="m-dot">{{ matrix_raw.c5 }}</div><div class="zone-label">Сила</div></div>
-            <div class="matrix-zone zone-power-r" style="top: 68%; right: 18%; transform: translate(50%,-50%);"><div class="m-dot">{{ matrix_raw.c6 }}</div><div class="zone-label">База</div></div>
-            <div class="matrix-zone zone-roots" style="bottom: 8%; left: 50%;"><div class="m-dot">{{ matrix_raw.c7 }}</div><div class="zone-label">Род</div></div>
+        <div class="vinci-matrix-wrapper animate-reveal delay-1">
+            <div class="human-figure"><img src="{{ url_for('static', filename='img/vitruvian.png') }}" class="golden-vinci"></div>
+            <div class="matrix-zone" style="top: 8%; left: 50%;"><div class="m-dot">{{ matrix_raw.c1 }}</div><div class="zone-label">Сознание</div></div>
+            <div class="matrix-zone" style="top: 25%; left: 15%;"><div class="m-dot">{{ matrix_raw.c2 }}</div><div class="zone-label">Маска</div></div>
+            <div class="matrix-zone" style="top: 25%; right: 15%; transform: translate(50%,-50%);"><div class="m-dot">{{ matrix_raw.c3 }}</div><div class="zone-label">Реализация</div></div>
+            <div class="matrix-zone" style="top: 45%; left: 50%;"><div class="m-dot">{{ matrix_raw.c4 }}</div><div class="zone-label">Душа</div></div>
+            <div class="matrix-zone" style="top: 68%; left: 18%;"><div class="m-dot">{{ matrix_raw.c5 }}</div><div class="zone-label">Сила</div></div>
+            <div class="matrix-zone" style="top: 68%; right: 18%; transform: translate(50%,-50%);"><div class="m-dot">{{ matrix_raw.c6 }}</div><div class="zone-label">База</div></div>
+            <div class="matrix-zone" style="bottom: 8%; left: 50%;"><div class="m-dot">{{ matrix_raw.c7 }}</div><div class="zone-label">Род</div></div>
+        </div>
+        <div class="matrix-legend animate-reveal delay-1">
+            <div class="legend-item"><b>Сознание</b><span>Цель и фокус</span></div>
+            <div class="legend-item"><b>Маска</b><span>Внешний образ</span></div>
+            <div class="legend-item"><b>Реализация</b><span>Социальный успех</span></div>
+            <div class="legend-item"><b>Душа</b><span>Точка покоя</span></div>
+            <div class="legend-item"><b>Сила</b><span>Энергия действия</span></div>
+            <div class="legend-item"><b>База</b><span>Опора личности</span></div>
+            <div class="legend-item"><b>Род</b><span>Сила предков</span></div>
         </div>
         {% endif %}
 
-        <div class="box animate delay-1"><h3>Потенциал Разума</h3>{{ result.mind_power|safe }}</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;" class="animate-reveal delay-2">
+            <div class="box box-power">
+                <h3 style="color:var(--blue);">⚡ Вектор Силы</h3>
+                {{ result.action_power|safe }}
+            </div>
+            <div class="box box-shadow">
+                <h3 style="color:var(--red);">🌑 Теневая Ловушка</h3>
+                {{ result.shadow_side|safe }}
+            </div>
+            <div class="box box-growth">
+                <h3 style="color:var(--gold);">🎯 Точка Роста</h3>
+                {{ result.growth_point|safe }}
+            </div>
+        </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
-            <div class="box animate delay-2"><h3>Сила Действия</h3>{{ result.action_power|safe }}</div>
-            <div class="box animate delay-2"><h3>Точка Роста</h3>{{ result.growth_point|safe }}</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;" class="animate-reveal delay-2">
+            <div class="box">
+                <h3>🚀 Реализация</h3>
+                {{ result.realization|safe }}
+            </div>
+            <div class="box" style="border-left: 3px solid var(--purple);">
+                <h3 style="color:var(--purple);">⚖️ Кармические задачи</h3>
+                {{ result.karmic_tasks|safe }}
+            </div>
+        </div>
+
+        <div class="box animate-reveal delay-3" style="background: linear-gradient(90deg, rgba(197, 160, 89, 0.08) 0%, transparent 100%);">
+            <h3>🔄 Цикл развития</h3>
+            {{ result.development_cycle|safe }}
         </div>
 
         {% if jobs %}
-        <div class="box animate delay-2" style="border-left: 4px solid var(--blue);">
-            <h3 style="color: var(--blue);">Профессиональный вектор</h3>
-            {% for job in jobs %}
-            <a href="{{ job.alternate_url }}" target="_blank" style="display:block; text-decoration:none; padding:12px; border:1px solid rgba(0,180,216,0.1); margin-top:8px; border-radius:4px; transition:0.3s;" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='transparent'">
-                <div style="color: #fff; font-weight: 600;">{{ job.name }}</div>
-                <div style="color: var(--blue); font-size: 0.8rem;">{{ job.employer.name }}</div>
-            </a>
-            {% endfor %}
+        <div class="box animate-reveal delay-3" style="border-left: 4px solid var(--blue);">
+            <h3 style="color: var(--blue);">Профессиональный вектор (HH.ru)</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                {% for job in jobs %}
+                <a href="{{ job.alternate_url }}" target="_blank" style="display:block; text-decoration:none; padding:12px; border:1px solid rgba(0,180,216,0.1); border-radius:4px; transition: 0.3s;">
+                    <div style="color: #fff; font-weight: 600;">{{ job.name }}</div>
+                    <div style="color: var(--blue); font-size: 0.75rem;">{{ job.employer.name }}</div>
+                </a>
+                {% endfor %}
+            </div>
         </div>
         {% endif %}
 
-        <section class="mind-map-section animate delay-2">
-            <button class="map-toggle" onclick="toggleMindMap()">
-                <span>ЦИФРОВАЯ КАРТА СОЗНАНИЯ (ПСИХОМАТРИЦА)</span>
-                <b id="map-arrow">▼</b>
-            </button>
+        <section class="mind-map-section animate-reveal delay-3">
+            <button class="map-toggle" onclick="toggleMindMap()"><span>ЦИФРОВАЯ КАРТА СОЗНАНИЯ (ПИФАГОР)</span><b id="map-arrow">▼</b></button>
             <div class="map-content" id="map-content">
-                <div class="matrix-3x3" id="pythagoras-matrix">
-                    <div class="node-3x3" data-num="1"><span>Характер/Эго</span><b>-</b></div>
-                    <div class="node-3x3" data-num="4"><span>Здоровье</span><b>-</b></div>
-                    <div class="node-3x3" data-num="7"><span>Удача/Талант</span><b>-</b></div>
-                    <div class="node-3x3" data-num="2"><span>Энергия</span><b>-</b></div>
-                    <div class="node-3x3" data-num="5"><span>Логика/Интуиция</span><b>-</b></div>
-                    <div class="node-3x3" data-num="8"><span>Долг/Род</span><b>-</b></div>
-                    <div class="node-3x3" data-num="3"><span>Интерес/Наука</span><b>-</b></div>
-                    <div class="node-3x3" data-num="6"><span>Труд/Власть</span><b>-</b></div>
-                    <div class="node-3x3" data-num="9"><span>Память/Ум</span><b>-</b></div>
-                </div>
-                <div>
-                    <h3 style="color:var(--gold); font-family: 'Almendra';">Глубинный психотип</h3>
-                    <p style="font-size:0.85rem; line-height: 1.6; color: #aaa;">
-                        Этот расчет основан на <b>Квадрате Пифагора</b>. Мы преобразовали дату вашего рождения в цифровой код, рассчитали дополнительные рабочие числа и распределили их по векторам.
-                        <br><br>
-                        Каждая ячейка отражает врожденный объем ресурса. <b>Отсутствие цифр</b> указывает на зоны, требующие сознательной наработки. <b>Многократные цифры</b> (например, 111 или 22) показывают доминирующие черты вашего "биокомпьютера".
-                    </p>
+                <div><div class="matrix-3x3" id="pythagoras-matrix">
+                    {% for i in range(1,10) %}<div class="node-3x3" data-num="{{i}}"><span>Ячейка {{i}}</span><b>-</b></div>{% endfor %}
+                </div></div>
+                <div class="analysis-stats">
+                    <div class="stat-bar-container"><div class="stat-label"><span>Волевой ресурс</span><span id="stat-val-1">0%</span></div><div class="stat-bar"><div class="stat-fill" id="fill-1"></div></div></div>
+                    <div class="stat-bar-container"><div class="stat-label"><span>Социальный ресурс</span><span id="stat-val-2">0%</span></div><div class="stat-bar"><div class="stat-fill" id="fill-2"></div></div></div>
+                    <div class="stat-bar-container"><div class="stat-label"><span>Интеллектуальный ресурс</span><span id="stat-val-3">0%</span></div><div class="stat-bar"><div class="stat-fill" id="fill-3"></div></div></div>
                 </div>
             </div>
         </section>
 
-        <div class="box animate delay-2"><h3>Итог жизни</h3>{{ result.life_result|safe }}</div>
+        <div class="box animate-reveal delay-3"><h3>Итог жизни</h3>{{ result.life_result|safe }}</div>
 
-        <div style="text-align: center; margin-top: 40px; margin-bottom: 60px;">
-            <form action="/export_pdf" method="POST" id="pdf-form">
-                <input type="hidden" name="html_to_pdf" id="html_input">
-                <button type="button" onclick="generatePDF()" style="background: none; border: 1px solid var(--gold); color: var(--gold); padding: 12px 30px; cursor: pointer; font-weight: 600; letter-spacing: 2px;">
-                    📜 ЭКСПОРТ В PDF
-                </button>
-            </form>
-        </div>
+        <form action="/export_pdf" method="POST" id="pdf-form" style="text-align: center; margin-bottom: 60px;">
+            <input type="hidden" name="html_to_pdf" id="html_input">
+            <button type="button" onclick="generatePDF()" style="background: none; border: 1px solid var(--gold); color: var(--gold); padding: 12px 30px; letter-spacing: 2px;">📜 СФОРМИРОВАТЬ ОТЧЕТ PDF</button>
+        </form>
     </div>
     {% else %}
-    <div style="display: flex; height: 100%; align-items: center; justify-content: center; opacity: 0.05;">
-        <h2 style="font-size: 5rem; font-family: 'Almendra'; letter-spacing: 30px;">GENESIS</h2>
-    </div>
+    <div style="display: flex; height: 100%; align-items: center; justify-content: center; opacity: 0.05;"><h2 style="font-size: 5rem; font-family: 'Almendra'; letter-spacing: 30px;">GENESIS</h2></div>
     {% endif %}
 </main>
 
 <div id="admin-trigger" onclick="document.getElementById('admin-panel').style.display='block'">✺</div>
 <div id="admin-panel" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 99999; padding: 40px; overflow-y: auto;">
-    <div style="max-width: 900px; margin: 0 auto;">
-        <h2 style="color: var(--gold); font-family: 'Almendra';">DATABASE EDITOR</h2>
-        <select id="group-select" onchange="loadGroupData()" style="width: 100%; padding: 12px; margin-bottom: 20px; background: #111; color: #fff; border: 1px solid var(--gold);">
-            <option value="">Выберите число...</option>
-            {% for i in range(1, 10) %}<option value="{{ i }}">Число {{ i }}</option>{% endfor %}
+    <div style="max-width: 1100px; margin: 0 auto;">
+        <h2 style="color: var(--gold); font-family: 'Almendra';">DATABASE ARCHITECT</h2>
+        <select id="group-select" onchange="loadGroupData()" style="margin-bottom: 20px;">
+            <option value="">Выберите архетип...</option>
+            {% for i in range(1, 10) %}<option value="{{ i }}">Архетип {{ i }}</option>{% endfor %}
         </select>
-        <div id="editor-fields"></div>
-        <div style="margin-top: 30px; padding: 20px; border: 1px solid var(--blue);">
-            <label style="color: var(--blue); text-transform: uppercase; font-size: 0.7rem;">Список профессий (через запятую)</label>
-            <textarea id="edit-profs" style="width: 100%; height: 80px; background: #000; color: #fff; border: 1px solid #333; margin-top: 10px;"></textarea>
-        </div>
+        <div id="editor-fields" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;"></div>
+        <div style="margin-top: 20px;"><label>Ключевые слова HH.ru (через запятую)</label><textarea id="edit-profs" style="height: 60px;"></textarea></div>
         <div style="display: flex; gap: 15px; margin-top: 30px;">
-            <button onclick="saveAdminData()" style="flex: 2;">Сохранить всё</button>
-            <button onclick="document.getElementById('admin-panel').style.display='none'" style="flex: 1; background:#333; color:#fff;">Закрыть</button>
+            <button onclick="saveAdminData()" style="flex: 2;">СОХРАНИТЬ В БАЗУ</button>
+            <button onclick="document.getElementById('admin-panel').style.display='none'" style="flex: 1; background:#333;">ЗАКРЫТЬ</button>
         </div>
     </div>
 </div>
 
 <script>
-    // ТВОЯ ЛОГИКА АДМИНКИ
-    const FIELDS = { 'title': 'Заголовок', 'mind_power': 'Разум', 'action_power': 'Действие', 'growth_point': 'Точка Роста', 'dharma': 'Дхарма', 'life_result': 'Итог жизни' };
+    // ВСЕ ПОЛЯ ДЛЯ ПОЛНОЙ СИНХРОНИЗАЦИИ
+    const FIELDS = {
+        'title': 'Заголовок', 'planet': 'Планета',
+        'action_power': 'Вектор Силы', 'shadow_side': 'Теневая Ловушка',
+        'growth_point': 'Точка Роста (Задание)', 'realization': 'Реализация',
+        'karmic_tasks': 'Кармические задачи', 'development_cycle': 'Цикл развития',
+        'mind_power': 'Разум (Потенциал)', 'life_result': 'Итог жизни',
+        'financial_tip': 'Финансы', 'health_tips': 'Здоровье', 'partner_type': 'Тип партнера'
+    };
     let activeEditors = {};
 
     async function loadGroupData() {
-        const num = document.getElementById('group-select').value;
-        if(!num) return;
-        for (let id in activeEditors) { activeEditors[id].removeInstance(id); }
-        activeEditors = {};
+        const num = document.getElementById('group-select').value; if(!num) return;
+        Object.keys(activeEditors).forEach(id => activeEditors[id].removeInstance(id));
         const res = await fetch(`/admin/get/${num}`).then(r => r.json());
         const container = document.getElementById('editor-fields'); container.innerHTML = '';
-        if(res.status === 'success') {
-            Object.entries(FIELDS).forEach(([key, label]) => {
-                const wrap = document.createElement('div');
-                wrap.innerHTML = `<label style="display:block; color:var(--gold); font-size:0.7rem; margin:15px 0 5px; text-transform:uppercase;">${label}</label>`;
-                const t = document.createElement('textarea'); t.id = `edit-${key}`; t.style = "width:100%; height:150px;";
-                t.value = res.data[key] || ''; wrap.appendChild(t); container.appendChild(wrap);
-                activeEditors[t.id] = new nicEditor({fullPanel: true}).panelInstance(t.id);
-            });
-        }
+        Object.entries(FIELDS).forEach(([key, label]) => {
+            const wrap = document.createElement('div');
+            wrap.innerHTML = `<label style="color:var(--gold); font-size:0.7rem; display:block; margin-bottom:5px;">${label}</label><textarea id="edit-${key}">${res.data[key]||''}</textarea>`;
+            container.appendChild(wrap);
+            activeEditors[`edit-${key}`] = new nicEditor({fullPanel: true}).panelInstance(`edit-${key}`);
+        });
         const pRes = await fetch(`/admin/get_profs/${num}`).then(r => r.json());
         document.getElementById('edit-profs').value = pRes.list_csv || '';
     }
@@ -315,91 +339,61 @@
     async function saveAdminData() {
         const num = document.getElementById('group-select').value; if(!num) return;
         const data = { number: num };
-        Object.keys(FIELDS).forEach(key => { data[key] = nicEditors.findEditor(`edit-${key}`).getContent(); });
+        Object.keys(FIELDS).forEach(key => data[key] = nicEditors.findEditor(`edit-${key}`).getContent());
         await fetch('/admin/update', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) });
         await fetch('/admin/update_profs', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ number: num, list_csv: document.getElementById('edit-profs').value }) });
-        alert('Хроники Genesis обновлены!'); location.reload();
+        alert('Данные обновлены!'); location.reload();
     }
 
-    // ЛОГИКА КАРТЫ СОЗНАНИЯ (РАСЧЕТ)
     function toggleMindMap() {
         const content = document.getElementById('map-content');
-        const arrow = document.getElementById('map-arrow');
         content.classList.toggle('active');
-        arrow.innerText = content.classList.contains('active') ? '▲' : '▼';
-        if(content.classList.contains('active')) content.scrollIntoView({ behavior: 'smooth' });
+        document.getElementById('map-arrow').innerText = content.classList.contains('active') ? '▲' : '▼';
+        if(content.classList.contains('active')) setTimeout(animateBars, 300);
     }
 
     function calculatePythagoras() {
-        const d = document.querySelector('input[name="day"]').value;
-        const m = document.querySelector('input[name="month"]').value;
-        const y = document.querySelector('input[name="year"]').value;
-
+        const d = "{{ request.form.get('day', '') }}", m = "{{ request.form.get('month', '') }}", y = "{{ request.form.get('year', '') }}";
         if (!d || !m || !y) return;
-
-        // 1. Сбор всех цифр даты
-        let dateDigits = (d.padStart(2, '0') + m.padStart(2, '0') + y).split('').map(Number);
-
-        // 2. Первое рабочее число (сумма всех цифр даты)
-        let n1 = dateDigits.reduce((a, b) => a + b, 0);
-
-        // 3. Второе рабочее число (сумма цифр n1)
+        let s = d.padStart(2,'0') + m.padStart(2,'0') + y;
+        let n1 = s.split('').reduce((a, b) => a + parseInt(b), 0);
         let n2 = n1.toString().split('').reduce((a, b) => a + parseInt(b), 0);
-
-        // 4. Третье рабочее число (n1 - первая цифра дня рождения * 2)
-        let firstDayDigit = d.padStart(2, '0')[0] === '0' ? d.padStart(2, '0')[1] : d.padStart(2, '0')[0];
-        let n3 = Math.abs(n1 - (parseInt(firstDayDigit) * 2));
-
-        // 5. Четвертое рабочее число (сумма цифр n3)
+        let n3 = Math.abs(n1 - (parseInt(s[0] === '0' ? s[1] : s[0]) * 2));
         let n4 = n3.toString().split('').reduce((a, b) => a + parseInt(b), 0);
-
-        // Объединяем все цифры в одну строку для подсчета
-        let allDigits = dateDigits.join('') + n1 + n2 + n3 + n4;
-
-        // Распределяем по ячейкам
+        let all = s + n1 + n2 + n3 + n4;
+        let counts = {};
         document.querySelectorAll('.node-3x3').forEach(node => {
-            const num = node.getAttribute('data-num');
-            const count = allDigits.split('').filter(char => char === num).length;
-            const valDisplay = node.querySelector('b');
+            const num = node.dataset.num;
+            const count = all.split('').filter(c => c === num).length;
+            counts[num] = count;
+            node.querySelector('b').innerText = count > 0 ? num.repeat(count) : '-';
+            if(count > 0) node.classList.add('active');
+        });
+        window.stats = [
+            Math.min(((counts['1']||0)+(counts['4']||0)+(counts['7']||0))*16, 100),
+            Math.min(((counts['2']||0)+(counts['5']||0)+(counts['8']||0))*16, 100),
+            Math.min(((counts['3']||0)+(counts['6']||0)+(counts['9']||0))*16, 100)
+        ];
+    }
 
-            if (count > 0) {
-                valDisplay.innerText = num.repeat(count);
-                node.classList.add('active');
-            } else {
-                valDisplay.innerText = '-';
-                node.classList.remove('active');
-            }
+    function animateBars() {
+        if(!window.stats) return;
+        window.stats.forEach((v, i) => {
+            document.getElementById(`fill-${i+1}`).style.width = v + '%';
+            document.getElementById(`stat-val-${i+1}`).innerText = Math.round(v) + '%';
         });
     }
 
-    // ПЕРЕХОД В ЛИЛУ
-    let leelaClicks = 0;
-    function checkLeelaSecret() {
-        leelaClicks++;
-        const logo = document.querySelector('.logo');
-        logo.style.textShadow = `0 0 ${leelaClicks * 5}px var(--gold)`;
-        if (leelaClicks >= 7) {
-            document.body.style.transition = '2s';
-            document.body.style.filter = 'brightness(0) sepia(1)';
-            setTimeout(() => { window.location.href = '/leela/play'; }, 1000);
-        }
-    }
-
-    // PDF ЭКСПОРТ
     function generatePDF() {
-        const userName = document.querySelector('input[name="user_name"]').value || "User";
-        const mainClone = document.querySelector('main').cloneNode(true);
-        mainClone.querySelectorAll('button, form, #admin-trigger, .nicEdit-panelContain').forEach(el => el.remove());
-        document.getElementById('html_input').value = `<html><body style="background:#000;color:#fff;">${mainClone.innerHTML}</body></html>`;
+        const clone = document.querySelector('main').cloneNode(true);
+        clone.querySelectorAll('button, form, #admin-trigger').forEach(e => e.remove());
+        const styles = Array.from(document.styleSheets).map(s => { try { return Array.from(s.cssRules).map(r => r.cssText).join(""); } catch(e) { return ""; } }).join("");
+        document.getElementById('html_input').value = `<html><head><style>${styles} body{padding:40px; background:#000; color:#fff;}</style></head><body>${clone.innerHTML}</body></html>`;
         document.getElementById('pdf-form').submit();
     }
 
-    // Вызов расчета при загрузке страницы, если результат уже есть
-    window.addEventListener('DOMContentLoaded', () => {
-        {% if result %}
-            calculatePythagoras();
-        {% endif %}
-    });
+    function checkLeelaSecret() { window.lc = (window.lc||0)+1; if(window.lc>=7) window.location.href='/leela/play'; }
+    window.addEventListener('DOMContentLoaded', () => { {% if result %} calculatePythagoras(); {% endif %} });
 </script>
 </body>
 </html>
