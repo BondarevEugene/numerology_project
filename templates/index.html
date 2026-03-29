@@ -62,19 +62,86 @@
 
         main { flex-grow: 1; padding: 50px 80px; overflow-y: auto; scroll-behavior: smooth; }
 
-        /* МАТРИЦА (ПИКТОГРАММА) */
-        .matrix-wrapper {
-            width: 160px; height: 220px; margin: 0 auto 40px;
-            background: url('https://cdn-icons-png.flaticon.com/512/743/743232.png') no-repeat center;
-            background-size: contain; position: relative; opacity: 0.5; filter: sepia(1) brightness(1.2);
-        }
-        .m-dot {
-            position: absolute; background: var(--gold); color: #000;
-            width: 22px; height: 22px; border-radius: 50%;
-            font-size: 0.7rem; font-weight: 900; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 10px var(--gold-glow);
+        /* ОБНОВЛЕННАЯ МАТРИЦА ДА ВИНЧИ */
+        .vinci-matrix-wrapper {
+            width: 100%; max-width: 800px; min-height: 650px; height: auto; margin: 30px auto 60px;
+            position: relative; border: 1px solid var(--border);
+            background: rgba(10, 10, 10, 0.5); backdrop-filter: blur(5px); border-radius: 8px;
+            overflow: hidden;
         }
 
+        .human-figure {
+            position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+            z-index: 1; padding: 40px;
+        }
+
+        .human-figure img {
+            width: 100%; height: 100%; object-fit: contain;
+            opacity: 0.25; filter: sepia(1) brightness(0.8) contrast(1.2);
+        }
+
+        .matrix-zone {
+            position: absolute; z-index: 5; display: flex; flex-direction: column; align-items: center;
+            transform: translate(-50%, -50%); width: 200px; text-align: center;
+        }
+        .zone-shoulder-r, .zone-power-r { transform: translate(50%, -50%); }
+
+        .m-dot {
+            background: #000; color: var(--gold); border: 2px solid var(--gold);
+            width: 32px; height: 32px; border-radius: 50%;
+            font-size: 1.1rem; font-weight: 900; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 15px var(--gold-glow); margin-bottom: 8px;
+            transition: 0.3s; z-index: 6;
+        }
+        .m-dot:hover { transform: scale(1.2); box-shadow: 0 0 25px var(--gold); }
+
+        .zone-label {
+            font-family: 'Almendra', serif; color: #fff; font-size: 0.85rem;
+            letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px;
+            text-shadow: 0 0 5px rgba(255,255,255,0.5);
+        }
+
+        .zone-desc {
+            color: var(--text); font-size: 0.7rem; line-height: 1.4; opacity: 0.8;
+            background: rgba(0, 0, 0, 0.7); padding: 4px 8px; border-radius: 4px;
+        }
+
+        .matrix-zone::before { content: ''; position: absolute; background: var(--gold); opacity: 0.3; z-index: -1; }
+        .zone-head::before { width: 1px; height: 50px; top: -50px; left: 50%; }
+        .zone-heart::before {
+            width: 140%; height: 1px; top: 16px; left: -20%;
+            background: linear-gradient(to right, transparent, var(--gold), transparent);
+        }
+        .zone-roots::before { width: 1px; height: 40px; bottom: -40px; left: 50%; }
+        /* ЗОЛОТАЯ АНИМАЦИЯ ЧЕЛОВЕКА */
+.golden-vinci {
+    width: 85%; height: 85%; object-fit: contain;
+
+    /* Магия выкрашивания в золото: Инверсия -> Сепия -> Яркость */
+    filter: invert(1) sepia(1) saturate(5) hue-rotate(15deg) brightness(1.1) contrast(1.3) drop-shadow(0 0 10px rgba(197, 160, 89, 0.6));
+
+    opacity: 0.6; /* Базовая прозрачность */
+
+    /* Подключаем анимацию перелива */
+    animation: goldShimmer 6s ease-in-out infinite;
+    transition: 0.5s;
+}
+
+/* Эффект пульсации при наведении на всю матрицу */
+.vinci-matrix-wrapper:hover .golden-vinci {
+    opacity: 1;
+    filter: invert(1) sepia(1) saturate(8) hue-rotate(10deg) brightness(1.2) contrast(1.4) drop-shadow(0 0 25px rgba(197, 160, 89, 0.9));
+}
+
+/* КЛЮЧЕВЫЕ КАДРЫ АНИМАЦИИ (Перелив) */
+@keyframes goldShimmer {
+    0%, 100% {
+        filter: invert(1) sepia(1) saturate(5) hue-rotate(15deg) brightness(1.1) contrast(1.3) drop-shadow(0 0 10px rgba(197, 160, 89, 0.6));
+    }
+    50% {
+        filter: invert(1) sepia(1) saturate(7) hue-rotate(-10deg) brightness(1.3) contrast(1.5) drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
+    }
+}
         /* БЛОКИ КОНТЕНТА */
         .box {
             background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px);
@@ -90,15 +157,6 @@
             border-bottom: 1px solid rgba(197,160,89,0.1); padding-bottom: 10px; margin-bottom: 15px;
         }
 
-        /* ДХАРМА СВИTOK */
-        .dharma-scroll {
-            border: 1px solid var(--gold);
-            background: linear-gradient(to bottom, rgba(197, 160, 89, 0.08), transparent);
-            cursor: pointer; overflow: hidden; max-height: 75px;
-            transition: max-height 0.8s ease;
-        }
-        .dharma-scroll.open { max-height: 2000px; background: rgba(197, 160, 89, 0.12); }
-
         .animate { opacity: 0; transform: translateY(30px); animation: magicEntrance 0.8s ease forwards; }
         @keyframes magicEntrance { to { opacity: 1; transform: translateY(0); } }
         .delay-1 { animation-delay: 0.2s; }
@@ -113,7 +171,7 @@
 <body>
 
 <aside>
-    <div class="logo">GENESIS</div>
+<div class="logo" onclick="checkLeelaSecret()" style="cursor: pointer; user-select: none;">GENESIS</div>
     <form method="POST">
         <div class="label-sm">Identification</div>
         <input type="text" name="user_name" placeholder="Ваше имя" required>
@@ -152,28 +210,61 @@
         </div>
 
         {% if matrix_raw %}
-        <div class="matrix-wrapper">
-            <div class="m-dot" style="top: 5%; left: 45%;">{{ matrix_raw.c1 }}</div>
-            <div class="m-dot" style="top: 25%; left: 15%;">{{ matrix_raw.c2 }}</div>
-            <div class="m-dot" style="top: 25%; left: 75%;">{{ matrix_raw.c3 }}</div>
-            <div class="m-dot" style="top: 45%; left: 45%;">{{ matrix_raw.c4 }}</div>
-            <div class="m-dot" style="top: 65%; left: 15%;">{{ matrix_raw.c5 }}</div>
-            <div class="m-dot" style="top: 65%; left: 75%;">{{ matrix_raw.c6 }}</div>
-            <div class="m-dot" style="bottom: 0%; left: 45%;">{{ matrix_raw.c7 }}</div>
-        </div>
-        {% endif %}
+<div class="vinci-matrix-wrapper animate delay-1">
 
-        {% if dharma_data %}
-        <div class="box dharma-scroll animate delay-1" onclick="this.classList.toggle('open')">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h3 style="margin:0; border:none; padding:0;">Вектор Дхармы №{{ dharma_data.number }}</h3>
-                <span style="color:var(--gold)">▼</span>
-            </div>
-            <div style="margin-top: 30px; border-top: 1px solid var(--border); padding-top: 20px; color:#fff; font-size:1.1rem;">
-                {{ dharma_data.dharma | safe }}
-            </div>
-        </div>
-        {% endif %}
+    <div class="human-figure">
+        <img src="{{ url_for('static', filename='img/vitruvian.png') }}" class="golden-vinci">
+
+        <svg viewBox="0 0 400 500" style="position: absolute; inset: 0; opacity: 0.25; pointer-events: none;">
+            <circle cx="200" cy="220" r="185" stroke="#c5a059" stroke-width="0.5" fill="none" />
+            <rect x="55" y="75" width="290" height="290" stroke="#c5a059" stroke-width="0.5" fill="none" />
+        </svg>
+    </div>
+
+    <div class="matrix-zone zone-head" style="top: 8%; left: 50%;">
+        <div class="m-dot">{{ matrix_raw.c1 }}</div>
+        <div class="zone-label">Сознание</div>
+        <div class="zone-desc">Мысли и идеи</div>
+    </div>
+
+    <div class="matrix-zone zone-shoulder-l" style="top: 25%; left: 15%;">
+        <div class="m-dot">{{ matrix_raw.c2 }}</div>
+        <div class="zone-label">Маска</div>
+        <div class="zone-desc">Социальный образ</div>
+    </div>
+
+    <div class="matrix-zone zone-shoulder-r" style="top: 25%; right: 15%;">
+        <div class="m-dot">{{ matrix_raw.c3 }}</div>
+        <div class="zone-label">Реализация</div>
+        <div class="zone-desc">Профессия и успех</div>
+    </div>
+
+    <div class="matrix-zone zone-heart" style="top: 45%; left: 50%;">
+        <div class="m-dot">{{ matrix_raw.c4 }}</div>
+        <div class="zone-label">Душа</div>
+        <div class="zone-desc">Внутренний покой</div>
+    </div>
+
+    <div class="matrix-zone zone-power-l" style="top: 68%; left: 18%;">
+        <div class="m-dot">{{ matrix_raw.c5 }}</div>
+        <div class="zone-label">Сила</div>
+        <div class="zone-desc">Энергия жизни</div>
+    </div>
+
+    <div class="matrix-zone zone-power-r" style="top: 68%; right: 18%;">
+        <div class="m-dot">{{ matrix_raw.c6 }}</div>
+        <div class="zone-label">База</div>
+        <div class="zone-desc">Результативность</div>
+    </div>
+
+    <div class="matrix-zone zone-roots" style="bottom: 8%; left: 50%;">
+        <div class="m-dot">{{ matrix_raw.c7 }}</div>
+        <div class="zone-label">Род</div>
+        <div class="zone-desc">Кармические корни</div>
+    </div>
+
+</div>
+{% endif %}
 
         <div class="box animate delay-1"><h3>Потенциал Разума</h3>{{ result.mind_power|safe }}</div>
 
@@ -203,6 +294,15 @@
         {% endif %}
 
         <div class="box animate delay-2"><h3>Итог жизни</h3>{{ result.life_result|safe }}</div>
+
+        <div style="text-align: center; margin-top: 40px; margin-bottom: 60px;">
+            <form action="/export_pdf" method="POST" id="pdf-form">
+                <input type="hidden" name="html_to_pdf" id="html_input">
+                <button type="button" onclick="generatePDF()" style="background: none; border: 1px solid var(--gold); color: var(--gold); padding: 12px 30px; cursor: pointer; font-weight: 600; letter-spacing: 2px;">
+                    📜 ЭКСПОРТ В PDF
+                </button>
+            </form>
+        </div>
     </div>
     {% else %}
     <div style="display: flex; height: 100%; align-items: center; justify-content: center; opacity: 0.05;">
@@ -288,6 +388,98 @@
         alert('Хроники Genesis обновлены!');
         location.reload();
     }
+
+    // ВЫНЕСЕННАЯ ФУНКЦИЯ ПЕЧАТИ В PDF
+    function generatePDF() {
+    const userName = document.querySelector('input[name="user_name"]').value || "User";
+
+    // 1. Берем только содержимое <main>
+    const mainClone = document.querySelector('main').cloneNode(true);
+
+    // 2. Удаляем все лишнее (кнопки, формы, админку)
+    const elementsToRemove = mainClone.querySelectorAll('button, form, #admin-trigger, .nicEdit-panelContain');
+    elementsToRemove.forEach(el => el.remove());
+
+    // 3. Собираем "безопасный" HTML для старого движка ПДФ
+    const fullHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <style>
+                /* Стили специально для PDF-движка */
+                body {
+                    background-color: #000000 !important;
+                    color: #ffffff !important;
+                    font-family: Arial, sans-serif;
+                    margin: 20px;
+                }
+                h1 { color: #c5a059 !important; text-align: center; font-size: 28px; }
+                h3 { color: #c5a059 !important; border-bottom: 1px solid #333; padding-bottom: 5px; text-transform: uppercase; font-size: 18px; }
+
+                .box {
+                    background-color: #111111 !important;
+                    border: 1px solid #c5a059 !important;
+                    padding: 15px;
+                    margin-bottom: 20px;
+                    border-radius: 5px;
+                }
+
+                /* Фикс для матрицы в ПДФ */
+                .vinci-matrix-wrapper {
+                    border: 1px solid #333 !important;
+                    height: 600px !important;
+                    position: relative !important;
+                    background-color: #050505 !important;
+                }
+                .m-dot {
+                    border: 2px solid #c5a059 !important;
+                    color: #c5a059 !important;
+                    font-weight: bold;
+                    width: 30px; height: 30px;
+                    text-align: center; line-height: 30px;
+                    background: #000;
+                    border-radius: 50%;
+                }
+                .zone-label { color: #ffffff !important; font-size: 10px; text-transform: uppercase; }
+                .zone-desc { color: #cccccc !important; font-size: 8px; }
+
+                /* Убираем анимации для ПДФ */
+                .animate { opacity: 1 !important; transform: none !important; }
+                .golden-vinci { opacity: 0.3 !important; filter: grayscale(1) invert(1) !important; }
+            </style>
+        </head>
+        <body>
+            <div style="color: #c5a059; text-align: center; margin-bottom: 10px;">GENESIS CHRONICS FOR: ${userName}</div>
+            ${mainClone.innerHTML}
+        </body>
+        </html>`;
+
+    document.getElementById('html_input').value = fullHtml;
+    document.getElementById('pdf-form').submit();
+}
+    // Переменная для секретки Лилы
+let leelaClicks = 0;
+
+function checkLeelaSecret() {
+    leelaClicks++;
+
+    // Визуальный отклик: логотип вспыхивает золотом
+    const logo = document.querySelector('.logo');
+    logo.style.textShadow = `0 0 ${leelaClicks * 5}px var(--gold)`;
+    logo.style.transform = 'scale(1.05)';
+    setTimeout(() => { logo.style.transform = 'scale(1)'; }, 100);
+
+    if (leelaClicks >= 7) {
+        // Эффект перехода
+        document.body.style.transition = '2s';
+        document.body.style.filter = 'brightness(0) sepia(1) hue-rotate(20deg)';
+
+        setTimeout(() => {
+            window.location.href = '/leela/play';
+        }, 1000);
+    }
+}
 </script>
 </body>
 </html>

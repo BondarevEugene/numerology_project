@@ -4,8 +4,12 @@ from flask import Flask, render_template, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from services import CareerService
+import pdfkit
+from leela_module.leela_logic import leela_bp # импорт лилы
 
 app = Flask(__name__)
+
+app.register_blueprint(leela_bp, url_prefix='/leela')
 
 # Настройки базы данных
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -130,6 +134,8 @@ def index():
                 dharma_data = ArchetypeContent.query.filter_by(number=str(d_num)).first()
             except:
                 dharma_data = None
+                #"расчет Дхармы для Согласно логике твоей функции sum_digits(int(day) + int(month)):День: "
+                 #"17Месяц: 07Сумма: $17 + 7 = 24$Редукция (сведение к цифре): $2 + 4 = \mathbf{6}$"
 
             # 3. Матрица для "человечка"
             full_date_str = f"{day}{month}{year}"
@@ -204,6 +210,50 @@ def admin_update():
 
     db.session.commit()
     return jsonify({'status': 'success'})
+
+
+# Укажи путь к установленному wkhtmltopdf.exe
+# ВНИМАНИЕ: Проверь этот путь на своем диске!
+PATH_WKHTML = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+
+
+@app.route('/export_pdf', methods=['POST'])
+def export_pdf():
+    # Получаем скомпилированный HTML из скрытого поля формы
+    html_content = request.form.get('html_to_pdf')
+
+    if not html_content:
+        return "Ошибка: данные для PDF не получены", 400
+
+    # Настройки PDF (шрифты, отступы)
+    options = {
+        'page-size': 'A4',
+        'margin-top': '10mm',
+        'margin-right': '10mm',
+        'margin-bottom': '10mm',
+        'margin-left': '10mm',
+        'encoding': "UTF-8",
+        'no-outline': None,
+        'enable-local-file-access': None,  # Важно для подгрузки стилей и КЛЮЧЕВОЙ ПАРАМЕТР ДЛЯ ЛОКАЛЬНЫХ КАРТИНОК
+        'disable-javascript': None,  # <--- ДОБАВЬ ЭТО: запрещаем JS внутри ПДФ, чтобы не вис
+        'quiet': ''
+    }
+
+    try:
+        config = pdfkit.configuration(wkhtmltopdf=PATH_WKHTML)
+        # Генерируем PDF в память
+        pdf = pdfkit.from_string(html_content, False, configuration=config, options=options)
+
+        # Отправляем файл пользователю
+        return (pdf, 200, {
+            'Content-Type': 'application/pdf',
+            'Content-Disposition': 'attachment; filename="Genesis_Chronics.pdf"'
+        })
+    except Exception as e:
+        print(f"DEBUG: [❌] Ошибка генерации PDF: {e}")
+        return f"Ошибка генерации PDF: {e}", 500
+
+
 
 if __name__ == '__main__':
     with app.app_context():
