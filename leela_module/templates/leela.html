@@ -243,5 +243,136 @@
         }, 1000);
     }
 </script>
+<section class="mind-map-section">
+    <button class="map-toggle" onclick="toggleMindMap()">
+        <span>ЦИФРОВАЯ КАРТА СОЗНАНИЯ</span>
+        <i id="toggle-icon">▼</i>
+    </button>
+
+    <div class="map-content" id="map-content">
+        <div class="matrix-grid" id="matrix-display">
+            </div>
+
+        <div class="analysis-board">
+            <h3>Психологический профиль</h3>
+            <div id="full-report" class="report-grid">
+                </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .mind-map-section {
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        background: #080808;
+        border-top: 1px solid var(--gold);
+        z-index: 1000;
+        transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .map-toggle {
+        width: 100%;
+        padding: 15px;
+        background: none;
+        border: none;
+        color: var(--gold);
+        font-family: 'Almendra';
+        letter-spacing: 4px;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        align-items: center;
+        background: rgba(197, 160, 89, 0.05);
+    }
+
+    .map-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.5s ease;
+        padding: 0 40px;
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 40px;
+    }
+
+    .mind-map-section.open .map-content {
+        max-height: 80vh;
+        padding-bottom: 40px;
+        overflow-y: auto;
+    }
+
+    /* Стили матрицы */
+    .matrix-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .matrix-node {
+        background: rgba(255,255,255,0.02);
+        border: 1px solid rgba(197, 160, 89, 0.1);
+        padding: 15px;
+        text-align: center;
+        border-radius: 5px;
+    }
+
+    .matrix-node.active { border-color: var(--gold); background: rgba(197, 160, 89, 0.05); }
+
+    .node-title { font-size: 0.6rem; color: #666; display: block; margin-bottom: 5px; }
+    .node-val { font-size: 1.5rem; color: var(--gold); font-family: 'Almendra'; }
+
+    /* Стили отчета */
+    .report-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        color: #888;
+        font-size: 0.85rem;
+    }
+
+    .report-item b { color: var(--gold); display: block; margin-bottom: 5px; }
+</style>
+
+<script>
+    function toggleMindMap() {
+        const section = document.querySelector('.mind-map-section');
+        const icon = document.getElementById('toggle-icon');
+        section.classList.toggle('open');
+        icon.innerText = section.classList.contains('open') ? '▲' : '▼';
+    }
+
+    // Эта функция вызывается при загрузке или вводе даты
+    function renderMindMap(data) {
+        const grid = document.getElementById('matrix-display');
+        const report = document.getElementById('full-report');
+
+        grid.innerHTML = '';
+        report.innerHTML = '';
+
+        // Номера в матрице идут не по порядку (3-6-9, 2-5-8, 1-4-7 - классика)
+        const order = ['3','6','9','2','5','8','1','4','7'];
+
+        order.forEach(num => {
+            const count = data.matrix[num];
+            const node = document.createElement('div');
+            node.className = `matrix-node ${count > 0 ? 'active' : ''}`;
+            node.innerHTML = `
+                <span class="node-title">${nodesInfo[num].name}</span>
+                <span class="node-val">${count > 0 ? num.repeat(count) : '-'}</span>
+            `;
+            grid.appendChild(node);
+
+            // Добавляем текст в отчет
+            const level = count === 0 ? 'low' : (count < 3 ? 'mid' : 'high');
+            const item = document.createElement('div');
+            item.className = 'report-item';
+            item.innerHTML = `<b>${nodesInfo[num].name}</b> ${nodesInfo[num][level]}`;
+            report.appendChild(item);
+        });
+    }
+</script>
 </body>
 </html>
