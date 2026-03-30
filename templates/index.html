@@ -63,7 +63,7 @@
 
         main { flex-grow: 1; padding: 50px 80px; overflow-y: auto; scroll-behavior: smooth; position: relative; z-index: 10; }
 
-        /* МАТРИЦА ВИНЧИ */
+        /* МАТРИЦА ВИНЧИ — ИСПРАВЛЕНО ДЛЯ ОТОБРАЖЕНИЯ ПОДПИСЕЙ */
         .vinci-matrix-wrapper {
             width: 100%; max-width: 800px; height: 700px; margin: 30px auto;
             position: relative; border: 1px solid var(--border);
@@ -74,53 +74,39 @@
         .golden-vinci {
             height: 85%; width: auto; object-fit: contain;
             filter: invert(1) sepia(1) saturate(5) hue-rotate(15deg) brightness(1.1) contrast(1.3);
-            opacity: 0.25;
+            opacity: 0.3; /* Уменьшили непрозрачность фона для лучшей читаемости */
         }
 
-        /* Исправленные зоны — теперь текст виден всегда */
+        /* Зоны с цифрами — АГРЕССИВНЫЙ CSS ДЛЯ ГАРАНТИРОВАННОЙ ВИДИМОСТИ */
         .matrix-zone {
             position: absolute;
-            z-index: 9999 !important;
+            z-index: 9999 !important; /* Максимальный приоритет */
             display: flex !important;
             flex-direction: column !important;
             align-items: center !important;
             transform: translate(-50%, -50%) !important;
             width: 120px !important; /* Фиксированная ширина для центровки текста */
             text-align: center !important;
+            pointer-events: none; /* Чтобы не мешали кликам */
         }
-
         .m-dot {
-            background: #000 !important;
-            color: var(--gold) !important;
-            border: 2px solid var(--gold) !important;
-            width: 42px !important;
-            height: 42px !important;
-            border-radius: 50% !important;
-            font-size: 1.2rem !important;
-            font-weight: 900 !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            box-shadow: 0 0 15px var(--gold-glow) !important;
-            margin-bottom: 8px !important;
-            position: relative !important;
+            background: #000 !important; color: var(--gold) !important; border: 2px solid var(--gold) !important;
+            width: 40px !important; height: 40px !important; border-radius: 50% !important;
+            font-size: 1.2rem !important; font-weight: 900 !important; display: flex !important; align-items: center !important; justify-content: center !important;
+            box-shadow: 0 0 15px var(--gold-glow) !important; margin-bottom: 6px !important;
+            position: relative !important; z-index: 10000 !important;
         }
-
         .zone-label {
-            font-size: 0.7rem !important;
+            font-size: 0.75rem !important;
             text-transform: uppercase !important;
             letter-spacing: 1px !important;
-            color: #ffffff !important;
+            color: #ffffff !important; /* Принудительно белый */
             /* Тройная обводка текста для читаемости на любом фоне */
-            text-shadow:
-                1px 1px 0 #000,
-                -1px -1px 0 #000,
-                1px -1px 0 #000,
-                -1px 1px 0 #000,
-                0px 0px 8px #000 !important;
+            text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0px 0px 8px #000 !important;
             font-weight: 600 !important;
-            white-space: nowrap !important;
+            white-space: nowrap !important; /* Запрет переноса */
             display: block !important;
+            visibility: visible !important;
             opacity: 1 !important;
         }
 
