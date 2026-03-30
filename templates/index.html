@@ -36,7 +36,7 @@
         aside {
             width: 340px; min-width: 340px; background: var(--panel); backdrop-filter: blur(20px);
             border-right: 1px solid var(--border); padding: 25px;
-            display: flex; flex-direction: column; z-index: 10; box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+            display: flex; flex-direction: column; z-index: 1000; box-shadow: 10px 0 30px rgba(0,0,0,0.5);
             overflow-y: auto;
         }
 
@@ -61,100 +61,104 @@
 
         .date-grid { display: grid; grid-template-columns: 1fr 1fr 1.5fr; gap: 8px; }
 
-        main { flex-grow: 1; padding: 50px 80px; overflow-y: auto; scroll-behavior: smooth; }
+        main { flex-grow: 1; padding: 50px 80px; overflow-y: auto; scroll-behavior: smooth; position: relative; z-index: 10; }
 
         /* МАТРИЦА ВИНЧИ */
         .vinci-matrix-wrapper {
-            width: 100%; max-width: 800px; min-height: 650px; height: auto; margin: 30px auto 20px;
+            width: 100%; max-width: 800px; height: 700px; margin: 30px auto;
             position: relative; border: 1px solid var(--border);
             background: rgba(10, 10, 10, 0.5); backdrop-filter: blur(5px); border-radius: 8px;
         }
 
-        .human-figure { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 1; padding: 40px; }
+        .human-figure { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 1; pointer-events: none; }
         .golden-vinci {
-            width: 85%; height: 85%; object-fit: contain;
-            filter: invert(1) sepia(1) saturate(5) hue-rotate(15deg) brightness(1.1) contrast(1.3) drop-shadow(0 0 10px rgba(197, 160, 89, 0.6));
-            opacity: 0.6; animation: goldShimmer 6s ease-in-out infinite; transition: 0.5s;
+            height: 85%; width: auto; object-fit: contain;
+            filter: invert(1) sepia(1) saturate(5) hue-rotate(15deg) brightness(1.1) contrast(1.3);
+            opacity: 0.25;
         }
 
-        @keyframes goldShimmer {
-            0%, 100% { filter: invert(1) sepia(1) saturate(5) hue-rotate(15deg) brightness(1.1) contrast(1.3); }
-            50% { filter: invert(1) sepia(1) saturate(7) hue-rotate(-10deg) brightness(1.3) contrast(1.5); }
+        /* Исправленные зоны — теперь текст виден всегда */
+        .matrix-zone {
+            position: absolute;
+            z-index: 9999 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            transform: translate(-50%, -50%) !important;
+            width: 120px !important; /* Фиксированная ширина для центровки текста */
+            text-align: center !important;
         }
 
-        .matrix-zone { position: absolute; z-index: 5; display: flex; flex-direction: column; align-items: center; transform: translate(-50%, -50%); width: 200px; text-align: center; }
         .m-dot {
-            background: #000; color: var(--gold); border: 2px solid var(--gold);
-            width: 32px; height: 32px; border-radius: 50%;
-            font-size: 1.1rem; font-weight: 900; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 15px var(--gold-glow); margin-bottom: 8px; transition: 0.3s;
+            background: #000 !important;
+            color: var(--gold) !important;
+            border: 2px solid var(--gold) !important;
+            width: 42px !important;
+            height: 42px !important;
+            border-radius: 50% !important;
+            font-size: 1.2rem !important;
+            font-weight: 900 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            box-shadow: 0 0 15px var(--gold-glow) !important;
+            margin-bottom: 8px !important;
+            position: relative !important;
         }
-        .zone-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
 
-        /* ЛЕГЕНДА ПИКТОГРАММЫ */
-        .matrix-legend {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 15px; margin-bottom: 50px; text-align: center; border-top: 1px solid var(--border); padding-top: 20px;
+        .zone-label {
+            font-size: 0.7rem !important;
+            text-transform: uppercase !important;
+            letter-spacing: 1px !important;
+            color: #ffffff !important;
+            /* Тройная обводка текста для читаемости на любом фоне */
+            text-shadow:
+                1px 1px 0 #000,
+                -1px -1px 0 #000,
+                1px -1px 0 #000,
+                -1px 1px 0 #000,
+                0px 0px 8px #000 !important;
+            font-weight: 600 !important;
+            white-space: nowrap !important;
+            display: block !important;
+            opacity: 1 !important;
         }
-        .legend-item b { color: var(--gold); display: block; font-size: 0.7rem; text-transform: uppercase; margin-bottom: 4px; }
-        .legend-item span { font-size: 0.75rem; color: #777; }
 
-        /* КАРТА СОЗНАНИЯ */
-        .mind-map-section {
-            background: #080808; border: 1px solid var(--border);
-            margin: 40px 0; padding: 25px; border-radius: 12px;
-        }
-        .map-toggle {
-            width: 100%; padding: 15px; background: rgba(197, 160, 89, 0.05); border: 1px solid var(--border);
-            color: var(--gold); font-family: 'Almendra'; letter-spacing: 3px; cursor: pointer;
-            display: flex; justify-content: center; gap: 15px; align-items: center;
-        }
-        .map-content { display: none; padding: 30px 0; grid-template-columns: 1fr 1.5fr; gap: 40px; }
-        .map-content.active { display: grid; }
-
-        .matrix-3x3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; max-width: 300px; }
-        .node-3x3 {
-            background: rgba(255,255,255,0.02); border: 1px solid #222;
-            padding: 15px; text-align: center; border-radius: 5px; transition: 0.4s;
-        }
-        .node-3x3.active { border-color: var(--gold); background: rgba(197, 160, 89, 0.05); box-shadow: 0 0 15px var(--gold-glow); }
-        .node-3x3 b { display: block; color: var(--gold); font-size: 1.2rem; min-height: 1.4rem; letter-spacing: 2px; }
-        .node-3x3 span { font-size: 0.6rem; text-transform: uppercase; color: #666; display: block; margin-top: 5px; }
-
-        /* БЛОКИ И АНИМАЦИИ */
+        /* БЛОКИ КОНТЕНТА */
         .box {
             background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px);
             border: 1px solid var(--border); padding: 25px; margin-bottom: 25px;
-            border-radius: 8px; position: relative; font-size: 0.9rem; line-height: 1.7;
-            opacity: 0; transform: translateY(30px);
+            border-radius: 8px; font-size: 0.9rem; line-height: 1.7;
+            transition: all 0.5s ease;
         }
-        .box h3 { font-family: 'Almendra'; color: var(--gold); margin: 0 0 15px; font-size: 1.1rem; letter-spacing: 2px; }
 
-        /* Цветовые акценты триады */
+        .box h3 { font-family: 'Almendra'; color: var(--gold); margin: 0 0 15px; font-size: 1.1rem; letter-spacing: 2px; }
         .box-power { border-top: 3px solid var(--blue); background: rgba(0, 180, 216, 0.05); }
         .box-shadow { border-top: 3px solid var(--red); background: rgba(230, 57, 70, 0.05); }
         .box-growth { border-top: 3px solid var(--gold); background: rgba(197, 160, 89, 0.05); }
 
-        .animate-reveal { animation: revealEffect 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
-        @keyframes revealEffect { to { opacity: 1; transform: translateY(0); } }
+        .animate-reveal { animation: revealEffect 0.8s ease-out forwards; }
+        @keyframes revealEffect {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
         .delay-1 { animation-delay: 0.2s; }
         .delay-2 { animation-delay: 0.4s; }
         .delay-3 { animation-delay: 0.6s; }
 
-        .badge { display: inline-block; padding: 4px 10px; background: var(--gold); color: #000; font-size: 0.7rem; font-weight: 700; border-radius: 3px; margin-bottom: 10px; text-transform: uppercase; }
+        /* КАРТА ПИФАГОРА */
+        .mind-map-section { background: #080808; border: 1px solid var(--border); margin: 40px 0; padding: 25px; border-radius: 12px; }
+        .map-toggle { width: 100%; padding: 15px; background: rgba(197, 160, 89, 0.05); border: 1px solid var(--border); color: var(--gold); font-family: 'Almendra'; letter-spacing: 3px; cursor: pointer; display: flex; justify-content: center; gap: 15px; }
+        .map-content { display: none; padding: 30px 0; grid-template-columns: 1fr 1.5fr; gap: 40px; }
+        .map-content.active { display: grid; }
 
-        /* АДАПТАЦИЯ */
-        @media (max-width: 768px) {
-            body { flex-direction: column; height: auto; overflow-y: auto; overflow-x: hidden; }
-            aside { width: 100%; min-width: 100%; height: auto; padding: 20px; border-right: none; border-bottom: 1px solid var(--border); }
-            main { padding: 30px 15px; width: 100%; }
-            .vinci-matrix-wrapper { zoom: 0.7; min-height: 500px; }
-            .map-content { grid-template-columns: 1fr; }
-            div[style*="grid-template-columns: 1fr 1fr 1fr"] { grid-template-columns: 1fr !important; }
-        }
+        .matrix-3x3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .node-3x3 { background: rgba(255,255,255,0.02); border: 1px solid #222; padding: 15px; text-align: center; border-radius: 5px; }
+        .node-3x3.active { border-color: var(--gold); background: rgba(197, 160, 89, 0.05); }
+        .node-3x3 b { display: block; color: var(--gold); font-size: 1.2rem; }
 
-        #admin-trigger { position: fixed; bottom: 20px; right: 20px; opacity: 0.2; cursor: pointer; color: var(--gold); font-size: 1.5rem; z-index: 100; transition: 0.3s; }
+        #admin-trigger { position: fixed; bottom: 20px; right: 20px; opacity: 0; pointer-events: none; cursor: pointer; color: var(--gold); font-size: 1.5rem; z-index: 2000; transition: 0.5s; }
     </style>
 </head>
 <body>
@@ -162,26 +166,22 @@
 <aside>
     <div class="logo" onclick="checkLeelaSecret()">GENESIS</div>
     <form method="POST">
-        <div class="label-sm">Identification</div>
-        <input type="text" name="user_name" placeholder="Ваше имя" value="{{ request.form.get('user_name', '') }}" required>
-        <input type="email" name="user_email" placeholder="Email" value="{{ request.form.get('user_email', '') }}" required>
+        <div class="label-sm">Subject Identification</div>
+        <input type="text" name="user_name" placeholder="Имя" value="{{ request.form.get('user_name', '') }}" required>
+        <input type="email" name="user_email" placeholder="Email для связи" value="{{ request.form.get('user_email', '') }}" required>
 
-        <div class="label-sm">Subject Birth Date</div>
+        <div class="label-sm">Birth Date</div>
         <div class="date-grid">
-            <input type="text" name="day" placeholder="ДД" maxlength="2" value="{{ request.form.get('day', '') }}" required>
-            <input type="text" name="month" placeholder="ММ" maxlength="2" value="{{ request.form.get('month', '') }}" required>
-            <input type="text" name="year" placeholder="ГГГГ" maxlength="4" value="{{ request.form.get('year', '') }}" required>
+            <input type="text" name="day" placeholder="ДД" value="{{ request.form.get('day', '') }}" required>
+            <input type="text" name="month" placeholder="ММ" value="{{ request.form.get('month', '') }}" required>
+            <input type="text" name="year" placeholder="ГГГГ" value="{{ request.form.get('year', '') }}" required>
         </div>
 
-        <div class="label-sm">Partner (Compatibility)</div>
-        <div class="date-grid">
-            <input type="text" name="p_day" placeholder="ДД" maxlength="2" value="{{ request.form.get('p_day', '') }}">
-            <input type="text" name="p_month" placeholder="ММ" maxlength="2" value="{{ request.form.get('p_month', '') }}">
-            <input type="text" name="p_year" placeholder="ГГГГ" maxlength="4" value="{{ request.form.get('p_year', '') }}">
-        </div>
+        <div class="label-sm">Partner (Optional)</div>
+        <input type="text" name="p_day" placeholder="День партнера" value="{{ request.form.get('p_day', '') }}">
 
-        <select name="country" style="margin-top: 10px;">
-            <option value="ua" {% if request.form.get('country') == 'ua' %}selected{% endif %}>Украина (UA)</option>
+        <select name="country">
+            <option value="ua" {% if request.form.get('country') == 'ua' %}selected{% endif %}>Украина</option>
             <option value="ru" {% if request.form.get('country') == 'ru' %}selected{% endif %}>International</option>
         </select>
         <button type="submit">Открыть Хроники</button>
@@ -189,77 +189,99 @@
 </aside>
 
 <main>
+    {% if calc %}
+    <div class="animate-reveal delay-1" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; margin-bottom: 30px;">
+        <div style="text-align: center; border: 1px solid var(--border); padding: 15px; background: rgba(197,160,89,0.05);">
+            <div style="color: var(--gold); font-size: 1.5rem; font-weight: bold;">{{ calc.mind }}</div>
+            <div style="font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px;">Число УМА</div>
+        </div>
+        <div style="text-align: center; border: 1px solid var(--border); padding: 15px; background: rgba(197,160,89,0.05);">
+            <div style="color: var(--gold); font-size: 1.5rem; font-weight: bold;">{{ calc.action }}</div>
+            <div style="font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px;">Число ДЕЙСТВИЯ</div>
+        </div>
+        <div style="text-align: center; border: 1px solid var(--border); padding: 15px; background: rgba(197,160,89,0.05);">
+            <div style="color: var(--gold); font-size: 1.5rem; font-weight: bold;">{{ calc.realization }}</div>
+            <div style="font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px;">Число РЕАЛИЗАЦИИ</div>
+        </div>
+        <div style="text-align: center; border: 1px solid var(--border); padding: 15px; background: rgba(197,160,89,0.05);">
+            <div style="color: var(--gold); font-size: 1.5rem; font-weight: bold;">{{ calc.final }}</div>
+            <div style="font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px;">ИТОГ ЖИЗНИ</div>
+        </div>
+        <div style="text-align: center; border: 1px solid var(--border); padding: 15px; background: rgba(197,160,89,0.05);">
+            <div style="color: var(--gold); font-size: 1.5rem; font-weight: bold;">{{ calc.dharma }}</div>
+            <div style="font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px;">ДХАРМА ДУШИ</div>
+        </div>
+    </div>
+    {% endif %}
+
     {% if result %}
     <div class="animate-reveal">
-        <div style="text-align: center; margin-bottom: 40px; border-bottom: 1px solid #222; padding-bottom: 20px;">
-            <span style="color: var(--gold); font-size: 0.7rem; letter-spacing: 3px; text-transform: uppercase;">Analysis for: {{ request.form.get('user_name') }}</span>
-            <h1 style="font-family: 'Almendra'; font-size: 3.5rem; margin: 5px 0; color: #fff; text-shadow: 0 0 20px var(--gold-glow);">
-                {{ result.title | striptags }}
-            </h1>
-            {% if result.planet %}<div class="badge">Планета: {{ result.planet }}</div>{% endif %}
+        <div style="text-align: center; margin-bottom: 40px;">
+            <h1 style="font-family: 'Almendra'; font-size: 3.5rem; color: #fff; margin-bottom: 5px;">{{ result.title }}</h1>
+            <div style="color: var(--gold); letter-spacing: 2px;">Планета: {{ result.planet }}</div>
         </div>
 
         {% if matrix_raw %}
         <div class="vinci-matrix-wrapper animate-reveal delay-1">
             <div class="human-figure"><img src="{{ url_for('static', filename='img/vitruvian.png') }}" class="golden-vinci"></div>
-            <div class="matrix-zone" style="top: 8%; left: 50%;"><div class="m-dot">{{ matrix_raw.c1 }}</div><div class="zone-label">Сознание</div></div>
-            <div class="matrix-zone" style="top: 25%; left: 15%;"><div class="m-dot">{{ matrix_raw.c2 }}</div><div class="zone-label">Маска</div></div>
-            <div class="matrix-zone" style="top: 25%; right: 15%; transform: translate(50%,-50%);"><div class="m-dot">{{ matrix_raw.c3 }}</div><div class="zone-label">Реализация</div></div>
-            <div class="matrix-zone" style="top: 45%; left: 50%;"><div class="m-dot">{{ matrix_raw.c4 }}</div><div class="zone-label">Душа</div></div>
-            <div class="matrix-zone" style="top: 68%; left: 18%;"><div class="m-dot">{{ matrix_raw.c5 }}</div><div class="zone-label">Сила</div></div>
-            <div class="matrix-zone" style="top: 68%; right: 18%; transform: translate(50%,-50%);"><div class="m-dot">{{ matrix_raw.c6 }}</div><div class="zone-label">База</div></div>
-            <div class="matrix-zone" style="bottom: 8%; left: 50%;"><div class="m-dot">{{ matrix_raw.c7 }}</div><div class="zone-label">Род</div></div>
-        </div>
-        <div class="matrix-legend animate-reveal delay-1">
-            <div class="legend-item"><b>Сознание</b><span>Цель и фокус</span></div>
-            <div class="legend-item"><b>Маска</b><span>Внешний образ</span></div>
-            <div class="legend-item"><b>Реализация</b><span>Социальный успех</span></div>
-            <div class="legend-item"><b>Душа</b><span>Точка покоя</span></div>
-            <div class="legend-item"><b>Сила</b><span>Энергия действия</span></div>
-            <div class="legend-item"><b>База</b><span>Опора личности</span></div>
-            <div class="legend-item"><b>Род</b><span>Сила предков</span></div>
+
+            <div class="matrix-zone" style="top: 10%; left: 50%;">
+                <div class="m-dot">{{ matrix_raw.c1 }}</div>
+                <div class="zone-label">Сознание</div>
+            </div>
+            <div class="matrix-zone" style="top: 32%; left: 24%;">
+                <div class="m-dot">{{ matrix_raw.c2 }}</div>
+                <div class="zone-label">Маска</div>
+            </div>
+            <div class="matrix-zone" style="top: 32%; left: 76%;">
+                <div class="m-dot">{{ matrix_raw.c3 }}</div>
+                <div class="zone-label">Реализация</div>
+            </div>
+            <div class="matrix-zone" style="top: 50%; left: 50%;">
+                <div class="m-dot">{{ matrix_raw.c4 }}</div>
+                <div class="zone-label">Душа</div>
+            </div>
+            <div class="matrix-zone" style="top: 72%; left: 28%;">
+                <div class="m-dot">{{ matrix_raw.c5 }}</div>
+                <div class="zone-label">Сила</div>
+            </div>
+            <div class="matrix-zone" style="top: 72%; left: 72%;">
+                <div class="m-dot">{{ matrix_raw.c6 }}</div>
+                <div class="zone-label">База</div>
+            </div>
+            <div class="matrix-zone" style="top: 90%; left: 50%;">
+                <div class="m-dot">{{ matrix_raw.c7 }}</div>
+                <div class="zone-label">Род</div>
+            </div>
         </div>
         {% endif %}
 
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;" class="animate-reveal delay-2">
-            <div class="box box-power">
-                <h3 style="color:var(--blue);">⚡ Вектор Силы</h3>
-                {{ result.action_power|safe }}
-            </div>
-            <div class="box box-shadow">
-                <h3 style="color:var(--red);">🌑 Теневая Ловушка</h3>
-                {{ result.shadow_side|safe }}
-            </div>
-            <div class="box box-growth">
-                <h3 style="color:var(--gold);">🎯 Точка Роста</h3>
-                {{ result.growth_point|safe }}
-            </div>
+            <div class="box box-power"><h3>⚡ Вектор Силы</h3>{{ result.action_power|safe }}</div>
+            <div class="box box-shadow"><h3>🌑 Теневая Ловушка</h3>{{ result.shadow_side|safe if result.shadow_side else 'Пустота...' }}</div>
+            <div class="box box-growth"><h3>🎯 Точка Роста</h3>{{ result.growth_point|safe if result.growth_point else 'В ожидании...' }}</div>
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;" class="animate-reveal delay-2">
-            <div class="box">
-                <h3>🚀 Реализация</h3>
-                {{ result.realization|safe }}
-            </div>
-            <div class="box" style="border-left: 3px solid var(--purple);">
-                <h3 style="color:var(--purple);">⚖️ Кармические задачи</h3>
-                {{ result.karmic_tasks|safe }}
-            </div>
+            <div class="box"><h3>🚀 Социальная реализация</h3>{{ result.realization|safe if result.realization else 'Скрыто' }}</div>
+            <div class="box" style="border-left: 3px solid var(--purple);"><h3>⚖️ Кармические задачи</h3>{{ result.karmic_tasks|safe if result.karmic_tasks else 'Не определены' }}</div>
         </div>
 
-        <div class="box animate-reveal delay-3" style="background: linear-gradient(90deg, rgba(197, 160, 89, 0.08) 0%, transparent 100%);">
-            <h3>🔄 Цикл развития</h3>
-            {{ result.development_cycle|safe }}
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;" class="animate-reveal delay-3">
+             <div class="box" style="border-left: 3px solid #2ecc71;"><h3>💰 Финансы и Здоровье</h3>{{ result.financial_tip|safe if result.financial_tip else 'Нет данных' }}</div>
+             <div class="box" style="border-left: 3px solid #f1c40f;"><h3>🧠 Потенциал Разума</h3>{{ result.mind_power|safe if result.mind_power else 'Скрыт' }}</div>
         </div>
+
+        <div class="box animate-reveal delay-3"><h3>🔄 Цикл развития</h3>{{ result.development_cycle|safe if result.development_cycle else 'Нет цикла' }}</div>
+        <div class="box animate-reveal delay-3" style="border-bottom: 2px solid var(--gold);"><h3>📜 Итог Жизни</h3>{{ result.life_result|safe if result.life_result else 'В процессе...' }}</div>
 
         {% if jobs %}
-        <div class="box animate-reveal delay-3" style="border-left: 4px solid var(--blue);">
+        <div class="box animate-reveal delay-3">
             <h3 style="color: var(--blue);">Профессиональный вектор (HH.ru)</h3>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                 {% for job in jobs %}
-                <a href="{{ job.alternate_url }}" target="_blank" style="display:block; text-decoration:none; padding:12px; border:1px solid rgba(0,180,216,0.1); border-radius:4px; transition: 0.3s;">
-                    <div style="color: #fff; font-weight: 600;">{{ job.name }}</div>
-                    <div style="color: var(--blue); font-size: 0.75rem;">{{ job.employer.name }}</div>
+                <a href="{{ job.alternate_url }}" target="_blank" style="display:block; text-decoration:none; padding:10px; border:1px solid #333; color:#fff;">
+                    {{ job.name }} <br><small style="color:var(--blue)">{{ job.employer.name }}</small>
                 </a>
                 {% endfor %}
             </div>
@@ -267,68 +289,89 @@
         {% endif %}
 
         <section class="mind-map-section animate-reveal delay-3">
-            <button class="map-toggle" onclick="toggleMindMap()"><span>ЦИФРОВАЯ КАРТА СОЗНАНИЯ (ПИФАГОР)</span><b id="map-arrow">▼</b></button>
+            <button class="map-toggle" onclick="toggleMindMap()"><span>ЦИФРОВАЯ КАРТА СОЗНИЯ</span><b id="map-arrow">▼</b></button>
             <div class="map-content" id="map-content">
-                <div><div class="matrix-3x3" id="pythagoras-matrix">
-                    {% for i in range(1,10) %}<div class="node-3x3" data-num="{{i}}"><span>Ячейка {{i}}</span><b>-</b></div>{% endfor %}
-                </div></div>
-                <div class="analysis-stats">
-                    <div class="stat-bar-container"><div class="stat-label"><span>Волевой ресурс</span><span id="stat-val-1">0%</span></div><div class="stat-bar"><div class="stat-fill" id="fill-1"></div></div></div>
-                    <div class="stat-bar-container"><div class="stat-label"><span>Социальный ресурс</span><span id="stat-val-2">0%</span></div><div class="stat-bar"><div class="stat-fill" id="fill-2"></div></div></div>
-                    <div class="stat-bar-container"><div class="stat-label"><span>Интеллектуальный ресурс</span><span id="stat-val-3">0%</span></div><div class="stat-bar"><div class="stat-fill" id="fill-3"></div></div></div>
+                <div class="matrix-3x3">
+                    {% for i in range(1,10) %}<div class="node-3x3" data-num="{{i}}"><span>{{i}}</span><b>-</b></div>{% endfor %}
                 </div>
             </div>
         </section>
 
-        <div class="box animate-reveal delay-3"><h3>Итог жизни</h3>{{ result.life_result|safe }}</div>
-
-        <form action="/export_pdf" method="POST" id="pdf-form" style="text-align: center; margin-bottom: 60px;">
+        <form action="/export_pdf" method="POST" id="pdf-form" style="text-align: center; margin: 40px 0;">
             <input type="hidden" name="html_to_pdf" id="html_input">
-            <button type="button" onclick="generatePDF()" style="background: none; border: 1px solid var(--gold); color: var(--gold); padding: 12px 30px; letter-spacing: 2px;">📜 СФОРМИРОВАТЬ ОТЧЕТ PDF</button>
+            <button type="button" onclick="generatePDF()" style="background: none; border: 1px solid var(--gold); color: var(--gold); padding: 15px 40px;">📜 СКАЧАТЬ PDF ОТЧЕТ</button>
         </form>
     </div>
-    {% else %}
-    <div style="display: flex; height: 100%; align-items: center; justify-content: center; opacity: 0.05;"><h2 style="font-size: 5rem; font-family: 'Almendra'; letter-spacing: 30px;">GENESIS</h2></div>
     {% endif %}
 </main>
 
 <div id="admin-trigger" onclick="document.getElementById('admin-panel').style.display='block'">✺</div>
-<div id="admin-panel" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 99999; padding: 40px; overflow-y: auto;">
-    <div style="max-width: 1100px; margin: 0 auto;">
-        <h2 style="color: var(--gold); font-family: 'Almendra';">DATABASE ARCHITECT</h2>
-        <select id="group-select" onchange="loadGroupData()" style="margin-bottom: 20px;">
+
+<div id="admin-panel" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10000; padding: 40px; overflow-y: auto;">
+    <div style="max-width: 1000px; margin: 0 auto;">
+        <h2 style="color:var(--gold); font-family:'Almendra'">Database Architect</h2>
+        <select id="group-select" onchange="loadGroupData()" style="padding:10px; width:100%; margin-bottom:20px;">
             <option value="">Выберите архетип...</option>
-            {% for i in range(1, 10) %}<option value="{{ i }}">Архетип {{ i }}</option>{% endfor %}
+            {% for i in range(1,10) %}<option value="{{i}}">Архетип {{i}}</option>{% endfor %}
         </select>
         <div id="editor-fields" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;"></div>
-        <div style="margin-top: 20px;"><label>Ключевые слова HH.ru (через запятую)</label><textarea id="edit-profs" style="height: 60px;"></textarea></div>
-        <div style="display: flex; gap: 15px; margin-top: 30px;">
-            <button onclick="saveAdminData()" style="flex: 2;">СОХРАНИТЬ В БАЗУ</button>
-            <button onclick="document.getElementById('admin-panel').style.display='none'" style="flex: 1; background:#333;">ЗАКРЫТЬ</button>
+        <div style="margin-top:20px;">
+            <label>Ключевые слова для вакансий (через запятую)</label>
+            <textarea id="edit-profs" style="height:60px; width:100%; background:#111; color:#fff;"></textarea>
+        </div>
+        <div style="display: flex; gap: 20px; margin-top: 30px;">
+            <button onclick="saveAdminData()" style="flex:2">СОХРАНИТЬ В БАЗУ</button>
+            <button onclick="document.getElementById('admin-panel').style.display='none'" style="flex:1; background:#333">ЗАКРЫТЬ</button>
         </div>
     </div>
 </div>
 
 <script>
-    // ВСЕ ПОЛЯ ДЛЯ ПОЛНОЙ СИНХРОНИЗАЦИИ
+    let clickCount = 0;
+    async function checkLeelaSecret() {
+        clickCount++;
+        if (clickCount >= 7) {
+            const password = prompt("Введите код доступа:");
+            if (password === "0602") {
+                const response = await fetch('/admin-auth', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({password: "0602"})
+                });
+                if (response.ok) {
+                    const goFull = confirm("Открыть полную панель?");
+                    if (goFull) window.location.href = '/admin';
+                    else {
+                        document.getElementById('admin-trigger').style.opacity = "1";
+                        document.getElementById('admin-trigger').style.pointerEvents = "all";
+                        document.getElementById('admin-panel').style.display = 'block';
+                    }
+                }
+            }
+            clickCount = 0;
+        }
+    }
+
     const FIELDS = {
-        'title': 'Заголовок', 'planet': 'Планета',
-        'action_power': 'Вектор Силы', 'shadow_side': 'Теневая Ловушка',
-        'growth_point': 'Точка Роста (Задание)', 'realization': 'Реализация',
+        'title': 'Заголовок', 'planet': 'Планета', 'action_power': 'Вектор Силы',
+        'shadow_side': 'Теневая Ловушка', 'growth_point': 'Точка Роста', 'realization': 'Реализация',
         'karmic_tasks': 'Кармические задачи', 'development_cycle': 'Цикл развития',
-        'mind_power': 'Разум (Потенциал)', 'life_result': 'Итог жизни',
-        'financial_tip': 'Финансы', 'health_tips': 'Здоровье', 'partner_type': 'Тип партнера'
+        'mind_power': 'Потенциал Разума', 'life_result': 'Итог жизни', 'financial_tip': 'Финансы'
     };
+
     let activeEditors = {};
 
     async function loadGroupData() {
         const num = document.getElementById('group-select').value; if(!num) return;
-        Object.keys(activeEditors).forEach(id => activeEditors[id].removeInstance(id));
+        for (let id in activeEditors) { if (activeEditors[id]) activeEditors[id].removeInstance(id); }
+        activeEditors = {};
         const res = await fetch(`/admin/get/${num}`).then(r => r.json());
-        const container = document.getElementById('editor-fields'); container.innerHTML = '';
+        const container = document.getElementById('editor-fields');
+        container.innerHTML = '';
+        const data = res.data || {};
         Object.entries(FIELDS).forEach(([key, label]) => {
             const wrap = document.createElement('div');
-            wrap.innerHTML = `<label style="color:var(--gold); font-size:0.7rem; display:block; margin-bottom:5px;">${label}</label><textarea id="edit-${key}">${res.data[key]||''}</textarea>`;
+            wrap.innerHTML = `<label>${label}</label><textarea id="edit-${key}">${data[key]||''}</textarea>`;
             container.appendChild(wrap);
             activeEditors[`edit-${key}`] = new nicEditor({fullPanel: true}).panelInstance(`edit-${key}`);
         });
@@ -339,17 +382,18 @@
     async function saveAdminData() {
         const num = document.getElementById('group-select').value; if(!num) return;
         const data = { number: num };
-        Object.keys(FIELDS).forEach(key => data[key] = nicEditors.findEditor(`edit-${key}`).getContent());
+        Object.keys(FIELDS).forEach(key => {
+            const ed = nicEditors.findEditor(`edit-${key}`);
+            data[key] = ed ? ed.getContent() : document.getElementById(`edit-${key}`).value;
+        });
         await fetch('/admin/update', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) });
         await fetch('/admin/update_profs', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ number: num, list_csv: document.getElementById('edit-profs').value }) });
-        alert('Данные обновлены!'); location.reload();
+        alert('Сохранено!');
     }
 
     function toggleMindMap() {
-        const content = document.getElementById('map-content');
-        content.classList.toggle('active');
-        document.getElementById('map-arrow').innerText = content.classList.contains('active') ? '▲' : '▼';
-        if(content.classList.contains('active')) setTimeout(animateBars, 300);
+        document.getElementById('map-content').classList.toggle('active');
+        document.getElementById('map-arrow').innerText = document.getElementById('map-content').classList.contains('active') ? '▲' : '▼';
     }
 
     function calculatePythagoras() {
@@ -361,38 +405,22 @@
         let n3 = Math.abs(n1 - (parseInt(s[0] === '0' ? s[1] : s[0]) * 2));
         let n4 = n3.toString().split('').reduce((a, b) => a + parseInt(b), 0);
         let all = s + n1 + n2 + n3 + n4;
-        let counts = {};
         document.querySelectorAll('.node-3x3').forEach(node => {
             const num = node.dataset.num;
             const count = all.split('').filter(c => c === num).length;
-            counts[num] = count;
             node.querySelector('b').innerText = count > 0 ? num.repeat(count) : '-';
             if(count > 0) node.classList.add('active');
-        });
-        window.stats = [
-            Math.min(((counts['1']||0)+(counts['4']||0)+(counts['7']||0))*16, 100),
-            Math.min(((counts['2']||0)+(counts['5']||0)+(counts['8']||0))*16, 100),
-            Math.min(((counts['3']||0)+(counts['6']||0)+(counts['9']||0))*16, 100)
-        ];
-    }
-
-    function animateBars() {
-        if(!window.stats) return;
-        window.stats.forEach((v, i) => {
-            document.getElementById(`fill-${i+1}`).style.width = v + '%';
-            document.getElementById(`stat-val-${i+1}`).innerText = Math.round(v) + '%';
         });
     }
 
     function generatePDF() {
-        const clone = document.querySelector('main').cloneNode(true);
-        clone.querySelectorAll('button, form, #admin-trigger').forEach(e => e.remove());
-        const styles = Array.from(document.styleSheets).map(s => { try { return Array.from(s.cssRules).map(r => r.cssText).join(""); } catch(e) { return ""; } }).join("");
-        document.getElementById('html_input').value = `<html><head><style>${styles} body{padding:40px; background:#000; color:#fff;}</style></head><body>${clone.innerHTML}</body></html>`;
+        const mainContent = document.querySelector('main').cloneNode(true);
+        mainContent.querySelectorAll('button, form, #admin-trigger, .map-toggle').forEach(e => e.remove());
+        const fullHtml = `<html><head><style>body{background:#000;color:#fff;padding:20px;font-family:sans-serif;} .box{border:1px solid #c5a059; padding:15px; margin:15px 0; background:rgba(255,255,255,0.05);}</style></head><body>${mainContent.innerHTML}</body></html>`;
+        document.getElementById('html_input').value = fullHtml;
         document.getElementById('pdf-form').submit();
     }
 
-    function checkLeelaSecret() { window.lc = (window.lc||0)+1; if(window.lc>=7) window.location.href='/leela/play'; }
     window.addEventListener('DOMContentLoaded', () => { {% if result %} calculatePythagoras(); {% endif %} });
 </script>
 </body>
