@@ -7,12 +7,18 @@ from flask_migrate import Migrate
 from services import CareerService
 import pdfkit
 from datetime import datetime
+from flask_mail import Mail, Message
 
 app = Flask(__name__)
-# Секретный ключ для сессий
 app.secret_key = 'genesis_secret_key_0602'
 
-# Настройки базы данных
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'  # или smtp.ukr.net
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'твой_email@gmail.com'
+app.config['MAIL_PASSWORD'] = 'твой_пароль_приложения'  # Специальный пароль для Google
+mail = Mail(app)
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'genesis_v2.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -20,13 +26,14 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
+
 # --- МОДЕЛИ ДАННЫХ ---
 class ArchetypeContent(db.Model):
     __tablename__ = 'archetype_content'
     id = db.Column(db.Integer, primary_key=True)
     number = db.Column(db.String(10), unique=True)
     title = db.Column(db.String(200))
-    planet = db.Column(db.String(100))
+    planet = db.Column(db.String(100))  # УБЕДИСЬ, ЧТО ЭТО ПОЛЕ ЕСТЬ
     action_power = db.Column(db.Text)
     shadow_side = db.Column(db.Text)
     growth_point = db.Column(db.Text)
@@ -39,11 +46,13 @@ class ArchetypeContent(db.Model):
     financial_tip = db.Column(db.Text)
     health_tips = db.Column(db.Text)
 
+
 class ProfessionContent(db.Model):
     __tablename__ = 'profession_content'
     id = db.Column(db.Integer, primary_key=True)
     number = db.Column(db.String(10))
     list_csv = db.Column(db.Text)
+
 
 class UserRecord(db.Model):
     __tablename__ = 'user_records'
@@ -53,16 +62,21 @@ class UserRecord(db.Model):
     archetype = db.Column(db.String(10))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+
 # --- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ---
 def sum_digits(n):
     if not n or str(n) == '0': return 0
-    s = sum(int(d) for d in str(n) if d.isdigit())
+    # Очистка строки от не-цифр (на случай если попадет дата с точками)
+    clean_n = "".join(filter(str.isdigit, str(n)))
+    s = sum(int(d) for d in clean_n)
     while s > 9:
         s = sum(int(d) for d in str(s))
     return s
 
+
 def get_group(d):
     return str(sum_digits(d))
+
 
 # --- ЛОГИКА ПАРОЛЯ ---
 @app.route('/admin-auth', methods=['POST'])
@@ -73,13 +87,14 @@ def admin_auth():
         return jsonify({'status': 'success'})
     return jsonify({'status': 'error'}), 401
 
+
 # --- РОУТЫ АДМИНКИ ---
 @app.route('/admin')
 def admin_panel():
     if not session.get('admin_logged_in'):
         return "Доступ запрещен. Используйте ключ на главной.", 403
 
-    archetypes = ArchetypeContent.query.order_by(ArchetypeContent.number).all()
+    archetypes = ArchetypeContent.query.order_by(ArchetypeContent.number.cast(db.Integer)).all()
     profs = ProfessionContent.query.all()
     records = UserRecord.query.order_by(UserRecord.created_at.desc()).all()
 
@@ -93,6 +108,7 @@ def admin_panel():
                            records=records,
                            stats=stats)
 
+
 @app.route('/admin/get/<num>')
 def admin_get(num):
     content = ArchetypeContent.query.filter_by(number=str(num)).first()
@@ -101,10 +117,12 @@ def admin_get(num):
         return jsonify({'status': 'success', 'data': {c: getattr(content, c) for c in cols}})
     return jsonify({'status': 'error'})
 
+
 @app.route('/admin/get_profs/<num>')
 def admin_get_profs(num):
     prof = ProfessionContent.query.filter_by(number=str(num)).first()
     return jsonify({'list_csv': prof.list_csv if prof else ''})
+
 
 @app.route('/admin/update', methods=['POST'])
 def admin_update():
@@ -121,6 +139,7 @@ def admin_update():
 
     for key, value in data.items():
         if hasattr(content, key) and key != 'id':
+            # Очистка заголовков от HTML тегов
             if key in ['title', 'planet']:
                 value = re.sub('<[^<]+?>', '', str(value)).strip()
             setattr(content, key, value)
@@ -131,6 +150,7 @@ def admin_update():
     except Exception as e:
         db.session.rollback()
         return jsonify({'status': 'error', 'message': str(e)}), 500
+
 
 @app.route('/admin/update_profs', methods=['POST'])
 def admin_update_profs():
@@ -145,6 +165,7 @@ def admin_update_profs():
     db.session.commit()
     return redirect(url_for('admin_panel')) if not request.is_json else jsonify({'status': 'success'})
 
+
 @app.route('/admin/delete-record/<int:id>', methods=['POST'])
 def delete_record(id):
     if not session.get('admin_logged_in'): return "Unauthorized", 403
@@ -153,6 +174,7 @@ def delete_record(id):
         db.session.delete(rec)
         db.session.commit()
     return redirect(url_for('admin_panel'))
+
 
 # --- ОСНОВНОЙ РОУТ ---
 @app.route('/', methods=['GET', 'POST'])
@@ -174,15 +196,23 @@ def index():
             group_num = get_group(day)
             result = ArchetypeContent.query.filter_by(number=str(group_num)).first()
 
+            # Сохраняем запись о пользователе
             new_rec = UserRecord(name=user_name, email=email, archetype=group_num)
             db.session.add(new_rec)
             db.session.commit()
 
-            # Расчет дополнительных индикаторов для шаблона
-            d_r, m_r, y_r = sum_digits(day), sum_digits(month), sum_digits(year)
+            # Расчет доп. параметров
+            d_r = sum_digits(day)
+            m_r = sum_digits(month)
+            y_r = sum_digits(year)
+
+            # Логика для шаблона
             calc = {
-                'mind': d_r, 'action': m_r, 'realization': y_r,
-                'final': sum_digits(d_r + m_r + y_r), 'dharma': sum_digits(d_r + m_r)
+                'mind': d_r,
+                'action': m_r,
+                'realization': y_r,
+                'final': sum_digits(d_r + m_r + y_r),
+                'dharma': sum_digits(d_r + m_r)
             }
 
             # Матрица Винчи (7 точек)
@@ -193,11 +223,14 @@ def index():
             }
 
             if result:
+                # Получаем ключевые слова для профессий из второй таблицы
                 prof_entry = ProfessionContent.query.filter_by(number=str(result.number)).first()
                 keywords = prof_entry.list_csv if prof_entry else None
-                jobs = CareerService.get_vacancies(result, country=country, custom_keywords=keywords)
+                # Передаем номер, страну и ключи
+                jobs = CareerService.get_vacancies(result.number, country=country, custom_keywords=keywords)
 
     return render_template('index.html', result=result, matrix_raw=matrix_raw, jobs=jobs, calc=calc)
+
 
 @app.route('/export_pdf', methods=['POST'])
 def export_pdf():
@@ -214,6 +247,34 @@ def export_pdf():
         })
     except Exception as e:
         return f"Ошибка генерации PDF: {str(e)}", 500
+
+
+#РОУТ настройки и отправки почтового сервера и отчета на почту пользователю
+@app.route('/send_pdf', methods=['POST'])
+def send_pdf():
+    email = request.form.get('email')
+    html_content = request.form.get('html_to_pdf')
+    user_name = request.form.get('user_name', 'Искатель')
+
+    if not email:
+        return "Email не указан", 400
+
+    # Генерируем PDF в память (без сохранения файла на диск)
+    path_wk = shutil.which("wkhtmltopdf") or r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+    config = pdfkit.configuration(wkhtmltopdf=path_wk)
+    pdf = pdfkit.from_string(html_content, False, configuration=config)
+
+    try:
+        msg = Message(f"Ваш отчет Genesis: {user_name}",
+                      sender=app.config['MAIL_USERNAME'],
+                      recipients=[email])
+        msg.body = f"Здравствуйте, {user_name}! Во вложении ваш персональный цифровой анализ Genesis."
+        msg.attach("Genesis_Report.pdf", "application/pdf", pdf)
+        mail.send(msg)
+        return "Отчет успешно отправлен на вашу почту!"
+    except Exception as e:
+        return f"Ошибка отправки: {str(e)}", 500
+
 
 if __name__ == '__main__':
     with app.app_context():
