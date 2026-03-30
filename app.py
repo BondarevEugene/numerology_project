@@ -221,10 +221,29 @@ def index():
 @app.route('/export_pdf', methods=['POST'])
 def export_pdf():
     html_content = request.form.get('html_to_pdf')
-    path_wk = shutil.which("wkhtmltopdf") or r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
-    config = pdfkit.configuration(wkhtmltopdf=path_wk)
-    pdf = pdfkit.from_string(html_content, False, configuration=config, options={'encoding': "UTF-8", 'quiet': ''})
-    return (pdf, 200, {'Content-Type': 'application/pdf', 'Content-Disposition': 'attachment; filename="Genesis.pdf"'})
+
+    # На Render (Linux) wkhtmltopdf обычно доступен просто по имени 'wkhtmltopdf'
+    # shutil.which найдет его автоматически в системе
+    path_wk = shutil.which("wkhtmltopdf")
+
+    if not path_wk:
+        # Если мы на локальной Windows
+        path_wk = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+
+    try:
+        config = pdfkit.configuration(wkhtmltopdf=path_wk)
+        pdf = pdfkit.from_string(html_content, False, configuration=config, options={
+            'encoding': "UTF-8",
+            'quiet': '',
+            'enable-local-file-access': ''  # Важно для картинок
+        })
+        return (pdf, 200, {
+            'Content-Type': 'application/pdf',
+            'Content-Disposition': 'attachment; filename="Genesis.pdf"'
+        })
+    except Exception as e:
+        print(f"PDF Error: {str(e)}")  # Это появится в логах Render
+        return f"Ошибка генерации PDF: {str(e)}", 500
 
 
 if __name__ == '__main__':

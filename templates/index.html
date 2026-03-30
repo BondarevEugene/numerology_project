@@ -65,10 +65,18 @@
 
         /* МАТРИЦА ВИНЧИ — ИСПРАВЛЕНО ДЛЯ ОТОБРАЖЕНИЯ ПОДПИСЕЙ */
         .vinci-matrix-wrapper {
-            width: 100%; max-width: 800px; height: 700px; margin: 30px auto;
-            position: relative; border: 1px solid var(--border);
-            background: rgba(10, 10, 10, 0.5); backdrop-filter: blur(5px); border-radius: 8px;
-        }
+    width: 100%;
+    max-width: 800px;
+    height: 700px;
+    margin: 30px auto;
+    position: relative;
+    border: 1px solid var(--border);
+    background: rgba(10, 10, 10, 0.5);
+    backdrop-filter: blur(5px);
+    border-radius: 8px;
+    display: block !important; /* Добавить */
+    overflow: visible !important; /* Чтобы текст не обрезался, если выйдет за края */
+}
 
         .human-figure { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 1; pointer-events: none; }
         .golden-vinci {
@@ -97,18 +105,20 @@
             position: relative !important; z-index: 10000 !important;
         }
         .zone-label {
-            font-size: 0.75rem !important;
-            text-transform: uppercase !important;
-            letter-spacing: 1px !important;
-            color: #ffffff !important; /* Принудительно белый */
-            /* Тройная обводка текста для читаемости на любом фоне */
-            text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0px 0px 8px #000 !important;
-            font-weight: 600 !important;
-            white-space: nowrap !important; /* Запрет переноса */
-            display: block !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-        }
+    position: relative !important;
+    display: block !important;
+    color: #ffffff !important; /* Яркий белый цвет */
+    font-size: 12px !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+    text-align: center !important;
+    /* Черная тень, чтобы текст был виден на фоне рисунка */
+    text-shadow: 2px 2px 2px #000, -2px -2px 2px #000, 2px -2px 2px #000, -2px 2px 2px #000 !important;
+    margin-top: 5px !important;
+    width: 100% !important;
+    z-index: 10000 !important;
+    visibility: visible !important;
+}
 
         /* БЛОКИ КОНТЕНТА */
         .box {
@@ -400,13 +410,29 @@
     }
 
     function generatePDF() {
-        const mainContent = document.querySelector('main').cloneNode(true);
-        mainContent.querySelectorAll('button, form, #admin-trigger, .map-toggle').forEach(e => e.remove());
-        const fullHtml = `<html><head><style>body{background:#000;color:#fff;padding:20px;font-family:sans-serif;} .box{border:1px solid #c5a059; padding:15px; margin:15px 0; background:rgba(255,255,255,0.05);}</style></head><body>${mainContent.innerHTML}</body></html>`;
-        document.getElementById('html_input').value = fullHtml;
-        document.getElementById('pdf-form').submit();
-    }
+    const mainContent = document.querySelector('main').cloneNode(true);
+    // Удаляем лишнее
+    mainContent.querySelectorAll('button, form, #admin-trigger, .map-toggle, .map-content').forEach(e => e.remove());
 
+    // Добавляем стили прямо в PDF, чтобы сохранить матрицу
+    const pdfStyles = `
+        <style>
+            body { background: #050505; color: #b8b8b8; font-family: sans-serif; padding: 20px; }
+            .vinci-matrix-wrapper { position: relative; width: 600px; height: 600px; margin: 0 auto; border: 1px solid #c5a059; }
+            .human-figure { position: absolute; inset: 0; text-align: center; opacity: 0.3; }
+            .golden-vinci { height: 100%; width: auto; }
+            .matrix-zone { position: absolute; display: flex; flex-direction: column; align-items: center; transform: translate(-50%, -50%); width: 100px; }
+            .m-dot { background: #000; color: #c5a059; border: 2px solid #c5a059; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-bottom: 5px; }
+            .zone-label { color: #fff; font-size: 10px; text-transform: uppercase; text-align: center; }
+            .box { border: 1px solid #c5a059; padding: 15px; margin: 15px 0; background: rgba(255,255,255,0.05); border-radius: 8px; }
+            h1, h3 { color: #c5a059; }
+        </style>
+    `;
+
+    const fullHtml = `<html><head>${pdfStyles}</head><body>${mainContent.innerHTML}</body></html>`;
+    document.getElementById('html_input').value = fullHtml;
+    document.getElementById('pdf-form').submit();
+}
     window.addEventListener('DOMContentLoaded', () => { {% if result %} calculatePythagoras(); {% endif %} });
 </script>
 </body>
