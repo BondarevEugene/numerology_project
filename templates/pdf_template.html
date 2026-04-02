@@ -1,97 +1,153 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <style>
-        /*DejaVu Sans — лучший выбор для кириллицы на Render*/
-        @page { size: A4; margin: 1.5cm; }
-        body { font-family: 'DejaVu Sans', sans-serif; font-size: 12px; color: #222; line-height: 1.5; }
+        /* Оптимизация для WeasyPrint (A4) */
+        @page { size: A4; margin: 1cm; }
+        body { font-family: 'DejaVu Sans', sans-serif; font-size: 10px; color: #1a1a1a; line-height: 1.4; background: #fff; margin: 0; }
 
         .gold { color: #8a6d35; font-weight: bold; }
-        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #c5a059; padding-bottom: 20px; }
+        .bg-gold { background-color: #fdfaf3; }
 
-        .section { margin-bottom: 20px; border-top: 1px solid #eee; padding-top: 15px; page-break-inside: avoid; }
-        h3 { color: #8a6d35; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+        .header { text-align: center; border-bottom: 2px solid #c5a059; padding-bottom: 15px; margin-bottom: 20px; }
+        .header h1 { margin: 0; color: #8a6d35; font-size: 22px; letter-spacing: 2px; }
+        .header p { font-size: 11px; color: #666; margin: 5px 0; }
 
-        .grid { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        .grid td { width: 50%; vertical-align: top; padding: 12px; border: 1px solid #f9f9f9; background-color: #fdfdfd; }
+        .section { margin-bottom: 18px; border: 1px solid #eee; padding: 15px; border-radius: 8px; page-break-inside: avoid; }
+        .section-title { color: #8a6d35; text-transform: uppercase; font-size: 12px; font-weight: bold; border-bottom: 1px solid #f0e6d2; margin-bottom: 10px; padding-bottom: 5px; display: block; }
 
-        .matrix-table { width: 320px; margin: 20px auto; border-collapse: collapse; background: #fff; }
-        .matrix-table td { border: 2px solid #c5a059; width: 106px; height: 70px; text-align: center; font-size: 16px; font-weight: bold; vertical-align: middle; }
-        .matrix-table span { display: block; font-size: 8px; color: #888; text-transform: uppercase; margin-bottom: 4px; font-weight: normal; }
+        /* Психоматрица */
+        .matrix-wrapper { overflow: hidden; margin-bottom: 10px; }
+        .matrix-table { width: 240px; border-collapse: collapse; float: left; margin-right: 20px; }
+        .matrix-table td { border: 2px solid #c5a059; width: 80px; height: 55px; text-align: center; font-size: 16px; font-weight: bold; background: #fff; vertical-align: middle; }
+        .matrix-table span { display: block; font-size: 7px; color: #999; font-weight: normal; text-transform: uppercase; margin-bottom: 2px; }
 
-        .footer { text-align: center; font-size: 9px; color: #aaa; margin-top: 30px; border-top: 1px solid #eee; padding-top: 10px; }
+        .matrix-desc { font-size: 9px; color: #444; line-height: 1.5; }
+
+        /* Витрувианская схема */
+        .vitruvian-container { text-align: center; padding: 15px; background: #f9f9f9; border: 1px dashed #c5a059; margin: 10px 0; border-radius: 10px; }
+        .dot-row { margin-bottom: 10px; }
+        .m-dot-static { display: inline-block; width: 30px; height: 30px; line-height: 30px; border: 2px solid #8a6d35; border-radius: 50%; background: #fff; font-weight: bold; margin: 0 10px; font-size: 14px; }
+        .dot-label { font-size: 7px; color: #8a6d35; text-transform: uppercase; display: block; margin-top: 3px; }
+
+        /* Энерго-шкала */
+        .energy-track { width: 100%; height: 12px; background: #eee; border-radius: 6px; margin: 10px 0; position: relative; overflow: hidden; }
+        .energy-bar { height: 100%; background: linear-gradient(90deg, #c5a059, #d97706); border-radius: 6px; }
+
+        /* Академия и Искажения */
+        .card { background: #f4f4f4; border-left: 4px solid #8a6d35; padding: 10px; margin-top: 10px; }
+        .blue-card { border-left-color: #00b4d8; background: #f0f7f9; }
+
+        .footer { text-align: center; font-size: 8px; color: #aaa; border-top: 1px solid #eee; margin-top: 30px; padding-top: 10px; }
+
+        .grid-2 { width: 100%; }
+        .grid-2 td { width: 50%; vertical-align: top; padding-right: 10px; }
     </style>
 </head>
 <body>
+
     <div class="header">
-        <div style="letter-spacing: 5px; font-size: 10px; color: #999; margin-bottom: 10px;">GENESIS PSYCHOLOGY SYSTEM</div>
-        <h1 style="margin: 0; color: #8a6d35;">ПЕРСОНАЛЬНЫЙ ЦИФРОВОЙ ОТЧЕТ</h1>
-        <p style="font-size: 14px;">
-            <b>ИСКАТЕЛЬ:</b> {{ user_name }} |
-            <b>ДАТА:</b> {{ day }}.{{ month }}.{{ year }} |
-            <b>АРХЕТИП:</b> <span class="gold">{{ result.number }} — {{ result.title }}</span>
+        <p style="letter-spacing: 5px;">GENESIS PSYCHOLOGY SYSTEM</p>
+        <h1>ЦИФРОВОЙ ПРОФИЛЬ ЛИЧНОСТИ v4.0</h1>
+        <p><b>ОБЪЕКТ:</b> {{ user_name }} | <b>ДАТА:</b> {{ day }}.{{ month }}.{{ year }} | <b>АРХЕТИП:</b> {{ result.number }} ({{ result.title }})</p>
+    </div>
+
+    <div class="section">
+        <span class="section-title">📊 ЦИФРОВАЯ КАРТА (ПСИХОМАТРИЦА)</span>
+        <div class="matrix-wrapper">
+            <table class="matrix-table">
+                <tr>
+                    <td><span>Характер</span>{{ matrix['1'] }}</td>
+                    <td><span>Здоровье</span>{{ matrix['4'] }}</td>
+                    <td><span>Удача</span>{{ matrix['7'] }}</td>
+                </tr>
+                <tr>
+                    <td><span>Энергия</span>{{ matrix['2'] }}</td>
+                    <td><span>Логика</span>{{ matrix['5'] }}</td>
+                    <td><span>Долг</span>{{ matrix['8'] }}</td>
+                </tr>
+                <tr>
+                    <td><span>Интерес</span>{{ matrix['3'] }}</td>
+                    <td><span>Труд</span>{{ matrix['6'] }}</td>
+                    <td><span>Память</span>{{ matrix['9'] }}</td>
+                </tr>
+            </table>
+            <div class="matrix-desc">
+                <b class="gold">Расшифровка линий:</b><br>
+                • <b>Самореализация (1-2-3):</b> Способность ставить цели и воля к их достижению.<br>
+                • <b>Семейный вектор (4-5-6):</b> Уровень привязанности, бытовая устойчивость.<br>
+                • <b>Социальный успех (7-8-9):</b> Признание миром, удача и таланты.<br>
+                <p><i>Количественные показатели определяют плотность энергии в секторе. Прочерк (-) указывает на необходимость сознательной наработки качества.</i></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <span class="section-title">🧬 ГЕОМЕТРИЯ ТЕЛА И ДУХА</span>
+        <div class="vitruvian-container">
+            <div class="dot-row">
+                <div style="display:inline-block"><span class="m-dot-static">{{ matrix['1'][0] if matrix['1'] != '-' else '0' }}</span><span class="dot-label">Сознание</span></div>
+            </div>
+            <div class="dot-row">
+                <div style="display:inline-block"><span class="m-dot-static">{{ matrix['2'][0] if matrix['2'] != '-' else '0' }}</span><span class="dot-label">Маска</span></div>
+                <div style="display:inline-block"><span class="m-dot-static">{{ matrix['3'][0] if matrix['3'] != '-' else '0' }}</span><span class="dot-label">Успех</span></div>
+            </div>
+            <div class="dot-row">
+                <div style="display:inline-block"><span class="m-dot-static">{{ matrix['4'][0] if matrix['4'] != '-' else '0' }}</span><span class="dot-label">Душа</span></div>
+            </div>
+        </div>
+        <table class="grid-2">
+            <tr>
+                <td>
+                    <b class="gold">Вектор Силы:</b><br>
+                    {{ result.action_power|safe }}
+                </td>
+                <td>
+                    <b class="gold">Линии Судьбы:</b><br>
+                    {% for l_id, line in matrix_lines.items() %}
+                    • {{ line.name }}: <b>{{ line.status }}</b> ({{ line.score }})<br>
+                    {% endfor %}
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <span class="section-title">📈 РЕСУРСНЫЙ ПРОГНОЗ 2026</span>
+        <table class="grid-2">
+            <tr>
+                <td>
+                    <b>График жизненной энергии:</b>
+                    <div class="energy-track"><div class="energy-bar" style="width: 75%;"></div></div>
+                    <span style="font-size: 8px; color: #666;">Текущий потенциал Архетипа {{ result.number }} в цикле реализации.</span>
+                </td>
+                <td>
+                    <b>Когнитивные искажения:</b>
+                    <div class="card bg-gold" style="margin-top:0; font-size: 9px;">
+                        Основная ловушка: <i>{{ result.shadow_side|striptags|truncate(150) }}</i>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="section">
+        <span class="section-title">🎓 ПЕРСОНАЛЬНЫЙ ТРЕК РАЗВИТИЯ (АКАДЕМИЯ GENESIS)</span>
+        <div class="card blue-card">
+            <b>Активация Точки Роста:</b> {{ result.growth_point|striptags|truncate(180) }}
+        </div>
+        <p style="margin-top: 10px;">
+            <b class="gold">Модель Совместимости (Синергия):</b> Ваша структура сознания настроена на
+            <b>{{ "Лидерское" if result.number in ['1','4','8'] else "Эмпатическое" if result.number in ['2','6','9'] else "Аналитическое" }}</b>
+            взаимодействие. В союзе вы выступаете как "катализатор изменений" для партнеров с планетой {{ result.planet }}.
         </p>
     </div>
 
-    <div class="section">
-        <h3>⚡ ЭНЕРГЕТИЧЕСКИЙ ПРОФИЛЬ</h3>
-        <table class="grid">
-            <tr>
-                <td><b class="gold">Вектор Силы:</b><br> {{ result.action_power|safe }}</td>
-                <td><b class="gold">Точка Роста:</b><br> {{ result.growth_point|safe }}</td>
-            </tr>
-            <tr>
-                <td><b class="gold">Теневая Ловушка:</b><br> {{ result.shadow_side|safe }}</td>
-                <td><b class="gold">Выход из минуса:</b><br> {{ result.exit_minus|safe }}</td>
-            </tr>
-        </table>
-    </div>
-
-    <div class="section">
-        <h3>📊 ЦИФРОВАЯ КАРТА (ПСИХОМАТРИЦА)</h3>
-        <table class="matrix-table">
-            <tr>
-                <td><span>Характер</span>{{ matrix['1'] }}</td>
-                <td><span>Здоровье</span>{{ matrix['4'] }}</td>
-                <td><span>Удача</span>{{ matrix['7'] }}</td>
-            </tr>
-            <tr>
-                <td><span>Энергия</span>{{ matrix['2'] }}</td>
-                <td><span>Логика</span>{{ matrix['5'] }}</td>
-                <td><span>Долг</span>{{ matrix['8'] }}</td>
-            </tr>
-            <tr>
-                <td><span>Интерес</span>{{ matrix['3'] }}</td>
-                <td><span>Труд</span>{{ matrix['6'] }}</td>
-                <td><span>Память</span>{{ matrix['9'] }}</td>
-            </tr>
-        </table>
-    </div>
-
-    <div class="section">
-        <h3>🗝 СФЕРЫ РЕАЛИЗАЦИИ</h3>
-        <table class="grid">
-            <tr>
-                <td><b class="gold">💑 Личные отношения:</b><br> {{ result.partner_type|safe }}</td>
-                <td><b class="gold">💰 Финансовый код:</b><br> {{ result.financial_tip|safe }}</td>
-            </tr>
-            <tr>
-                <td colspan="2"><b class="gold">🧬 Ресурс здоровья:</b><br> {{ result.health_tips|safe }}</td>
-            </tr>
-        </table>
-    </div>
-
-    <div class="section">
-        <h3>⚖️ КАРМИЧЕСКИЙ ПУТЬ</h3>
-        <p><b class="gold">Задачи воплощения:</b><br> {{ result.karmic_tasks|safe }}</p>
-        <p><b class="gold">Сила вашего разума:</b><br> {{ result.mind_power|safe }}</p>
-        <p><b class="gold">Итоговый результат пути:</b><br> {{ result.life_result|safe }}</p>
-    </div>
-
     <div class="footer">
-        Анализ подготовлен Genesis Psychology Portal v4.0. <br>
-        Данный отчет является интеллектуальной собственностью и предназначен для личного использования.
+        Отчет подготовлен системой Genesis Psychology Portal v4.0. <br>
+        Данные являются интерпретацией на основе психоматрицы Пифагора и системы Архетипов.
     </div>
+
 </body>
 </html>
