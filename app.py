@@ -2,11 +2,12 @@ import os
 import re
 import shutil
 from datetime import datetime
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for, make_response
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_mail import Mail, Message
-import pdfkit
+from weasyprint import HTML
+import io
 
 # Импорт сервисов и логики (убедись, что файлы лежат рядом)
 try:
@@ -23,18 +24,22 @@ except ImportError:
     ARCHETYPES = {}
 
 app = Flask(__name__)
-app.secret_key = 'genesis_secret_key_0602'
+app.secret_key = os.environ.get('SECRET_KEY', 'genesis_secret_key_0602')
 
 # --- КОНФИГУРАЦИЯ ПОЧТЫ ---
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'projectnumerology@gmail.com'
-app.config['MAIL_PASSWORD'] = 'ohkzqberuempfqhn'  # На Render лучше использовать os.environ.get('MAIL_PWD')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', 'ohkzqberuempfqhn')
 mail = Mail(app)
 
 basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'genesis_v2.db')
+# Поддержка PostgreSQL для Render
+db_url = os.environ.get('DATABASE_URL', 'sqlite:///' + os.path.join(basedir, 'genesis_v2.db'))
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
+app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -62,8 +67,8 @@ class ArchetypeContent(db.Model):
     partner_type = db.Column(db.Text)
     financial_tip = db.Column(db.Text)
     health_tips = db.Column(db.Text)
-    exit_minus = db.Column(db.Text)  # Для синхронизации с семенами
-    search_queries = db.Column(db.Text)  # Для вакансий
+    exit_minus = db.Column(db.Text)
+    search_queries = db.Column(db.Text)
     coach_tips = db.relationship('DailyCoachTip', backref='archetype', lazy=True)
 
 
@@ -71,7 +76,7 @@ class DailyCoachTip(db.Model):
     __tablename__ = 'daily_coach_tips'
     id = db.Column(db.Integer, primary_key=True)
     archetype_id = db.Column(db.Integer, db.ForeignKey('archetype_content.id'))
-    day_type = db.Column(db.String(20))  # high, mid, low
+    day_type = db.Column(db.String(20))
     phys_content = db.Column(db.Text)
     ment_content = db.Column(db.Text)
     harm_content = db.Column(db.Text)
@@ -80,7 +85,7 @@ class DailyCoachTip(db.Model):
 class Course(db.Model):
     __tablename__ = 'courses'
     id = db.Column(db.Integer, primary_key=True)
-    type = db.Column(db.String(50))  # Soft, Hard, Agile
+    type = db.Column(db.String(50))
     title = db.Column(db.String(200))
     platform = db.Column(db.String(100))
     link = db.Column(db.String(500))
@@ -92,7 +97,7 @@ class Article(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200))
     content = db.Column(db.Text)
-    category = db.Column(db.String(50))  # Trends, Methodology
+    category = db.Column(db.String(50))
     image_url = db.Column(db.String(500))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -265,8 +270,8 @@ def delete_record(id):
 def index():
     result = None
     matrix_raw = None
-    matrix_desc = {}  # Новое: расшифровка ячеек
-    extra = {}  # Новое: звезды и планеты
+    matrix_desc = {}
+    extra = {}
     jobs = []
     calc = None
     user_id = None
@@ -284,11 +289,9 @@ def index():
             group_num = get_group(day)
             result = ArchetypeContent.query.filter_by(number=str(group_num)).first()
 
-            # Доп. данные из data.py (Звезды, Арканы)
             if 'ARCHETYPE_EXTRAS' in globals():
                 extra = ARCHETYPE_EXTRAS.get(str(group_num), {})
 
-            # Сохраняем пользователя
             new_rec = UserRecord(
                 name=user_name, email=email, archetype=group_num,
                 s_leadership=75, s_comm=80, s_empathy=65, s_logic=70, s_agile=60
@@ -297,7 +300,6 @@ def index():
             db.session.commit()
             user_id = new_rec.id
 
-            # Расчеты Психоматрицы
             d_r, m_r, y_r = sum_digits(day), sum_digits(month), sum_digits(year)
             calc = {
                 'mind': d_r, 'action': m_r, 'realization': y_r,
@@ -310,7 +312,6 @@ def index():
                 "c6": sum_digits(m_r + y_r), "c7": calc['final']
             }
 
-            # Расшифровка через mind_logic.py
             if 'NODES_INFO' in globals():
                 all_digits = f"{day}{month}{year}{calc['mind']}{calc['action']}{calc['realization']}{calc['final']}"
                 for n_id, info in NODES_INFO.items():
@@ -318,10 +319,8 @@ def index():
                     lvl = "low" if cnt <= 1 else "mid" if cnt <= 3 else "high"
                     matrix_desc[n_id] = {"name": info["name"], "text": info[lvl], "count": cnt}
 
-            # Поиск вакансий через CareerService
             if result:
                 prof_entry = ProfessionContent.query.filter_by(number=str(result.number)).first()
-                # Если в архетипе есть свои запросы - берем их, иначе из таблицы профессий
                 keywords = result.search_queries if hasattr(result, 'search_queries') and result.search_queries else (
                     prof_entry.list_csv if prof_entry else None)
                 try:
@@ -335,125 +334,69 @@ def index():
                            user_id=user_id, pif_decode=PIF_DECODE if 'PIF_DECODE' in globals() else {})
 
 
-# --- ЭКСПОРТ И ОТПРАВКА PDF ---
+# --- ЭКСПОРТ И ОТПРАВКА PDF (ОБНОВЛЕНО НА WEASYPRINT) ---
 
 @app.route('/export_pdf', methods=['POST'])
 def export_pdf():
-    user_name = request.form.get('user_name', 'Искатель')
-    day = request.form.get('day')
-    month = request.form.get('month')
-    year = request.form.get('year')
-
-    if not day: return "Нет данных даты", 400
-
-    # 1. Расчет группы (как в основной логике)
-    # Важно: используем ту же функцию sum_digits, что и в начале файла
-    d_r = sum_digits(day)
-    group_num = str(d_r)
-
-    # 2. Получение данных из БД
-    result = ArchetypeContent.query.filter_by(number=group_num).first()
-
-    if not result:
-        return f"Ошибка: Архетип {group_num} не найден в базе данных", 404
-
-    # 3. Расчет Психоматрицы (Пифагора)
-    # Собираем строку из всех чисел даты и доп. чисел
-    m_r = sum_digits(month)
-    y_r = sum_digits(year)
-    # Дополнительные числа Пифагора
-    n1 = sum(int(d) for d in (day + month + year))
-    n2 = sum(int(d) for d in str(n1))
-    # n3 = n1 - (первая цифра дня * 2)
-    first_digit = int(day[0] if day[0] != '0' else day[1])
-    n3 = abs(n1 - (first_digit * 2))
-    n4 = sum(int(d) for d in str(n3))
-
-    all_digits = day + month + year + str(n1) + str(n2) + str(n3) + str(n4)
-
-    matrix = {}
-    for i in range(1, 10):
-        cnt = all_digits.count(str(i))
-        matrix[str(i)] = str(i) * cnt if cnt > 0 else "-"
-
-        # Данные для шаблона pdf_print_template (УМ, ДЕЙСТВИЕ и т.д.)
-        calc = {
-            'mind': d_r,
-            'action': m_r,
-            'realization': y_r,
-            'final': sum_digits(d_r + m_r + y_r),
-            'dharma': sum_digits(d_r + m_r)
-        }
-
-        # Рендерим (используем pdf_template.html, который с таблицами)
-        rendered_html = render_template('pdf_template.html',
-                                        result=result,
-                                        matrix=matrix,
-                                        calc=calc,
-                                        user_name=user_name,
-                                        day=day, month=month, year=year)
-
-        path_wk = shutil.which("wkhtmltopdf") or r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
-        config = pdfkit.configuration(wkhtmltopdf=path_wk)
-
-        options = {
-            'page-size': 'A4',
-            'encoding': "UTF-8",
-            'enable-local-file-access': '',
-            'quiet': ''
-        }
-
-        try:
-            pdf = pdfkit.from_string(rendered_html, False, configuration=config, options=options)
-            return (pdf, 200, {
-                'Content-Type': 'application/pdf',
-                'Content-Disposition': f'attachment; filename="Genesis_Report.pdf"'
-            })
-        except Exception as e:
-            return f"Ошибка PDFKit: {str(e)}", 500
-
-    # 5. Конфигурация PDF
-    path_wk = shutil.which("wkhtmltopdf") or r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
-    config = pdfkit.configuration(wkhtmltopdf=path_wk)
-
-    options = {
-        'page-size': 'A4',
-        'encoding': "UTF-8",
-        'margin-top': '15mm',
-        'margin-bottom': '15mm',
-        'enable-local-file-access': ''
-    }
-
     try:
-        pdf = pdfkit.from_string(rendered_html, False, configuration=config, options=options)
-        return (pdf, 200, {
-            'Content-Type': 'application/pdf',
-            'Content-Disposition': f'attachment; filename="Genesis_Report_{user_name}.pdf"'
-        })
+        user_name = request.form.get('user_name', 'Искатель')
+        day = request.form.get('day')
+        month = request.form.get('month')
+        year = request.form.get('year')
+
+        if not day: return "Нет данных даты", 400
+
+        group_num = str(sum_digits(day))
+        result = ArchetypeContent.query.filter_by(number=group_num).first()
+        if not result: return f"Архетип {group_num} не найден", 404
+
+        # Расчет Психоматрицы
+        m_r, y_r = sum_digits(month), sum_digits(year)
+        n1 = sum(int(d) for d in (day + month + year))
+        n2 = sum(int(d) for d in str(n1))
+        first_digit = int(day[0] if day[0] != '0' else day[1])
+        n3 = abs(n1 - (first_digit * 2))
+        n4 = sum(int(d) for d in str(n3))
+        all_digits = day + month + year + str(n1) + str(n2) + str(n3) + str(n4)
+
+        matrix = {str(i): (str(i) * all_digits.count(str(i)) if all_digits.count(str(i)) > 0 else "-") for i in
+                  range(1, 10)}
+        calc = {
+            'mind': sum_digits(day), 'action': m_r, 'realization': y_r,
+            'final': sum_digits(sum_digits(day) + m_r + y_r),
+            'dharma': sum_digits(sum_digits(day) + m_r)
+        }
+
+        rendered_html = render_template('pdf_template.html',
+                                        result=result, matrix=matrix, calc=calc,
+                                        user_name=user_name, day=day, month=month, year=year)
+
+        pdf = HTML(string=rendered_html).write_pdf()
+        response = make_response(pdf)
+        response.headers['Content-Type'] = 'application/pdf'
+        response.headers['Content-Disposition'] = f'attachment; filename="Genesis_Report_{user_name}.pdf"'
+        return response
     except Exception as e:
-        return f"Ошибка генерации: {str(e)}", 500
+        return f"Ошибка генерации PDF: {str(e)}", 500
 
 
 @app.route('/send_pdf', methods=['POST'])
 def send_pdf():
-    email = request.form.get('email')
-    html_content = request.form.get('html_to_pdf')
-    user_name = request.form.get('user_name', 'Искатель')
-
-    if not email: return "Email не указан", 400
-
-    path_wk = shutil.which("wkhtmltopdf") or r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
     try:
-        config = pdfkit.configuration(wkhtmltopdf=path_wk)
-        pdf = pdfkit.from_string(html_content, False, configuration=config)
+        email = request.form.get('email')
+        html_content = request.form.get('html_to_pdf')
+        user_name = request.form.get('user_name', 'Искатель')
 
+        if not email or not html_content: return "Данные не полные", 400
+
+        pdf = HTML(string=html_content).write_pdf()
         msg = Message(f"Ваш отчет Genesis: {user_name}",
                       sender=app.config['MAIL_USERNAME'],
                       recipients=[email])
         msg.body = f"Здравствуйте, {user_name}! Во вложении ваш персональный цифровой анализ Genesis."
-        msg.attach("Genesis_Report.pdf", "application/pdf", pdf)
+        msg.attach(f"Genesis_Report_{user_name}.pdf", "application/pdf", pdf)
         mail.send(msg)
-        return "Отчет успешно отправлен на вашу почту!"
+        return "Отчет успешно отправлен!"
     except Exception as e:
         return f"Ошибка отправки: {str(e)}", 500
 
@@ -463,27 +406,15 @@ def send_email():
     try:
         recipient = request.form.get('email')
         html_content = request.form.get('html_content')
-
-        if not recipient:
-            return "Email не указан", 400
+        if not recipient: return "Email не указан", 400
 
         msg = Message("Ваш цифровой профиль | Genesis Psychology",
                       sender=app.config['MAIL_USERNAME'],
                       recipients=[recipient])
-
-        # Оборачиваем в базовый HTML, чтобы стили подхватились в почте
-        msg.html = f"""
-        <html>
-            <body style="background-color: #050505; color: #b8b8b8; padding: 20px;">
-                {html_content}
-            </body>
-        </html>
-        """
-
+        msg.html = f"<html><body style='background-color: #050505; color: #b8b8b8; padding: 20px;'>{html_content}</body></html>"
         mail.send(msg)
         return "OK", 200
     except Exception as e:
-        print(f"Ошибка отправки: {e}")
         return str(e), 500
 
 
