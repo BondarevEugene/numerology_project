@@ -470,6 +470,11 @@ def send_email():
     except Exception as e:
         return str(e), 500
 
+@app.after_request
+def add_header(response):
+    # Это разрешает выполнение скриптов с использованием eval
+    response.headers['Content-Security-Policy'] = "script-src 'self' 'unsafe-eval' 'unsafe-inline';"
+    return response
 
 if __name__ == '__main__':
     with app.app_context():
