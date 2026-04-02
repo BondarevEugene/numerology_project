@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Genesis | LEELA Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Almendra&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #c5a059;
+            --gold-glow: rgba(197, 160, 89, 0.4);
+            --bg: #050505;
+            --cell-border: rgba(197, 160, 89, 0.15);
+            --text-main: #b8b8b8;
+            --text-highlight: #ffffff;
+        }
+
+        body {
+            background: var(--bg); color: var(--text-main);
+            font-family: 'Inter', sans-serif; margin: 0;
+            display: flex; height: 100vh; overflow: hidden;
+            background-image: radial-gradient(circle at 50% 50%, #111 0%, #050505 100%);
+        }
+
+        .board-container { flex-grow: 1; display: flex; align-items: center; justify-content: center; padding: 40px; }
+
+        .leela-grid {
+            display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(9, 1fr);
+            width: 90vh; height: 90vh; gap: 4px; padding: 10px;
+            background: rgba(10, 10, 10, 0.5); border: 1px solid var(--cell-border);
+            backdrop-filter: blur(10px); border-radius: 8px; position: relative;
+        }
+
+        .cell {
+            background: rgba(0, 0, 0, 0.3); position: relative;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 8px; text-align: center; transition: 0.4s;
+            border: 1px solid var(--cell-border); border-radius: 4px;
+        }
+
+        .cell.active { background: rgba(197, 160, 89, 0.12); border-color: var(--gold); box-shadow: 0 0 20px var(--gold-glow); }
+
+        .cell-num { position: absolute; top: 4px; left: 6px; font-size: 1rem; color: #fff; font-weight: 900; opacity: 0.2; }
+
+        .cell-name { font-size: 0.7rem; color: var(--text-highlight); text-transform: uppercase; font-weight: 600; }
+
+        #player-token {
+            width: 28px; height: 28px; background: #fff; border-radius: 50%;
+            position: absolute; z-index: 100; pointer-events: none;
+            box-shadow: 0 0 15px #fff, 0 0 30px var(--gold);
+            transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+            display: none; border: 2px solid var(--gold);
+        }
+
+        .sidebar {
+            width: 380px; background: #0a0a0a; border-left: 1px solid rgba(197, 160, 89, 0.2);
+            padding: 30px; display: flex; flex-direction: column; box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+        }
+
+        .logo-small { font-family: 'Almendra'; color: var(--gold); font-size: 2rem; letter-spacing: 7px; text-align: center; margin-bottom: 20px; }
+
+        .desc-card {
+            background: rgba(255, 255, 255, 0.03); border: 1px solid var(--cell-border);
+            padding: 20px; border-radius: 8px; margin-bottom: 20px; min-height: 150px;
+        }
+
+        .desc-card h3 { font-family: 'Almendra'; color: var(--gold); margin: 0 0 10px 0; font-size: 1.3rem; }
+
+        .path-journal {
+            flex-grow: 1; background: rgba(255, 255, 255, 0.02);
+            border: 1px dashed rgba(197, 160, 89, 0.2); border-radius: 4px;
+            margin-bottom: 20px; display: flex; flex-direction: column; overflow: hidden;
+        }
+
+        .journal-header { background: rgba(197, 160, 89, 0.1); color: var(--gold); font-size: 0.7rem; padding: 5px; text-align: center; }
+
+        .journal-content { padding: 10px; font-size: 0.8rem; overflow-y: auto; color: #888; flex-grow: 1; }
+
+        .journal-entry { margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+
+        .dice-section { text-align: center; padding-top: 20px; border-top: 1px solid #222; }
+
+        #dice-result { font-size: 4rem; font-family: 'Almendra'; color: var(--gold); margin-bottom: 10px; }
+
+        .btn-roll {
+            background: linear-gradient(135deg, #c5a059 0%, #8a6d35 100%);
+            color: #000; border: none; padding: 15px; font-weight: 900;
+            cursor: pointer; width: 100%; border-radius: 4px; text-transform: uppercase;
+        }
+
+        @keyframes diceRoll { 0% { transform: rotate(0); } 100% { transform: rotate(360deg); } }
+        .rolling { animation: diceRoll 0.5s infinite; }
+
+        .cell.snake { border-bottom: 3px solid #ff4d4d; }
+        .cell.arrow { border-bottom: 3px solid #00ffcc; }
+    </style>
+</head>
+<body>
+
+<div id="player-token"></div>
+
+<div class="board-container">
+    <div class="leela-grid" id="board"></div>
+</div>
+
+<aside class="sidebar">
+    <div class="logo-small">LEELA</div>
+
+    <div class="desc-card">
+        <h3 id="cell-name-display">Подготовка...</h3>
+        <p id="game-log">Для рождения нужна 6.</p>
+    </div>
+
+    <div class="path-journal">
+        <div class="journal-header">ДНЕВНИК ПУТИ</div>
+        <div id="journal-content" class="journal-content">
+            <div class="journal-entry">Ожидание воплощения...</div>
+        </div>
+    </div>
+
+    <div class="dice-section">
+        <div id="dice-result">?</div>
+        <button class="btn-roll" id="roll-btn" onclick="rollDice()">Бросить кость</button>
+    </div>
+</aside>
+
+<script>
+    const cellsData = {{ cells_info|tojson }};
+    const snakes = {{ snakes|tojson }};
+    const arrows = {{ arrows|tojson }};
+
+    let currentPos = 0;
+    let isRolling = false;
+    const board = document.getElementById('board');
+
+    function createBoard() {
+        for (let row = 9; row >= 1; row--) {
+            let rowCells = [];
+            for (let col = 1; col <= 8; col++) { rowCells.push((row - 1) * 8 + col); }
+            if (row % 2 === 0) rowCells.reverse();
+            rowCells.forEach(num => {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                if (snakes[num]) cell.classList.add('snake');
+                if (arrows[num]) cell.classList.add('arrow');
+                cell.id = `cell-${num}`;
+                cell.innerHTML = `<div class="cell-num">${num}</div><div class="cell-name">${cellsData[num] ? cellsData[num].name : 'Поток'}</div>`;
+                board.appendChild(cell);
+            });
+        }
+    }
+    createBoard();
+
+    function addToJournal(message) {
+        const journal = document.getElementById('journal-content');
+        const entry = document.createElement('div');
+        entry.className = 'journal-entry';
+        entry.innerHTML = `<b>${message}</b>`;
+        journal.appendChild(entry);
+        journal.scrollTop = journal.scrollHeight;
+    }
+
+    function rollDice() {
+        if (isRolling) return;
+        isRolling = true;
+        const btn = document.getElementById('roll-btn');
+        const diceDisplay = document.getElementById('dice-result');
+        btn.disabled = true;
+        diceDisplay.classList.add('rolling');
+
+        setTimeout(() => {
+            const roll = Math.floor(Math.random() * 6) + 1;
+            diceDisplay.classList.remove('rolling');
+            diceDisplay.innerText = roll;
+            processMove(roll);
+            btn.disabled = false;
+            isRolling = false;
+        }, 600);
+    }
+
+    function processMove(roll) {
+        const log = document.getElementById('game-log');
+        const nameDisplay = document.getElementById('cell-name-display');
+
+        if (currentPos === 0) {
+            if (roll === 6) {
+                currentPos = 1;
+                nameDisplay.innerText = "РОЖДЕНИЕ!";
+                log.innerText = "Вы вошли в игру на клетку 1.";
+                addToJournal("Рождение на клетке 1");
+                document.getElementById('player-token').style.display = 'block';
+            } else {
+                nameDisplay.innerText = "ОЖИДАНИЕ";
+                log.innerText = `Выпало ${roll}. Нужна 6.`;
+            }
+        } else {
+            let nextPos = currentPos + roll;
+            if (nextPos > 72) {
+                addToJournal(`Бросок ${roll}: Перелёт. Остался на ${currentPos}`);
+            } else {
+                currentPos = nextPos;
+                addToJournal(`Ход на ${roll}. Клетка ${currentPos}`);
+            }
+        }
+        updateUI();
+        checkSpecialSquares();
+    }
+
+    function updateUI() {
+        if (currentPos === 0) return;
+        const targetCell = document.getElementById(`cell-${currentPos}`);
+        const token = document.getElementById('player-token');
+        const rect = targetCell.getBoundingClientRect();
+
+        token.style.top = (rect.top + rect.height / 2 - 14) + 'px';
+        token.style.left = (rect.left + rect.width / 2 - 14) + 'px';
+
+        document.querySelectorAll('.cell').forEach(c => c.classList.remove('active'));
+        targetCell.classList.add('active');
+
+        if (cellsData[currentPos]) {
+            document.getElementById('cell-name-display').innerText = cellsData[currentPos].name;
+            document.getElementById('game-log').innerText = cellsData[currentPos].desc;
+        }
+    }
+
+    function checkSpecialSquares() {
+        setTimeout(() => {
+            let oldPos = currentPos;
+            if (snakes[currentPos]) {
+                currentPos = snakes[currentPos];
+                addToJournal(`Змея! Падение с ${oldPos} на ${currentPos}`);
+                updateUI();
+            } else if (arrows[currentPos]) {
+                currentPos = arrows[currentPos];
+                addToJournal(`Стрела! Взлёт с ${oldPos} на ${currentPos}`);
+                updateUI();
+            }
+
+            if (currentPos === 68) {
+                alert("КОСМИЧЕСКОЕ СОЗНАНИЕ! Игра завершена.");
+                location.reload();
+            }
+        }, 1000);
+    }
+</script>
+<section class="mind-map-section">
+    <button class="map-toggle" onclick="toggleMindMap()">
+        <span>ЦИФРОВАЯ КАРТА СОЗНАНИЯ</span>
+        <i id="toggle-icon">▼</i>
+    </button>
+
+    <div class="map-content" id="map-content">
+        <div class="matrix-grid" id="matrix-display">
+            </div>
+
+        <div class="analysis-board">
+            <h3>Психологический профиль</h3>
+            <div id="full-report" class="report-grid">
+                </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .mind-map-section {
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        background: #080808;
+        border-top: 1px solid var(--gold);
+        z-index: 1000;
+        transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .map-toggle {
+        width: 100%;
+        padding: 15px;
+        background: none;
+        border: none;
+        color: var(--gold);
+        font-family: 'Almendra';
+        letter-spacing: 4px;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        align-items: center;
+        background: rgba(197, 160, 89, 0.05);
+    }
+
+    .map-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.5s ease;
+        padding: 0 40px;
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 40px;
+    }
+
+    .mind-map-section.open .map-content {
+        max-height: 80vh;
+        padding-bottom: 40px;
+        overflow-y: auto;
+    }
+
+    /* Стили матрицы */
+    .matrix-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .matrix-node {
+        background: rgba(255,255,255,0.02);
+        border: 1px solid rgba(197, 160, 89, 0.1);
+        padding: 15px;
+        text-align: center;
+        border-radius: 5px;
+    }
+
+    .matrix-node.active { border-color: var(--gold); background: rgba(197, 160, 89, 0.05); }
+
+    .node-title { font-size: 0.6rem; color: #666; display: block; margin-bottom: 5px; }
+    .node-val { font-size: 1.5rem; color: var(--gold); font-family: 'Almendra'; }
+
+    /* Стили отчета */
+    .report-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        color: #888;
+        font-size: 0.85rem;
+    }
+
+    .report-item b { color: var(--gold); display: block; margin-bottom: 5px; }
+</style>
+
+<script>
+    function toggleMindMap() {
+        const section = document.querySelector('.mind-map-section');
+        const icon = document.getElementById('toggle-icon');
+        section.classList.toggle('open');
+        icon.innerText = section.classList.contains('open') ? '▲' : '▼';
+    }
+
+    // Эта функция вызывается при загрузке или вводе даты
+    function renderMindMap(data) {
+        const grid = document.getElementById('matrix-display');
+        const report = document.getElementById('full-report');
+
+        grid.innerHTML = '';
+        report.innerHTML = '';
+
+        // Номера в матрице идут не по порядку (3-6-9, 2-5-8, 1-4-7 - классика)
+        const order = ['3','6','9','2','5','8','1','4','7'];
+
+        order.forEach(num => {
+            const count = data.matrix[num];
+            const node = document.createElement('div');
+            node.className = `matrix-node ${count > 0 ? 'active' : ''}`;
+            node.innerHTML = `
+                <span class="node-title">${nodesInfo[num].name}</span>
+                <span class="node-val">${count > 0 ? num.repeat(count) : '-'}</span>
+            `;
+            grid.appendChild(node);
+
+            // Добавляем текст в отчет
+            const level = count === 0 ? 'low' : (count < 3 ? 'mid' : 'high');
+            const item = document.createElement('div');
+            item.className = 'report-item';
+            item.innerHTML = `<b>${nodesInfo[num].name}</b> ${nodesInfo[num][level]}`;
+            report.appendChild(item);
+        });
+    }
+</script>
+</body>
+</html>

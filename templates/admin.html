@@ -2,176 +2,152 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Genesis Admin | Sacred Control</title>
+    <title>Genesis Admin | Sacred Control v4.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lora:ital,wght@0,400;0,700&display=swap" rel="stylesheet">
-    <script src="https://cdn.ckeditor.com/4.25.1-lts/standard/ckeditor.js"></script>
+    <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
     <style>
-        :root { --gold: #d4af37; --copper: #b08d57; --void: #060709; --card-bg: #0c0e12; --text: #a0a0a0; }
-
+        :root { --gold: #d4af37; --copper: #b08d57; --void: #060709; --card-bg: #0c0e12; --text: #a0a0a0; --red: #e63946; --blue: #00b4d8; --green: #2ecc71; --purple: #9b59b6; }
         body {
             background: var(--void); color: var(--text); font-family: 'Lora', serif; margin: 0; overflow-x: hidden;
             background-image: radial-gradient(circle at center, #11141a 0%, #060709 100%);
         }
-
-        /* АНИМАЦИЯ ФОНА (ЧЕРНАЯ МАГИЯ) */
-        .magic-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.3; pointer-events: none; }
-
-        /* ВКЛАДКИ */
         .admin-nav {
-            display: flex; justify-content: center; gap: 20px; padding: 30px;
-            background: rgba(0,0,0,0.5); border-bottom: 1px solid rgba(176,141,87,0.2);
-            backdrop-filter: blur(10px); sticky; top: 0; z-index: 100;
+            display: flex; justify-content: center; gap: 15px; padding: 15px;
+            background: rgba(0,0,0,0.95); border-bottom: 1px solid rgba(176,141,87,0.2);
+            backdrop-filter: blur(15px); position: sticky; top: 0; z-index: 1000;
         }
         .tab-btn {
             background: transparent; border: 1px solid var(--copper); color: var(--copper);
-            padding: 12px 25px; cursor: pointer; font-family: 'Cinzel'; letter-spacing: 2px;
-            transition: 0.5s; position: relative; overflow: hidden;
+            padding: 8px 20px; cursor: pointer; font-family: 'Cinzel'; letter-spacing: 1px; transition: 0.4s; font-size: 0.8rem;
         }
         .tab-btn:hover, .tab-btn.active { background: var(--copper); color: var(--void); box-shadow: 0 0 15px var(--copper); }
 
-        .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; animation: fadeIn 1.5s ease; }
-
-        /* ЭФФЕКТЫ ПОЯВЛЕНИЯ */
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        .tab-content { display: none; animation: slideIn 0.6s ease-out; }
+        .container { max-width: 1400px; margin: 30px auto; padding: 0 30px; }
+        .tab-content { display: none; animation: fadeIn 0.5s ease; }
         .tab-content.active { display: block; }
-        @keyframes slideIn { from { opacity: 0; filter: blur(10px); } to { opacity: 1; filter: blur(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* КАРТОЧКИ РЕДАКТИРОВАНИЯ */
-        .card {
-            background: var(--card-bg); border: 1px solid rgba(176,141,87,0.1);
-            padding: 30px; margin-bottom: 30px; position: relative;
-            transition: 0.3s;
-        }
-        .card:hover { border-color: var(--copper); box-shadow: 0 0 30px rgba(176,141,87,0.05); }
-        h2, h3 { font-family: 'Cinzel'; color: var(--copper); letter-spacing: 3px; }
+        .card { background: var(--card-bg); border: 1px solid rgba(176,141,87,0.15); padding: 25px; border-radius: 12px; position: relative; margin-bottom: 20px; }
+        .arch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+        .arch-card { cursor: pointer; text-align: center; transition: 0.4s; padding: 20px; border: 1px solid rgba(176,141,87,0.1); }
+        .arch-card:hover { transform: translateY(-8px); border-color: var(--gold); background: #11141a; }
+        .arch-card h3 { font-family: 'Cinzel'; font-size: 4rem; margin: 0; color: var(--gold); opacity: 0.7; }
 
-        input, textarea {
-            background: transparent; border: none; border-bottom: 1px solid rgba(176,141,87,0.3);
-            color: #fff; width: 100%; padding: 12px 0; margin-bottom: 20px; font-family: 'Lora'; font-size: 1rem;
+        #editor-overlay, #article-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 2000; padding: 20px; overflow-y: auto; }
+        .modal-container { max-width: 1100px; margin: 20px auto; background: var(--card-bg); padding: 40px; border: 1px solid var(--gold); border-radius: 15px; box-shadow: 0 0 50px rgba(212, 175, 55, 0.1); }
+
+        .section-label { font-family: 'Cinzel'; color: var(--gold); font-size: 0.8rem; letter-spacing: 2px; display: block; margin: 30px 0 10px; text-transform: uppercase; border-bottom: 1px solid rgba(212, 175, 55, 0.1); padding-bottom: 5px; }
+
+        input, textarea, select {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(176,141,87,0.3);
+            color: #fff; width: 100%; padding: 12px; font-family: 'Lora'; outline: none; border-radius: 4px; box-sizing: border-box;
         }
-        input:focus { outline: none; border-bottom-color: var(--gold); }
 
         .btn-magic {
             background: transparent; color: var(--gold); border: 1px solid var(--gold);
-            padding: 10px 30px; font-family: 'Cinzel'; cursor: pointer; transition: 0.4s;
+            padding: 20px; font-family: 'Cinzel'; cursor: pointer; transition: 0.4s;
+            width: 100%; margin-top: 40px; letter-spacing: 3px; font-weight: bold; font-size: 1.1rem;
         }
-        .btn-magic:hover { background: var(--gold); color: var(--void); box-shadow: 0 0 20px var(--gold); }
+        .btn-magic:hover { background: var(--gold); color: var(--void); box-shadow: 0 0 30px var(--gold); }
+        .btn-magic:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        /* ТАБЛИЦА КЛИЕНТОВ */
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { font-family: 'Cinzel'; color: var(--copper); padding: 15px; text-align: left; border-bottom: 2px solid var(--copper); }
-        td { padding: 15px; border-bottom: 1px solid rgba(176,141,87,0.1); }
-        .email-key { color: var(--gold); font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; }
+        th { font-family: 'Cinzel'; color: var(--copper); padding: 15px; text-align: left; border-bottom: 2px solid var(--copper); font-size: 0.8rem; }
+        td { padding: 12px 15px; border-bottom: 1px solid rgba(176,141,87,0.1); font-size: 0.9rem; }
 
-        /* СТАТИСТИКА */
-        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-        .stat-item { background: rgba(176,141,87,0.05); padding: 30px; text-align: center; border: 1px solid rgba(176,141,87,0.1); }
-        .stat-num { font-size: 2.5rem; color: var(--gold); font-family: 'Cinzel'; display: block; }
-
-        /* ПУЛЬСИРУЮЩАЯ ПЕЧАТЬ ПРИ ЗАГРУЗКЕ */
-        #magic-loader {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--void);
-            display: flex; justify-content: center; align-items: center; z-index: 1000; transition: 0.8s;
-        }
-        .seal { width: 100px; height: 100px; border: 2px solid var(--copper); border-radius: 50%; display: flex; justify-content: center; align-items: center; animation: rotateSeal 10s linear infinite; }
-        .seal::after { content: "✺"; color: var(--copper); font-size: 3rem; }
-        @keyframes rotateSeal { from { transform: rotate(0deg); box-shadow: 0 0 20px var(--copper); } to { transform: rotate(360deg); box-shadow: 0 0 60px var(--gold); } }
+        #magic-loader { position: fixed; inset: 0; background: var(--void); display: flex; justify-content: center; align-items: center; z-index: 9999; }
+        .seal { width: 60px; height: 60px; border: 2px solid var(--copper); border-radius: 50%; animation: spin 4s linear infinite; display: flex; align-items: center; justify-content: center; color: var(--gold); font-size: 24px; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
 </head>
 <body onload="hideLoader()">
 
-    <div id="magic-loader"><div class="seal"></div></div>
-
-    <canvas class="magic-bg" id="particles"></canvas>
+    <div id="magic-loader"><div class="seal">✺</div></div>
 
     <nav class="admin-nav">
-        <button class="tab-btn active" onclick="showTab('arch')">Архетипы</button>
-        <button class="tab-btn" onclick="showTab('prof')">Mapping</button>
-        <button class="tab-btn" onclick="showTab('users')">Клиенты</button>
-        <button class="tab-btn" onclick="showTab('stats')">Статистика</button>
+        <button class="tab-btn active" onclick="showTab('arch', event)">Архетипы</button>
+        <button class="tab-btn" onclick="showTab('articles', event)">Статьи & Тренды</button>
+        <button class="tab-btn" onclick="showTab('users', event)">База Клиентов</button>
+        <button class="tab-btn" onclick="showTab('stats', event)">Аналитика</button>
+        <a href="/" style="margin-left: auto; color: var(--copper); text-decoration: none; font-family: 'Cinzel'; font-size: 0.8rem; align-self: center;">ВЫХОД →</a>
     </nav>
 
     <div class="container">
 
         <div id="arch" class="tab-content active">
-            <h2>Редактирование Знаний</h2>
-            {% for item in archetypes %}
-            <div class="card">
-                <h3>Код {{ item.number }}</h3>
-                <form action="/admin/edit/arch/{{ item.id }}" method="POST">
-                    <input type="text" name="title" value="{{ item.title }}" placeholder="Заголовок">
-                    <textarea name="full_text_html" id="ed_{{ item.id }}">{{ item.full_text | safe }}</textarea>
-                    <button type="submit" class="btn-magic">Запечатать изменения</button>
-                </form>
-                <script>CKEDITOR.replace('ed_{{ item.id }}');</script>
+            <h2 style="font-family: 'Cinzel'; color: var(--gold); text-align: center; letter-spacing: 5px; margin-bottom: 40px;">Конфигуратор Матрицы Судьбы</h2>
+            <div class="arch-grid">
+                {% for i in range(1, 10) %}
+                <div class="card arch-card" onclick="openArcaneEditor('{{ i }}')">
+                    <h3>{{ i }}</h3>
+                    <div style="font-family: 'Cinzel'; font-size: 0.7rem; color: var(--copper); letter-spacing: 2px;">МОДИФИЦИРОВАТЬ КОД</div>
+                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
         </div>
 
-        <div id="prof" class="tab-content">
-            <h2>Матрица Профессий</h2>
-            {% for prof in profs %}
-            <div class="card" style="display: flex; align-items: center; gap: 30px;">
-                <span style="font-family: 'Cinzel'; font-size: 1.5rem; color: var(--gold);">{{ prof.number }}</span>
-                <form action="/admin/edit/prof/{{ prof.id }}" method="POST" style="flex-grow: 1; display: flex; gap: 20px;">
-                    <input type="text" name="list_csv" value="{{ prof.list_csv }}" style="margin: 0;">
-                    <button type="submit" class="btn-magic">Save</button>
-                </form>
+        <div id="articles" class="tab-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                <h2 style="font-family: 'Cinzel'; color: var(--gold);">Trends & Insights 2026</h2>
+                <button class="tab-btn" onclick="openArticleModal()">+ НОВАЯ СТАТЬЯ</button>
             </div>
-            {% endfor %}
+            <div class="card" style="padding: 0;">
+                <table>
+                    <thead>
+                        <tr><th>Заголовок</th><th>Категория</th><th>Дата</th><th>Действия</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for art in articles %}
+                        <tr>
+                            <td style="color: #fff;">{{ art.title }}</td>
+                            <td>{{ art.category }}</td>
+                            <td style="color: #666;">{{ art.created_at.strftime('%d.%m.%Y') }}</td>
+                            <td>
+                                <form action="/admin/articles/delete/{{ art.id }}" method="POST" style="display:inline;">
+                                    <button type="submit" style="color: var(--red); background:none; border:none; cursor:pointer;">Удалить</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <div id="users" class="tab-content">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h2>Свитки Искателей</h2>
-                <a href="/admin/export-csv" class="btn-magic" style="text-decoration: none;">Экспорт Душ (CSV)</a>
+            <h2 style="font-family: 'Cinzel'; color: var(--gold); letter-spacing: 4px;">Реестр Искателей</h2>
+            <div class="card" style="padding: 0; overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Дата</th><th>Имя / Email</th><th>Аркан</th><th>LDR</th><th>COM</th><th>EMP</th><th>LOG</th><th>AGL</th><th>Действие</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in records %}
+                        <tr>
+                            <td>{{ record.created_at.strftime('%d.%m %H:%M') }}</td>
+                            <td><b>{{ record.name }}</b><br><small>{{ record.email }}</small></td>
+                            <td>{{ record.archetype }}</td>
+                            <td>{{ record.s_leadership }}</td><td>{{ record.s_comm }}</td><td>{{ record.s_empathy }}</td><td>{{ record.s_logic }}</td><td>{{ record.s_agile }}</td>
+                            <td>
+                                <form action="/admin/delete-record/{{ record.id }}" method="POST">
+                                    <button type="submit" style="color: var(--red); background:none; border:none; cursor:pointer;">🗑</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Дата</th>
-                        <th>Имя</th>
-                        <th>Email (Ключ)</th>
-                        <th>Код</th>
-                        <th>Удаление</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for record in records %}
-                    <tr>
-                        <td>{{ record.created_at.strftime('%d.%m.%Y') }}</td>
-                        <td>{{ record.name }}</td>
-                        <td class="email-key">{{ record.email }}</td>
-                        <td>{{ record.archetype }}</td>
-                        <td>
-                            <form action="/admin/delete-record/{{ record.id }}" method="POST">
-                                <button type="submit" style="background:none; border:none; color:red; cursor:pointer;">✕</button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
         </div>
 
         <div id="stats" class="tab-content">
-            <h2>Вибрации Поля</h2>
-            <div class="stat-grid">
-                <div class="stat-item"><span class="stat-num">{{ records|length }}</span>Анализов проведено</div>
-                <div class="stat-item"><span class="stat-num">{{ stats|length }}</span>Активных кодов</div>
-            </div>
-            <div style="margin-top: 40px;">
-                {% for code, count in stats.items() %}
-                <div style="margin-bottom: 15px;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                        <span>Аркан {{ code }}</span>
-                        <span>{{ count }} проявлений</span>
-                    </div>
-                    <div style="height: 4px; background: rgba(176,141,87,0.1); width: 100%;">
-                        <div style="height: 100%; background: var(--copper); width: {{ (count / records|length * 100)|round }}%; box-shadow: 0 0 10px var(--copper);"></div>
-                    </div>
+            <div class="card">
+                <h4 style="font-family: 'Cinzel'; color: var(--gold);">Статистика архетипов</h4>
+                {% for i in range(1, 10) %}
+                <div style="margin-bottom: 10px;">
+                    Тип {{ i }}: {{ stats.get(i|string, 0) }} исследований
                 </div>
                 {% endfor %}
             </div>
@@ -179,34 +155,170 @@
 
     </div>
 
-    <script>
-        function hideLoader() { document.getElementById('magic-loader').style.opacity = '0'; setTimeout(() => { document.getElementById('magic-loader').style.display = 'none'; }, 800); }
+    <div id="editor-overlay">
+        <div class="modal-container">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                <h1 id="modal-title" style="font-family: 'Cinzel'; color: var(--gold); margin: 0;">АРКАН</h1>
+                <button onclick="closeArcaneEditor()" class="tab-btn">ЗАКРЫТЬ ✕</button>
+            </div>
 
-        function showTab(tabId) {
+            <form id="arcane-form">
+                <input type="hidden" id="edit-number">
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                    <div><span class="section-label">Имя Архетипа</span><input type="text" id="edit-title"></div>
+                    <div><span class="section-label">Планета</span><input type="text" id="edit-planet"></div>
+                    <div><span class="section-label">Стихия</span><input type="text" id="edit-element"></div>
+                </div>
+                <div style="margin-top: 20px;">
+                    <span class="section-label">🔍 Ключи HH.ru</span>
+                    <input type="text" id="edit-queries">
+                </div>
+
+                <span class="section-label">⚡ Вектор Силы</span><textarea id="ed-action_power"></textarea>
+                <span class="section-label">🌑 Теневая Ловушка</span><textarea id="ed-shadow_side"></textarea>
+                <span class="section-label">📍 Выход из Минуса</span><textarea id="ed-exit_minus"></textarea>
+                <span class="section-label">🎯 Точка Роста</span><textarea id="ed-growth_point"></textarea>
+                <span class="section-label">🚀 Реализация</span><textarea id="ed-realization"></textarea>
+                <span class="section-label">⚖️ Кармические задачи</span><textarea id="ed-karmic_tasks"></textarea>
+                <span class="section-label">🔄 Цикл Развития</span><textarea id="ed-development_cycle"></textarea>
+                <span class="section-label">📜 Итог Пути</span><textarea id="ed-life_result"></textarea>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div><span class="section-label">🧠 Сила Разума</span><textarea id="ed-mind_power"></textarea></div>
+                    <div><span class="section-label">💑 Партнер</span><textarea id="ed-partner_type"></textarea></div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div><span class="section-label">💰 Финансы</span><textarea id="ed-financial_tip"></textarea></div>
+                    <div><span class="section-label">🧬 Здоровье</span><textarea id="ed-health_tips"></textarea></div>
+                </div>
+
+                <button type="button" id="save-btn" onclick="saveArcane()" class="btn-magic">СОХРАНИТЬ В ХРОНИКИ</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="article-overlay">
+        <div class="modal-container">
+            <h2 style="font-family: 'Cinzel'; color: var(--gold);">Новая Публикация</h2>
+            <input type="text" id="art-title" placeholder="Заголовок" style="margin-bottom: 15px;">
+            <select id="art-category" style="margin-bottom: 15px;">
+                <option value="Trends">Trends</option>
+                <option value="Methodology">Methodology</option>
+            </select>
+            <textarea id="art-content"></textarea>
+            <button onclick="saveArticle()" class="btn-magic">ОПУБЛИКОВАТЬ</button>
+            <button onclick="closeArticleModal()" class="tab-btn" style="margin-top: 10px; width: 100%;">ОТМЕНА</button>
+        </div>
+    </div>
+
+    <script>
+        // Исправленный массив полей (добавлены запятые!)
+        const editorIds = [
+            'ed-action_power', 'ed-shadow_side', 'ed-exit_minus',
+            'ed-growth_point', 'ed-realization', 'ed-karmic_tasks',
+            'ed-development_cycle', 'ed-life_result',
+            'ed-mind_power', 'ed-partner_type', 'ed-financial_tip', 'ed-health_tips'
+        ];
+
+        const ckConfig = {
+            uiColor: '#0c0e12', height: 160,
+            toolbar: [ { name: 'basic', items: ['Bold', 'Italic', 'Underline', '-', 'BulletedList', 'NumberedList', 'Link'] } ]
+        };
+
+        function hideLoader() { document.getElementById('magic-loader').style.display = 'none'; }
+
+        function showTab(tabId, event) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             event.currentTarget.classList.add('active');
         }
 
-        // КАНВАС ЧАСТИЦ (МЕРЦАНИЕ)
-        const canvas = document.getElementById('particles');
-        const ctx = canvas.getContext('2d');
-        let dots = [];
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        async function openArcaneEditor(num) {
+            document.getElementById('edit-number').value = num;
+            document.getElementById('modal-title').innerText = "АРКАН " + num;
+            document.getElementById('editor-overlay').style.display = 'block';
 
-        for(let i=0; i<80; i++) { dots.push({ x: Math.random()*canvas.width, y: Math.random()*canvas.height, r: Math.random()*2, d: Math.random()*1 }); }
-        function draw() {
-            ctx.clearRect(0,0,canvas.width, canvas.height);
-            ctx.fillStyle = "rgba(176, 141, 87, 0.3)";
-            dots.forEach(p => {
-                ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
-                p.y -= p.d; if(p.y < 0) p.y = canvas.height;
+            const res = await fetch(`/admin/get/${num}`);
+            const json = await res.json();
+            const data = json.data || {};
+
+            document.getElementById('edit-title').value = data.title || '';
+            document.getElementById('edit-planet').value = data.planet || '';
+            document.getElementById('edit-element').value = data.element || '';
+            document.getElementById('edit-queries').value = data.search_queries || '';
+
+            // Безопасная инициализация редакторов
+            editorIds.forEach(id => {
+                const key = id.replace('ed-', '');
+                if (!CKEDITOR.instances[id]) {
+                    CKEDITOR.replace(id, ckConfig);
+                }
+                // Ждем пока загрузится инстанс, если он только что создался
+                setTimeout(() => {
+                    if (CKEDITOR.instances[id]) CKEDITOR.instances[id].setData(data[key] || '');
+                }, 100);
             });
-            requestAnimationFrame(draw);
         }
-        draw();
+
+        function closeArcaneEditor() { document.getElementById('editor-overlay').style.display = 'none'; }
+
+        async function saveArcane() {
+            const btn = document.getElementById('save-btn');
+            const num = document.getElementById('edit-number').value;
+            btn.innerText = "СОХРАНЕНИЕ...";
+            btn.disabled = true;
+
+            const payload = {
+                number: num,
+                title: document.getElementById('edit-title').value,
+                planet: document.getElementById('edit-planet').value,
+                element: document.getElementById('edit-element').value,
+                search_queries: document.getElementById('edit-queries').value
+            };
+
+            editorIds.forEach(id => {
+                const key = id.replace('ed-', '');
+                if (CKEDITOR.instances[id]) {
+                    payload[key] = CKEDITOR.instances[id].getData();
+                }
+            });
+
+            try {
+                const res = await fetch('/admin/update', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+                if(res.ok) alert("Хроники Аркана " + num + " обновлены.");
+                else alert("Ошибка связи с сервером.");
+            } catch (e) {
+                console.error(e);
+            } finally {
+                btn.innerText = "СОХРАНИТЬ В ХРОНИКИ";
+                btn.disabled = false;
+            }
+        }
+
+        function openArticleModal() {
+            document.getElementById('article-overlay').style.display = 'block';
+            if (!CKEDITOR.instances['art-content']) CKEDITOR.replace('art-content', ckConfig);
+        }
+        function closeArticleModal() { document.getElementById('article-overlay').style.display = 'none'; }
+
+        async function saveArticle() {
+            const payload = {
+                title: document.getElementById('art-title').value,
+                category: document.getElementById('art-category').value,
+                content: CKEDITOR.instances['art-content'].getData()
+            };
+            const res = await fetch('/admin/articles/add', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            });
+            if(res.ok) location.reload();
+        }
     </script>
 </body>
 </html>

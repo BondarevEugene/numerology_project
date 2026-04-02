@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Вот пошаговый план превращения твоего кода в боевой сервис.
+
+🛠 Шаг 1: Подготовка сервера (Ubuntu)
+Зайди на свой сервер по SSH и обнови пакеты:
+
+Bash
+sudo apt update && sudo apt upgrade -y
+sudo apt install python3-pip python3-venv nginx git -y
+Если ты используешь pdfkit, не забудь установить движок для него:
+
+Bash
+sudo apt install wkhtmltopdf -y
+📦 Шаг 2: Настройка проекта
+Создай папку и клонируй (или перенеси) туда файлы:
+
+Bash
+mkdir ~/genesis_app && cd ~/genesis_app
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt  # Или установи библиотеки вручную
+pip install gunicorn  # Наш "моторчик" для сервера
+Важно: Убедись, что в app.py в самом конце стоит if __name__ == "__main__": app.run(), но Gunicorn будет запускать объект app напрямую.
+
+🚀 Шаг 3: Настройка Gunicorn (Systemd)
+Мы создадим «службу», чтобы приложение само запускалось после перезагрузки сервера.
+
+Bash
+sudo nano /etc/systemd/system/genesis.service
+Вставь туда этот текст (замени user на свое имя пользователя в Ubuntu):
+
+Ini, TOML
+[Unit]
+Description=Gunicorn instance to serve Genesis App
+After=network.target
+
+[Service]
+User=user
+Group=www-data
+WorkingDirectory=/home/user/genesis_app
+Environment="PATH=/home/user/genesis_app/venv/bin"
+ExecStart=/home/user/genesis_app/venv/bin/gunicorn --workers 3 --bind unix:genesis.sock -m 007 app:app
+
+[Install]
+WantedBy=multi-user.target
+Запусти службу:
+
+Bash
+sudo systemctl start genesis
+sudo systemctl enable genesis
+🌐 Шаг 4: Настройка Nginx (Швейцар на входе)
+Теперь скажем Nginx принимать запросы из интернета и передавать их Gunicorn.
+
+Создай конфиг:
+
+Bash
+sudo nano /etc/nginx/sites-available/genesis
+Вставь настройки (замени your_domain_or_ip на IP сервера):
+
+Nginx
+server {
+    listen 80;
+    server_name your_domain_or_ip;
+
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:/home/user/genesis_app/genesis.sock;
+    }
+
+    # Для статических файлов (картинки, стили)
+    location /static {
+        alias /home/user/genesis_app/static;
+    }
+}
+Активируй конфиг и перезапусти Nginx:
+
+Bash
+sudo ln -s /etc/nginx/sites-available/genesis /etc/nginx/sites-enabled
+sudo nginx -t
+sudo systemctl restart nginx
+🔐 Шаг 5: Безопасность и База Данных
+База данных: После переноса файлов не забудь один раз запустить python final_seed.py на сервере (внутри venv), чтобы создать файл базы данных в папке проекта.
+
+Права доступа: Убедись, что у файла базы .db есть права на запись для группы www-data (под которой работает Nginx/Gunicorn).
+
+Bash
+sudo chown user:www-data genesis_v2.db
+chmod 664 genesis_v2.db
+Брандмауэр: Разреши трафик:
+
+Bash
+sudo ufw allow 'Nginx Full'
+🌸 Нюанс для PDF
+Если при генерации PDF на сервере будут проблемы со шрифтами (вместо букв — квадратики), просто скопируй файл DejaVuSans.ttf (или любой кириллический .ttf) в системную папку шрифтов Ubuntu:
+
+Bash
+sudo mkdir -p /usr/share/fonts/truetype/custom
+sudo cp ~/genesis_app/static/fonts/DejaVuSans.ttf /usr/share/fonts/truetype/custom/
+sudo fc-cache -f -v</title>
+</head>
+<body>
+
+</body>
+</html>
