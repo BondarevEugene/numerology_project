@@ -1,82 +1,74 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <style>
-        body { font-family: Arial, sans-serif; font-size: 13px; color: #222; }
-        .gold { color: #c5a059; font-weight: bold; }
-        .section { margin-bottom: 25px; border-top: 2px solid #c5a059; padding-top: 10px; page-break-inside: avoid; }
-        .grid { width: 100%; border-collapse: collapse; }
-        .grid td { width: 50%; vertical-align: top; padding: 10px; border: 1px solid #eee; }
-
-        .matrix-table { width: 300px; margin: 20px auto; border-collapse: collapse; }
-        .matrix-table td { border: 2px solid #c5a059; width: 100px; height: 60px; text-align: center; font-size: 18px; font-weight: bold; }
-        .matrix-table span { display: block; font-size: 9px; color: #777; text-transform: uppercase; }
+        @page { size: A4; margin: 20mm; }
+        body { font-family: serif; color: #333; line-height: 1.5; background: #fff; }
+        .header { text-align: center; border-bottom: 2px solid #c5a059; padding-bottom: 20px; margin-bottom: 30px; }
+        h1 { color: #c5a059; font-size: 28pt; margin: 0; }
+        .section { margin-bottom: 25px; padding: 15px; border: 1px solid #eee; border-radius: 8px; }
+        .section-title { color: #c5a059; font-size: 16pt; border-bottom: 1px solid #c5a059; margin-bottom: 10px; }
+        .grid { display: block; width: 100%; }
+        .matrix-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        .matrix-table td { border: 1px solid #c5a059; width: 33%; height: 60px; text-align: center; font-size: 18pt; font-weight: bold; }
+        .skills-bar { background: #f0f0f0; height: 15px; border-radius: 10px; margin-bottom: 10px; position: relative; }
+        .skills-fill { background: #c5a059; height: 100%; border-radius: 10px; }
+        .label { font-size: 10pt; font-weight: bold; }
     </style>
 </head>
 <body>
-    <div style="text-align: center; margin-bottom: 30px;">
-        <h1 class="gold">GENESIS: ПЕРСОНАЛЬНЫЙ ОТЧЕТ</h1>
-        <p><b>КЛИЕНТ:</b> {{ user_name }} | <b>ДАТА:</b> {{ day }}.{{ month }}.{{ year }} | <b>АРХЕТИП:</b> {{ result.number }}</p>
+    <div class="header">
+        <h1>GENESIS: {{ result.title }}</h1>
+        <p>Персональный цифровой анализ для: <strong>{{ user_name }}</strong></p>
+        <p>Дата рождения: {{ day }}.{{ month }}.{{ year }}</p>
     </div>
 
     <div class="section">
-        <h3>⚡ ВЕКТОР СИЛЫ И РОСТА</h3>
-        <table class="grid">
-            <tr>
-                <td><b class="gold">Вектор Силы:</b><br> {{ result.action_power|safe }}</td>
-                <td><b class="gold">Точка Роста:</b><br> {{ result.growth_point|safe }}</td>
-            </tr>
-            <tr>
-                <td><b class="gold">Теневая Ловушка:</b><br> {{ result.shadow_side|safe }}</td>
-                <td><b class="gold">Выход из минуса:</b><br> {{ result.exit_minus|safe }}</td>
-            </tr>
-        </table>
+        <div class="section-title">Аспекты Личности</div>
+        <p><strong>Планета:</strong> {{ result.planet }} | <strong>Стихия:</strong> {{ result.element }} | <strong>Аркан:</strong> {{ result.tarot_arcane }}</p>
     </div>
 
     <div class="section">
-        <h3>🗝 СФЕРЫ БЛАГОПОЛУЧИЯ</h3>
-        <table class="grid">
-            <tr>
-                <td><b class="gold">💑 Партнер:</b><br> {{ result.partner_type|safe }}</td>
-                <td><b class="gold">💰 Финансы:</b><br> {{ result.financial_tip|safe }}</td>
-            </tr>
-            <tr>
-                <td colspan="2"><b class="gold">🧬 Здоровье:</b><br> {{ result.health_tips|safe }}</td>
-            </tr>
-        </table>
-    </div>
-
-    <div class="section" style="text-align: center;">
-        <h3>📊 ЦИФРОВАЯ КАРТА (ПСИХОМАТРИЦА)</h3>
+        <div class="section-title">Психоматрица (Квадрат Пифагора)</div>
         <table class="matrix-table">
             <tr>
-                <td><span>Характер</span>{{ matrix['1'] }}</td>
-                <td><span>Здоровье</span>{{ matrix['4'] }}</td>
-                <td><span>Удача</span>{{ matrix['7'] }}</td>
+                <td>{{ matrix['1'] }}<br><small style="font-size: 8pt;">Характер</small></td>
+                <td>{{ matrix['4'] }}<br><small style="font-size: 8pt;">Здоровье</small></td>
+                <td>{{ matrix['7'] }}<br><small style="font-size: 8pt;">Удача</small></td>
             </tr>
             <tr>
-                <td><span>Энергия</span>{{ matrix['2'] }}</td>
-                <td><span>Логика</span>{{ matrix['5'] }}</td>
-                <td><span>Долг</span>{{ matrix['8'] }}</td>
+                <td>{{ matrix['2'] }}<br><small style="font-size: 8pt;">Энергия</small></td>
+                <td>{{ matrix['5'] }}<br><small style="font-size: 8pt;">Логика</small></td>
+                <td>{{ matrix['8'] }}<br><small style="font-size: 8pt;">Долг</small></td>
             </tr>
             <tr>
-                <td><span>Интерес</span>{{ matrix['3'] }}</td>
-                <td><span>Труд</span>{{ matrix['6'] }}</td>
-                <td><span>Память</span>{{ matrix['9'] }}</td>
+                <td>{{ matrix['3'] }}<br><small style="font-size: 8pt;">Интерес</small></td>
+                <td>{{ matrix['6'] }}<br><small style="font-size: 8pt;">Труд</small></td>
+                <td>{{ matrix['9'] }}<br><small style="font-size: 8pt;">Память</small></td>
             </tr>
         </table>
     </div>
 
     <div class="section">
-        <h3>⚖️ КАРМИЧЕСКИЕ ЗАДАЧИ И ИТОГ</h3>
-        <p><b class="gold">Задачи:</b> {{ result.karmic_tasks|safe }}</p>
-        <p><b class="gold">Сила разума:</b> {{ result.mind_power|safe }}</p>
-        <p><b class="gold">Итог пути:</b> {{ result.life_result|safe }}</p>
+        <div class="section-title">Потенциал Навыков</div>
+        {% for label in user_skills.labels %}
+            {% set index = loop.index0 %}
+            <div class="label">{{ label }}: {{ user_skills.data[index] }}%</div>
+            <div class="skills-bar">
+                <div class="skills-fill" style="width: {{ user_skills.data[index] }}%;"></div>
+            </div>
+        {% endfor %}
     </div>
 
-    <div style="text-align: center; font-size: 10px; color: #999; margin-top: 40px;">
-        Genesis Psychology Digital Analysis © 2026
+    <div class="section">
+        <div class="section-title">Вектор Силы</div>
+        <div>{{ result.action_power|safe }}</div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Кармические Задачи</div>
+        <div>{{ result.karmic_tasks|safe }}</div>
     </div>
 </body>
 </html>
