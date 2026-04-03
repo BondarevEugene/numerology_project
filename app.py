@@ -89,11 +89,12 @@ LINES_INFO = {
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'genesis_secret_key_0602')
 
+
 @app.after_request
 def add_header(response):
-    # Это разрешает выполнение скриптов с использованием eval
     response.headers['Content-Security-Policy'] = "script-src 'self' 'unsafe-eval' 'unsafe-inline';"
     return response
+
 
 # --- ПОЧТА ---
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -202,11 +203,9 @@ def sum_digits(n):
 
 
 def calculate_full_matrix_logic(day, month, year):
-    """Единая функция расчета для синхронизации сайта и PDF"""
     d_s, m_s, y_s = day.zfill(2), month.zfill(2), str(year)
     s_base = f"{d_s}{m_s}{y_s}"
 
-    # Расчет дополнительных чисел Пифагора
     n1 = sum(int(c) for c in s_base if c.isdigit())
     n2 = sum(int(c) for c in str(n1))
     first_digit = int(d_s[0] if d_s[0] != '0' else d_s[1])
@@ -215,11 +214,38 @@ def calculate_full_matrix_logic(day, month, year):
 
     all_digits = s_base + str(n1) + str(n2) + str(n3) + str(n4)
 
-    # Формирование ячеек
+    # 1. Матрица для точек
     matrix = {str(i): (str(i) * all_digits.count(str(i)) if all_digits.count(str(i)) > 0 else "-") for i in
               range(1, 10)}
 
-    # Расчет линий мощности
+    # 2. Навыки для Радара
+    def get_score(chars, weight=20):
+        count = sum(all_digits.count(c) for c in chars)
+        return min(20 + (count * weight), 100)
+
+    skills = {
+        "labels": ["Лидерство", "Энергия", "Логика", "Гибкость", "Эмпатия"],
+        "data": [get_score('1', 15), get_score('2', 25), get_score('5', 35), get_score('36', 15), get_score('84', 20)]
+    }
+
+    # 3. Линии матрицы
+    def get_l(keys):
+        return sum(len(matrix[k]) if matrix[k] != "-" else 0 for k in keys)
+
+    matrix_lines = {}
+    lines_map = {
+        "row1": ['1', '4', '7'], "row2": ['2', '5', '8'], "row3": ['3', '6', '9'],
+        "col1": ['1', '2', '3'], "col2": ['4', '5', '6'], "col3": ['7', '8', '9'],
+        "diag1": ['1', '5', '9'], "diag2": ['3', '5', '7']
+    }
+
+    for k, keys in lines_map.items():
+        sc = get_l(keys)
+        matrix_lines[k] = {
+            "score": sc,
+            "status": "Мощная" if sc > 5 else "Средняя" if sc >= 3 else "Слабая"
+        }
+
     def get_l(keys):
         return sum(len(matrix[k]) if matrix[k] != "-" else 0 for k in keys)
 
@@ -233,17 +259,13 @@ def calculate_full_matrix_logic(day, month, year):
         "diag1": {"name": "Духовность", "score": get_l(['1', '5', '9'])},
         "diag2": {"name": "Темперамент", "score": get_l(['3', '5', '7'])}
     }
-
     for k in matrix_lines:
         sc = matrix_lines[k]['score']
         matrix_lines[k]['status'] = "Мощная" if sc > 5 else "Средняя" if sc >= 3 else "Слабая"
-        # Добавляем теорию из LINES_INFO
-        if k in LINES_INFO:
-            matrix_lines[k]['theory'] = LINES_INFO[k]['text']
-        else:
-            matrix_lines[k]['theory'] = ""
+        matrix_lines[k]['theory'] = LINES_INFO[k]['text'] if k in LINES_INFO else ""
 
-    return matrix, matrix_lines, all_digits
+        # ЕДИНСТВЕННЫЙ RETURN в конце функции
+    return matrix, skills, all_digits, matrix_lines
 
 
 # --- API ---
@@ -270,8 +292,7 @@ def api_get_skills(user_id):
 # --- АДМИНКА ---
 @app.route('/admin-auth', methods=['POST'])
 def admin_auth():
-    password = request.json.get('password')
-    if password == '0602':
+    if request.json.get('password') == '0602':
         session['admin_logged_in'] = True
         return jsonify({'status': 'success'})
     return jsonify({'status': 'error'}), 401
@@ -280,7 +301,7 @@ def admin_auth():
 @app.route('/admin')
 def admin_panel():
     if not session.get('admin_logged_in'):
-        return "Доступ запрещен. Используйте ключ на главной.", 403
+        return "Доступ запрещен.", 403
     archetypes = ArchetypeContent.query.order_by(ArchetypeContent.number.cast(db.Integer)).all()
     profs = ProfessionContent.query.all()
     records = UserRecord.query.order_by(UserRecord.created_at.desc()).all()
@@ -302,38 +323,18 @@ def admin_get(num):
     return jsonify({'status': 'error'})
 
 
-@app.route('/admin/get_profs/<num>')
-def admin_get_profs(num):
-    prof = ProfessionContent.query.filter_by(number=str(num)).first()
-    return jsonify({'list_csv': prof.list_csv if prof else ''})
-
-
 @app.route('/admin/update', methods=['POST'])
 def admin_update():
     if not session.get('admin_logged_in'): return jsonify({'status': 'error'}), 403
-    data = request.json if request.is_json else request.form
+    data = request.json or request.form
     num = data.get('number')
-    content = ArchetypeContent.query.filter_by(number=str(num)).first()
-    if not content:
-        content = ArchetypeContent(number=str(num))
-        db.session.add(content)
+    content = ArchetypeContent.query.filter_by(number=str(num)).first() or ArchetypeContent(number=str(num))
+    if not content.id: db.session.add(content)
     for key, value in data.items():
         if hasattr(content, key) and key != 'id':
             setattr(content, key, value)
     db.session.commit()
     return jsonify({'status': 'success'})
-
-
-@app.route('/admin/update_profs', methods=['POST'])
-def admin_update_profs():
-    if not session.get('admin_logged_in'): return jsonify({'status': 'error'}), 403
-    data = request.json if request.is_json else request.form
-    num = data.get('number')
-    prof = ProfessionContent.query.filter_by(number=str(num)).first() or ProfessionContent(number=str(num))
-    if not prof.id: db.session.add(prof)
-    prof.list_csv = data.get('list_csv', '')
-    db.session.commit()
-    return redirect(url_for('admin_panel')) if not request.is_json else jsonify({'status': 'success'})
 
 
 @app.route('/admin/delete-record/<int:id>', methods=['POST'])
@@ -348,16 +349,24 @@ def delete_record(id):
 
 # --- ОСНОВНОЙ РОУТ ---
 @app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 def index():
+    # 1. Инициализация (Начальное состояние для GET и POST)
+    # Используем локальную переменную для energy_data, global тут обычно лишний
     result = None
     matrix_desc = {}
     matrix_lines = {}
     jobs = []
     user_id = None
     synastry_result = None
-    trends = Article.query.filter_by(category='Trends').order_by(Article.created_at.desc()).limit(3).all()
+    user_skills = {"labels": ["Лидерство", "Коммуникация", "Эмпатия", "Логика", "Agile"], "data": [0, 0, 0, 0, 0]}
+    energy_data = [0, 0, 0, 0, 0, 0, 0]
+
+    # Тренды нужны всегда — и при загрузке, и при расчете
+    trends = Article.query.filter_by(category='Trends').limit(3).all()
 
     if request.method == 'POST':
+        print("--- NEW CALCULATION REQUEST ---")
         user_name = request.form.get('user_name', 'Искатель')
         email = request.form.get('user_email')
         day = request.form.get('day', '').strip()
@@ -367,24 +376,28 @@ def index():
         p_day = request.form.get('partner_day', '').strip()
 
         if day and month and year:
+            # 2.1 Расчет Архетипа
             group_num = str(sum_digits(day))
             result = ArchetypeContent.query.filter_by(number=group_num).first()
 
-            # Расчет Психоматрицы и Линий через единую логику
-            matrix_dict, matrix_lines, all_digits = calculate_full_matrix_logic(day, month, year)
+            # 2.2 Психоматрица (Распаковываем 4 значения из твоей функции)
+            matrix_dict, user_skills, all_digits, m_lines = calculate_full_matrix_logic(day, month, year)
+            matrix_lines = m_lines
 
-            # Формируем описание ячеек для шаблона
             for n_id, info in NODES_INFO.items():
                 cnt = all_digits.count(n_id)
                 lvl = "low" if cnt == 0 else "mid" if cnt <= 2 else "high"
-                matrix_desc[n_id] = {
-                    "name": info["name"],
-                    "text": info[lvl],
-                    "count": cnt,
-                    "visual": matrix_dict[n_id]
-                }
+                matrix_desc[n_id] = {"name": info["name"], "text": info[lvl], "count": cnt, "visual": matrix_dict[n_id]}
 
-            # Совместимость
+            # 2.3 График Энергии
+            try:
+                calc_val = int(day) * int(month) * int(year)
+                s_val = str(calc_val).ljust(7, '0')[:7]
+                energy_data = [int(d) for d in s_val]
+            except Exception as e:
+                print(f"Ошибка энергии: {e}")
+
+            # 2.4 Синастрия
             if p_day:
                 try:
                     p_group = sum_digits(p_day)
@@ -395,34 +408,51 @@ def index():
                         "description": SYNASTRY_TEXTS.get(union_num, "Сложный союз.")
                     }
                 except:
-                    synastry_result = None
+                    pass
 
-            # Вакансии
+            # 2.5 Карьера
             if result and CareerService:
-                prof_entry = ProfessionContent.query.filter_by(number=str(result.number)).first()
-                kw = result.search_queries or (prof_entry.list_csv if prof_entry else None)
                 try:
+                    prof_entry = ProfessionContent.query.filter_by(number=str(result.number)).first()
+                    kw = result.search_queries or (prof_entry.list_csv if prof_entry else None)
                     jobs = CareerService.get_vacancies(result.number, country=country, custom_keywords=kw)
-                except:
+                except Exception as e:
+                    print(f"Ошибка CareerService: {e}")
                     jobs = []
 
-            # Сохранение записи
-            new_rec = UserRecord(name=user_name, email=email, archetype=group_num,
-                                 s_leadership=75, s_comm=80, s_empathy=65, s_logic=70, s_agile=60)
-            db.session.add(new_rec)
-            db.session.commit()
-            user_id = new_rec.id
+            # 2.6 Сохранение в БД
+            try:
+                new_rec = UserRecord(
+                    name=user_name, email=email, archetype=group_num,
+                    s_leadership=user_skills['data'][0],
+                    s_comm=user_skills['data'][1],
+                    s_empathy=user_skills['data'][4]
+                )
+                db.session.add(new_rec)
+                db.session.commit()
+                user_id = new_rec.id
+            except Exception as e:
+                db.session.rollback()
+                print(f"⚠️ Ошибка БД: {e}")
 
-    return render_template('index.html', result=result, matrix_desc=matrix_desc,
-                           matrix_lines=matrix_lines, jobs=jobs, trends=trends,
-                           user_id=user_id, synastry_result=synastry_result)
-
-
+    # --- ВАЖНО: ЭТОТ ВЫХОД ТЕПЕРЬ ВНЕ IF ---
+    # Теперь и GET (простой заход), и POST (после расчета) вернут страницу.
+    return render_template('index.html',
+                           result=result,
+                           matrix_desc=matrix_desc,
+                           user_skills=user_skills,
+                           energy_data=energy_data,
+                           matrix_lines=matrix_lines,
+                           jobs=jobs,
+                           trends=trends,
+                           user_id=user_id,
+                           synastry_result=synastry_result
+                           )
 # --- ЭКСПОРТ PDF ---
 @app.route('/export_pdf', methods=['POST'])
 def export_pdf():
     if not WEASYPRINT_AVAILABLE:
-        return "PDF доступен только на сервере (установите WeasyPrint).", 503
+        return "PDF недоступен локально (WeasyPrint не найден).", 503
 
     try:
         user_name = request.form.get('user_name', 'Искатель')
@@ -431,21 +461,27 @@ def export_pdf():
         year = request.form.get('year', '').strip()
 
         if not (day and month and year):
-            return "Неполные данные даты рождения", 400
+            return "Ошибка данных", 400
 
-        # Определение Архетипа
+        # 1. Расчет Архетипа
         group_num = str(sum_digits(day))
         result = ArchetypeContent.query.filter_by(number=group_num).first()
 
-        # Единый расчет матрицы и линий для PDF
-        matrix, matrix_lines, _ = calculate_full_matrix_logic(day, month, year)
+        # 2. Расчет Матрицы и Навыков
+        matrix_dict, skills_info, all_digits, m_lines = calculate_full_matrix_logic(day, month, year)
 
-        # Рендеринг HTML для PDF
+        # 3. Энергия (для текста или графиков)
+        calc_val = int(day) * int(month) * int(year)
+        s_val = str(calc_val).ljust(7, '0')[:7]
+        energy_data = [int(d) for d in s_val]
+
+        # 4. Рендерим шаблон
         rendered_html = render_template(
             'pdf_template.html',
             result=result,
-            matrix=matrix,
-            matrix_lines=matrix_lines,
+            matrix=matrix_dict,
+            user_skills=skills_info,
+            energy_data=energy_data,
             user_name=user_name,
             day=day,
             month=month,
@@ -460,27 +496,21 @@ def export_pdf():
         return response
 
     except Exception as e:
-        app.logger.error(f"PDF Export Error: {str(e)}")
-        return f"Ошибка генерации PDF: {str(e)}", 500
+        print(f"PDF Error: {e}")
+        return f"Ошибка: {str(e)}", 500
 
 
 @app.route('/send_email', methods=['POST'])
 def send_email():
     try:
         recipient = request.form.get('email')
-        html_content = request.form.get('html_content')
         msg = Message("Ваш профиль | Genesis", sender=app.config['MAIL_USERNAME'], recipients=[recipient])
-        msg.html = f"<html><body style='background:#050505; color:#b8b8b8; padding:20px;'>{html_content}</body></html>"
+        msg.html = f"<html><body style='background:#050505; color:#b8b8b8; padding:20px;'>{request.form.get('html_content')}</body></html>"
         mail.send(msg)
         return "OK", 200
     except Exception as e:
         return str(e), 500
 
-@app.after_request
-def add_header(response):
-    # Это разрешает выполнение скриптов с использованием eval
-    response.headers['Content-Security-Policy'] = "script-src 'self' 'unsafe-eval' 'unsafe-inline';"
-    return response
 
 if __name__ == '__main__':
     with app.app_context():
