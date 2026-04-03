@@ -16,12 +16,54 @@ except (ImportError, OSError):
     WEASYPRINT_AVAILABLE = False
     print("⚠️ WeasyPrint не найден или не настроен (это нормально для Windows). PDF отключен локально.")
 
+# --- ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ ---
+app = Flask(__name__)
+app.secret_key = os.environ.get('SECRET_KEY', 'genesis_secret_key_0602')
+
+# --- КОНФИГУРАЦИЯ БАЗЫ ДАННЫХ (NEON.TECH) ---
+# Твоя прямая ссылка для подключения
+NEON_DB_URL = "postgresql://neondb_owner:npg_cLG3oCesPw6A@ep-damp-math-al92xna7.c-3.eu-central-1.aws.neon.tech/neondb?sslmode=require"
+
+# Приоритет переменной окружения (для Render), иначе используем Neon напрямую
+db_url = os.environ.get('DATABASE_URL', NEON_DB_URL)
+
+# Исправление протокола для SQLAlchemy 2.0
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# --- ДОБАВЬ ЭТИ ТРИ СТРОКИ НИЖЕ ---
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    "pool_pre_ping": True,  # Проверять живое ли соединение перед каждым запросом
+    "pool_recycle": 300,  # Пересоздавать соединение каждые 5 минут
+}
+
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+
+# --- ПОЧТА ---
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'projectnumerology@gmail.com'
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', 'ohkzqberuempfqhn')
+mail = Mail(app)
+
 # Импорт сервисов
 try:
     from services import CareerService
 except ImportError as e:
     CareerService = None
     print(f"⚠️ Ошибка импорта CareerService: {e}")
+
+
+@app.after_request
+def add_header(response):
+    response.headers['Content-Security-Policy'] = "script-src 'self' 'unsafe-eval' 'unsafe-inline';"
+    return response
+
 
 # --- ВСТРОЕННЫЕ ДАННЫЕ (ПОЛНЫЕ) ---
 NODES_INFO = {
@@ -86,34 +128,6 @@ LINES_INFO = {
     "diag2": {"name": "Темперамент (3-5-7)", "text": "Сексуальная энергия и внешняя привлекательность."}
 }
 
-app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'genesis_secret_key_0602')
-
-
-@app.after_request
-def add_header(response):
-    response.headers['Content-Security-Policy'] = "script-src 'self' 'unsafe-eval' 'unsafe-inline';"
-    return response
-
-
-# --- ПОЧТА ---
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'projectnumerology@gmail.com'
-app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', 'ohkzqberuempfqhn')
-mail = Mail(app)
-
-basedir = os.path.abspath(os.path.dirname(__file__))
-db_url = os.environ.get('DATABASE_URL', 'sqlite:///' + os.path.join(basedir, 'genesis_v2.db'))
-if db_url.startswith("postgres://"):
-    db_url = db_url.replace("postgres://", "postgresql://", 1)
-app.config['SQLALCHEMY_DATABASE_URI'] = db_url
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
-
 
 # --- МОДЕЛИ ДАННЫХ ---
 class ArchetypeContent(db.Model):
@@ -123,7 +137,7 @@ class ArchetypeContent(db.Model):
     title = db.Column(db.String(200))
     planet = db.Column(db.String(100))
     element = db.Column(db.String(50))
-    tarot_arcane = db.Column(db.String(100))
+    tarot_arcane = db.Column(db.Text)
     action_power = db.Column(db.Text)
     shadow_side = db.Column(db.Text)
     growth_point = db.Column(db.Text)
@@ -232,23 +246,6 @@ def calculate_full_matrix_logic(day, month, year):
     def get_l(keys):
         return sum(len(matrix[k]) if matrix[k] != "-" else 0 for k in keys)
 
-    matrix_lines = {}
-    lines_map = {
-        "row1": ['1', '4', '7'], "row2": ['2', '5', '8'], "row3": ['3', '6', '9'],
-        "col1": ['1', '2', '3'], "col2": ['4', '5', '6'], "col3": ['7', '8', '9'],
-        "diag1": ['1', '5', '9'], "diag2": ['3', '5', '7']
-    }
-
-    for k, keys in lines_map.items():
-        sc = get_l(keys)
-        matrix_lines[k] = {
-            "score": sc,
-            "status": "Мощная" if sc > 5 else "Средняя" if sc >= 3 else "Слабая"
-        }
-
-    def get_l(keys):
-        return sum(len(matrix[k]) if matrix[k] != "-" else 0 for k in keys)
-
     matrix_lines = {
         "row1": {"name": "Целеустремленность", "score": get_l(['1', '4', '7'])},
         "row2": {"name": "Семейность", "score": get_l(['2', '5', '8'])},
@@ -264,7 +261,6 @@ def calculate_full_matrix_logic(day, month, year):
         matrix_lines[k]['status'] = "Мощная" if sc > 5 else "Средняя" if sc >= 3 else "Слабая"
         matrix_lines[k]['theory'] = LINES_INFO[k]['text'] if k in LINES_INFO else ""
 
-        # ЕДИНСТВЕННЫЙ RETURN в конце функции
     return matrix, skills, all_digits, matrix_lines
 
 
@@ -289,7 +285,8 @@ def api_get_skills(user_id):
     })
 
 
-# --- АДМИНКА ---
+# --- РОУТЫ АДМИНКИ ---
+
 @app.route('/admin-auth', methods=['POST'])
 def admin_auth():
     if request.json.get('password') == '0602':
@@ -301,40 +298,64 @@ def admin_auth():
 @app.route('/admin')
 def admin_panel():
     if not session.get('admin_logged_in'):
-        return "Доступ запрещен.", 403
+        return "Доступ запрещен. Зайдите через главную (пароль 0602)", 403
     archetypes = ArchetypeContent.query.order_by(ArchetypeContent.number.cast(db.Integer)).all()
-    profs = ProfessionContent.query.all()
     records = UserRecord.query.order_by(UserRecord.created_at.desc()).all()
     articles = Article.query.all()
-    courses = Course.query.all()
     stats = {}
     for r in records:
         stats[r.archetype] = stats.get(r.archetype, 0) + 1
-    return render_template('admin.html', archetypes=archetypes, profs=profs, records=records, stats=stats,
-                           articles=articles, courses=courses)
+    return render_template('admin.html', archetypes=archetypes, records=records, stats=stats, articles=articles)
 
 
 @app.route('/admin/get/<num>')
 def admin_get(num):
     content = ArchetypeContent.query.filter_by(number=str(num)).first()
     if content:
-        cols = [c.name for c in ArchetypeContent.__table__.columns]
-        return jsonify({'status': 'success', 'data': {c: getattr(content, c) for c in cols}})
-    return jsonify({'status': 'error'})
+        fields = ['title', 'planet', 'element', 'action_power', 'shadow_side',
+                  'growth_point', 'realization', 'karmic_tasks', 'development_cycle',
+                  'mind_power', 'life_result', 'partner_type', 'financial_tip',
+                  'health_tips', 'exit_minus', 'search_queries']
+        data = {f: getattr(content, f) for f in fields}
+        return jsonify({'status': 'success', 'data': data})
+    return jsonify({'status': 'error', 'message': 'Not found'})
 
 
 @app.route('/admin/update', methods=['POST'])
 def admin_update():
-    if not session.get('admin_logged_in'): return jsonify({'status': 'error'}), 403
-    data = request.json or request.form
+    #if not session.get('admin_logged_in'): return jsonify({'status': 'error'}), 403 временная заглушка для наполнения базы
+    data = request.json
     num = data.get('number')
-    content = ArchetypeContent.query.filter_by(number=str(num)).first() or ArchetypeContent(number=str(num))
-    if not content.id: db.session.add(content)
+    content = ArchetypeContent.query.filter_by(number=str(num)).first()
+    if not content:
+        content = ArchetypeContent(number=str(num))
+        db.session.add(content)
+
     for key, value in data.items():
-        if hasattr(content, key) and key != 'id':
+        if hasattr(content, key) and key not in ['id', 'number']:
             setattr(content, key, value)
-    db.session.commit()
-    return jsonify({'status': 'success'})
+
+    try:
+        db.session.commit()
+        return jsonify({'status': 'success'})
+    except Exception as e:
+        db.session.rollback()
+        print(f"Database error: {e}")  # Видеть ошибку в консоли полезно
+        return jsonify({'status': 'error', 'message': str(e)}), 500  #поправление додавления
+
+
+@app.route('/admin/articles/add', methods=['POST'])
+def admin_add_article():
+    if not session.get('admin_logged_in'): return jsonify({'status': 'error'}), 403
+    data = request.json
+    try:
+        new_art = Article(title=data.get('title'), category=data.get('category'), content=data.get('content'))
+        db.session.add(new_art)
+        db.session.commit()
+        return jsonify({'status': 'success'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
 
 @app.route('/admin/delete-record/<int:id>', methods=['POST'])
@@ -349,10 +370,8 @@ def delete_record(id):
 
 # --- ОСНОВНОЙ РОУТ ---
 @app.route('/', methods=['GET', 'POST'])
-@app.route('/', methods=['GET', 'POST'])
 def index():
-    # 1. Инициализация (Начальное состояние для GET и POST)
-    # Используем локальную переменную для energy_data, global тут обычно лишний
+    trends = Article.query.filter_by(category='Trends').limit(3).all()
     result = None
     matrix_desc = {}
     matrix_lines = {}
@@ -362,11 +381,7 @@ def index():
     user_skills = {"labels": ["Лидерство", "Коммуникация", "Эмпатия", "Логика", "Agile"], "data": [0, 0, 0, 0, 0]}
     energy_data = [0, 0, 0, 0, 0, 0, 0]
 
-    # Тренды нужны всегда — и при загрузке, и при расчете
-    trends = Article.query.filter_by(category='Trends').limit(3).all()
-
     if request.method == 'POST':
-        print("--- NEW CALCULATION REQUEST ---")
         user_name = request.form.get('user_name', 'Искатель')
         email = request.form.get('user_email')
         day = request.form.get('day', '').strip()
@@ -376,12 +391,13 @@ def index():
         p_day = request.form.get('partner_day', '').strip()
 
         if day and month and year:
-            # 2.1 Расчет Архетипа
+            # 1. Расчет Архетипа
             group_num = str(sum_digits(day))
             result = ArchetypeContent.query.filter_by(number=group_num).first()
 
-            # 2.2 Психоматрица (Распаковываем 4 значения из твоей функции)
-            matrix_dict, user_skills, all_digits, m_lines = calculate_full_matrix_logic(day, month, year)
+            # 2. Психоматрица
+            matrix_dict, user_skills_calc, all_digits, m_lines = calculate_full_matrix_logic(day, month, year)
+            user_skills = user_skills_calc
             matrix_lines = m_lines
 
             for n_id, info in NODES_INFO.items():
@@ -389,7 +405,7 @@ def index():
                 lvl = "low" if cnt == 0 else "mid" if cnt <= 2 else "high"
                 matrix_desc[n_id] = {"name": info["name"], "text": info[lvl], "count": cnt, "visual": matrix_dict[n_id]}
 
-            # 2.3 График Энергии
+            # 3. График Энергии
             try:
                 calc_val = int(day) * int(month) * int(year)
                 s_val = str(calc_val).ljust(7, '0')[:7]
@@ -397,7 +413,7 @@ def index():
             except Exception as e:
                 print(f"Ошибка энергии: {e}")
 
-            # 2.4 Синастрия
+            # 4. Синастрия
             if p_day:
                 try:
                     p_group = sum_digits(p_day)
@@ -410,7 +426,7 @@ def index():
                 except:
                     pass
 
-            # 2.5 Карьера
+            # 5. Карьера
             if result and CareerService:
                 try:
                     prof_entry = ProfessionContent.query.filter_by(number=str(result.number)).first()
@@ -420,7 +436,7 @@ def index():
                     print(f"Ошибка CareerService: {e}")
                     jobs = []
 
-            # 2.6 Сохранение в БД
+            # 6. Сохранение в БД Neon
             try:
                 new_rec = UserRecord(
                     name=user_name, email=email, archetype=group_num,
@@ -435,8 +451,6 @@ def index():
                 db.session.rollback()
                 print(f"⚠️ Ошибка БД: {e}")
 
-    # --- ВАЖНО: ЭТОТ ВЫХОД ТЕПЕРЬ ВНЕ IF ---
-    # Теперь и GET (простой заход), и POST (после расчета) вернут страницу.
     return render_template('index.html',
                            result=result,
                            matrix_desc=matrix_desc,
@@ -448,6 +462,8 @@ def index():
                            user_id=user_id,
                            synastry_result=synastry_result
                            )
+
+
 # --- ЭКСПОРТ PDF ---
 @app.route('/export_pdf', methods=['POST'])
 def export_pdf():
@@ -456,47 +472,27 @@ def export_pdf():
 
     try:
         user_name = request.form.get('user_name', 'Искатель')
-        day = request.form.get('day', '').strip()
-        month = request.form.get('month', '').strip()
-        year = request.form.get('year', '').strip()
+        day, month, year = request.form.get('day', '').strip(), request.form.get('month', '').strip(), request.form.get(
+            'year', '').strip()
 
-        if not (day and month and year):
-            return "Ошибка данных", 400
+        if not (day and month and year): return "Ошибка данных", 400
 
-        # 1. Расчет Архетипа
         group_num = str(sum_digits(day))
         result = ArchetypeContent.query.filter_by(number=group_num).first()
-
-        # 2. Расчет Матрицы и Навыков
         matrix_dict, skills_info, all_digits, m_lines = calculate_full_matrix_logic(day, month, year)
 
-        # 3. Энергия (для текста или графиков)
         calc_val = int(day) * int(month) * int(year)
-        s_val = str(calc_val).ljust(7, '0')[:7]
-        energy_data = [int(d) for d in s_val]
+        energy_data = [int(d) for d in str(calc_val).ljust(7, '0')[:7]]
 
-        # 4. Рендерим шаблон
-        rendered_html = render_template(
-            'pdf_template.html',
-            result=result,
-            matrix=matrix_dict,
-            user_skills=skills_info,
-            energy_data=energy_data,
-            user_name=user_name,
-            day=day,
-            month=month,
-            year=year
-        )
-
+        rendered_html = render_template('pdf_template.html', result=result, matrix=matrix_dict, user_skills=skills_info,
+                                        energy_data=energy_data, user_name=user_name, day=day, month=month, year=year)
         pdf = HTML(string=rendered_html).write_pdf()
 
         response = make_response(pdf)
         response.headers['Content-Type'] = 'application/pdf'
         response.headers['Content-Disposition'] = f'attachment; filename="Genesis_{user_name}.pdf"'
         return response
-
     except Exception as e:
-        print(f"PDF Error: {e}")
         return f"Ошибка: {str(e)}", 500
 
 
@@ -512,11 +508,13 @@ def send_email():
         return str(e), 500
 
 
+# --- ЗАПУСК ---
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
+        # Авто-заполнение базы при первом запуске
         if not ArchetypeContent.query.first():
             for i in range(1, 10):
-                db.session.add(ArchetypeContent(number=str(i), title=f"Архетип {i}", action_power="Загрузка..."))
+                db.session.add(ArchetypeContent(number=str(i), title=f"Архетип {i}"))
             db.session.commit()
     app.run(debug=True)
