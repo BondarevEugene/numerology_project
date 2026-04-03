@@ -89,6 +89,12 @@ LINES_INFO = {
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'genesis_secret_key_0602')
 
+@app.after_request
+def add_header(response):
+    # Это разрешает выполнение скриптов с использованием eval
+    response.headers['Content-Security-Policy'] = "script-src 'self' 'unsafe-eval' 'unsafe-inline';"
+    return response
+
 # --- ПОЧТА ---
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
