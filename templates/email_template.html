@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Helvetica', Arial, sans-serif; background-color: #050505; color: #b8b8b8;">
+    <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #050505;">
+        <tr>
+            <td align="center" style="padding: 20px;">
+
+                <table width="640" border="0" cellspacing="0" cellpadding="0" style="background-color: #0a0a0a; border: 1px solid #c5a059; border-radius: 12px; overflow: hidden;">
+
+                    <tr>
+                        <td align="center" style="padding: 50px 20px; background-color: #111;">
+                            <div style="color: #c5a059; font-size: 32px; letter-spacing: 10px; font-weight: bold;">GENESIS</div>
+                            <div style="color: #fff; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; margin-top: 10px; opacity: 0.7;">Digital Analysis v4.0</div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding: 40px 30px; text-align: center;">
+                            <h1 style="color: #fff; font-size: 36px; margin: 0;">{{ result.title }}</h1>
+                            <p style="color: #c5a059; text-transform: uppercase; letter-spacing: 2px; font-size: 12px; margin-top: 15px;">
+                                🪐 {{ result.planet }} &nbsp; | &nbsp; 🔥 {{ result.element }} &nbsp; | &nbsp; 🃏 {{ result.tarot_arcane }}
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding: 0 30px 40px;">
+                            <h3 style="color: #c5a059; border-bottom: 1px solid #222; padding-bottom: 10px; font-size: 18px;">📊 Цифровая Карта (Психоматрица)</h3>
+                            <table width="100%" border="1" bordercolor="#222" cellspacing="0" cellpadding="15" style="border-collapse: collapse; text-align: center; background: #000;">
+                                <tr>
+                                    <td><span style="font-size: 10px; color: #666;">ХАРАКТЕР</span><br><b style="color:#c5a059; font-size: 20px;">{{ matrix['1'].visual if '1' in matrix else '-' }}</b></td>
+                                    <td><span style="font-size: 10px; color: #666;">ЗДОРОВЬЕ</span><br><b style="color:#c5a059; font-size: 20px;">{{ matrix['4'].visual if '4' in matrix else '-' }}</b></td>
+                                    <td><span style="font-size: 10px; color: #666;">УДАЧА</span><br><b style="color:#c5a059; font-size: 20px;">{{ matrix['7'].visual if '7' in matrix else '-' }}</b></td>
+                                </tr>
+                                <tr>
+                                    <td><span style="font-size: 10px; color: #666;">ЭНЕРГИЯ</span><br><b style="color:#c5a059; font-size: 20px;">{{ matrix['2'].visual if '2' in matrix else '-' }}</b></td>
+                                    <td><span style="font-size: 10px; color: #666;">ЛОГИКА</span><br><b style="color:#c5a059; font-size: 20px;">{{ matrix['5'].visual if '5' in matrix else '-' }}</b></td>
+                                    <td><span style="font-size: 10px; color: #666;">ДОЛГ</span><br><b style="color:#c5a059; font-size: 20px;">{{ matrix['8'].visual if '8' in matrix else '-' }}</b></td>
+                                </tr>
+                                <tr>
+                                    <td><span style="font-size: 10px; color: #666;">ИНТЕРЕС</span><br><b style="color:#c5a059; font-size: 20px;">{{ matrix['3'].visual if '3' in matrix else '-' }}</b></td>
+                                    <td><span style="font-size: 10px; color: #666;">ТРУД</span><br><b style="color:#c5a059; font-size: 20px;">{{ matrix['6'].visual if '6' in matrix else '-' }}</b></td>
+                                    <td><span style="font-size: 10px; color: #666;">ПАМЯТЬ</span><br><b style="color:#c5a059; font-size: 20px;">{{ matrix['9'].visual if '9' in matrix else '-' }}</b></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding: 0 30px;">
+                            <div style="border-left: 4px solid #00b4d8; background: rgba(0, 180, 216, 0.05); padding: 20px; margin-bottom: 20px;">
+                                <h4 style="color: #00b4d8; margin: 0 0 10px; text-transform: uppercase;">⚡ Вектор Силы</h4>
+                                <div style="font-size: 14px; line-height: 1.6;">{{ result.action_power|safe }}</div>
+                            </div>
+
+                            <div style="border-left: 4px solid #e63946; background: rgba(230, 57, 70, 0.05); padding: 20px; margin-bottom: 20px;">
+                                <h4 style="color: #e63946; margin: 0 0 10px; text-transform: uppercase;">🌑 Теневая Ловушка</h4>
+                                <div style="font-size: 14px; line-height: 1.6;">{{ result.shadow_side|safe }}</div>
+                            </div>
+
+                            <div style="border-left: 4px solid #c5a059; background: rgba(197, 160, 89, 0.05); padding: 20px; margin-bottom: 20px;">
+                                <h4 style="color: #c5a059; margin: 0 0 10px; text-transform: uppercase;">🎯 Точка Роста</h4>
+                                <div style="font-size: 14px; line-height: 1.6;">{{ result.growth_point|safe }}</div>
+                            </div>
+                        </td>
+                    </tr>
+
+                    {% if jobs %}
+                    <tr>
+                        <td style="padding: 20px 30px;">
+                            <h3 style="color: #fff; font-family: serif; border-bottom: 1px solid #333; padding-bottom: 10px;">💼 Путь Реализации</h3>
+                            <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                {% for job in jobs %}
+                                <tr>
+                                    <td style="padding: 15px; background: #111; border: 1px solid #222; margin-bottom: 10px; border-radius: 5px;">
+                                        <div style="color: #c5a059; font-weight: bold;">{{ job.name }}</div>
+                                        <div style="color: #777; font-size: 12px;">{{ job.employer.name }}</div>
+                                        <div style="text-align: right; margin-top: 10px;">
+                                            <a href="{{ job.alternate_url }}" style="color: #c5a059; text-decoration: none; font-size: 11px;">СМОТРЕТЬ ВАКАНСИЮ →</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr><td height="10"></td></tr>
+                                {% endfor %}
+                            </table>
+                        </td>
+                    </tr>
+                    {% endif %}
+
+                    <tr>
+                        <td style="padding: 30px; background: #000;">
+                            <h3 style="color: #2ecc71; margin-top: 0;">📜 Кармический Итог</h3>
+                            <div style="font-size: 14px; font-style: italic; color: #999;">{{ result.life_result|safe }}</div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td align="center" style="padding: 30px; background-color: #111; color: #555; font-size: 11px; letter-spacing: 1px;">
+                            СГЕНЕРИРОВАНО СИСТЕМОЙ GENESIS PSYCHOLOGY<br>
+                            © 2026 DIGITAL ANALYSIS SYSTEM
+                        </td>
+                    </tr>
+                </table>
+
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

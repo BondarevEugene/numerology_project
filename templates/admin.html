@@ -49,7 +49,6 @@
             width: 100%; margin-top: 40px; letter-spacing: 3px; font-weight: bold; font-size: 1.1rem;
         }
         .btn-magic:hover { background: var(--gold); color: var(--void); box-shadow: 0 0 30px var(--gold); }
-        .btn-magic:disabled { opacity: 0.5; cursor: not-allowed; }
 
         table { width: 100%; border-collapse: collapse; }
         th { font-family: 'Cinzel'; color: var(--copper); padding: 15px; text-align: left; border-bottom: 2px solid var(--copper); font-size: 0.8rem; }
@@ -58,9 +57,18 @@
         #magic-loader { position: fixed; inset: 0; background: var(--void); display: flex; justify-content: center; align-items: center; z-index: 9999; }
         .seal { width: 60px; height: 60px; border: 2px solid var(--copper); border-radius: 50%; animation: spin 4s linear infinite; display: flex; align-items: center; justify-content: center; color: var(--gold); font-size: 24px; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* Замок (пароль) */
+        #lock-screen { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; }
     </style>
 </head>
 <body onload="hideLoader()">
+
+    <div id="lock-screen">
+        <h2 style="font-family: 'Cinzel'; color: var(--gold); letter-spacing: 5px;">SACRED ACCESS</h2>
+        <input type="password" id="admin-pass" placeholder="Код доступа" style="width: 250px; text-align: center; margin-top: 20px;">
+        <button onclick="checkPass()" class="tab-btn" style="margin-top: 20px;">ВОЙТИ</button>
+    </div>
 
     <div id="magic-loader"><div class="seal">✺</div></div>
 
@@ -73,7 +81,6 @@
     </nav>
 
     <div class="container">
-
         <div id="arch" class="tab-content active">
             <h2 style="font-family: 'Cinzel'; color: var(--gold); text-align: center; letter-spacing: 5px; margin-bottom: 40px;">Конфигуратор Матрицы Судьбы</h2>
             <div class="arch-grid">
@@ -120,7 +127,7 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>Дата</th><th>Имя / Email</th><th>Аркан</th><th>LDR</th><th>COM</th><th>EMP</th><th>LOG</th><th>AGL</th><th>Действие</th>
+                            <th>Дата</th><th>Имя / Email</th><th>Аркан</th><th>LDR</th><th>COM</th><th>EMP</th><th>Действие</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -129,7 +136,7 @@
                             <td>{{ record.created_at.strftime('%d.%m %H:%M') }}</td>
                             <td><b>{{ record.name }}</b><br><small>{{ record.email }}</small></td>
                             <td>{{ record.archetype }}</td>
-                            <td>{{ record.s_leadership }}</td><td>{{ record.s_comm }}</td><td>{{ record.s_empathy }}</td><td>{{ record.s_logic }}</td><td>{{ record.s_agile }}</td>
+                            <td>{{ record.s_leadership }}</td><td>{{ record.s_comm }}</td><td>{{ record.s_empathy }}</td>
                             <td>
                                 <form action="/admin/delete-record/{{ record.id }}" method="POST">
                                     <button type="submit" style="color: var(--red); background:none; border:none; cursor:pointer;">🗑</button>
@@ -146,32 +153,31 @@
             <div class="card">
                 <h4 style="font-family: 'Cinzel'; color: var(--gold);">Статистика архетипов</h4>
                 {% for i in range(1, 10) %}
-                <div style="margin-bottom: 10px;">
-                    Тип {{ i }}: {{ stats.get(i|string, 0) }} исследований
+                <div style="margin-bottom: 10px; color: #fff;">
+                    Тип {{ i }}: <span style="color: var(--gold);">{{ stats.get(i|string, 0) }}</span> исследований
                 </div>
                 {% endfor %}
             </div>
         </div>
-
     </div>
 
     <div id="editor-overlay">
         <div class="modal-container">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-                <h1 id="modal-title" style="font-family: 'Cinzel'; color: var(--gold); margin: 0;">АРКАН</h1>
+                <h1 id="modal-label" style="font-family: 'Cinzel'; color: var(--gold); margin: 0;">АРКАН</h1>
                 <button onclick="closeArcaneEditor()" class="tab-btn">ЗАКРЫТЬ ✕</button>
             </div>
 
             <form id="arcane-form">
                 <input type="hidden" id="edit-number">
                 <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
-                    <div><span class="section-label">Имя Архетипа</span><input type="text" id="edit-title"></div>
-                    <div><span class="section-label">Планета</span><input type="text" id="edit-planet"></div>
-                    <div><span class="section-label">Стихия</span><input type="text" id="edit-element"></div>
+                    <div><span class="section-label">Имя Архетипа</span><input type="text" id="ed-title"></div>
+                    <div><span class="section-label">Планета</span><input type="text" id="ed-planet"></div>
+                    <div><span class="section-label">Стихия</span><input type="text" id="ed-element"></div>
                 </div>
                 <div style="margin-top: 20px;">
-                    <span class="section-label">🔍 Ключи HH.ru</span>
-                    <input type="text" id="edit-queries">
+                    <span class="section-label">🔍 Ключи поиска (CSV)</span>
+                    <input type="text" id="ed-queries">
                 </div>
 
                 <span class="section-label">⚡ Вектор Силы</span><textarea id="ed-action_power"></textarea>
@@ -212,7 +218,8 @@
     </div>
 
     <script>
-        // Исправленный массив полей (добавлены запятые!)
+        let currentArcane = null;
+
         const editorIds = [
             'ed-action_power', 'ed-shadow_side', 'ed-exit_minus',
             'ed-growth_point', 'ed-realization', 'ed-karmic_tasks',
@@ -227,6 +234,18 @@
 
         function hideLoader() { document.getElementById('magic-loader').style.display = 'none'; }
 
+        function checkPass() {
+            const p = document.getElementById('admin-pass').value;
+            if(p === '0602') {
+                document.getElementById('lock-screen').style.display = 'none';
+                localStorage.setItem('genesis_auth', 'true');
+            } else { alert('Доступ закрыт.'); }
+        }
+
+        if(localStorage.getItem('genesis_auth') === 'true') {
+            document.getElementById('lock-screen').style.display = 'none';
+        }
+
         function showTab(tabId, event) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -235,30 +254,36 @@
         }
 
         async function openArcaneEditor(num) {
+            currentArcane = num;
+            document.getElementById('modal-label').innerText = "АРКАН " + num;
             document.getElementById('edit-number').value = num;
-            document.getElementById('modal-title').innerText = "АРКАН " + num;
-            document.getElementById('editor-overlay').style.display = 'block';
 
-            const res = await fetch(`/admin/get/${num}`);
-            const json = await res.json();
-            const data = json.data || {};
+            try {
+                const res = await fetch(`/admin/get/${num}`);
+                const data = await res.json();
+                const arc = data.data;
 
-            document.getElementById('edit-title').value = data.title || '';
-            document.getElementById('edit-planet').value = data.planet || '';
-            document.getElementById('edit-element').value = data.element || '';
-            document.getElementById('edit-queries').value = data.search_queries || '';
+                // Заполняем простые поля
+                document.getElementById('ed-title').value = arc.title || '';
+                document.getElementById('ed-planet').value = arc.planet || '';
+                document.getElementById('ed-element').value = arc.element || '';
+                document.getElementById('ed-queries').value = arc.search_queries || '';
 
-            // Безопасная инициализация редакторов
-            editorIds.forEach(id => {
-                const key = id.replace('ed-', '');
-                if (!CKEDITOR.instances[id]) {
-                    CKEDITOR.replace(id, ckConfig);
-                }
-                // Ждем пока загрузится инстанс, если он только что создался
-                setTimeout(() => {
-                    if (CKEDITOR.instances[id]) CKEDITOR.instances[id].setData(data[key] || '');
-                }, 100);
-            });
+                // Заполняем CKEditor
+                editorIds.forEach(id => {
+                    const key = id.replace('ed-', '');
+                    const content = arc[key] || '';
+                    if (CKEDITOR.instances[id]) {
+                        CKEDITOR.instances[id].setData(content);
+                    } else {
+                        CKEDITOR.replace(id, ckConfig).on('instanceReady', function(evt) {
+                            evt.editor.setData(content);
+                        });
+                    }
+                });
+
+                document.getElementById('editor-overlay').style.display = 'block';
+            } catch (e) { console.error(e); alert("Ошибка загрузки данных."); }
         }
 
         function closeArcaneEditor() { document.getElementById('editor-overlay').style.display = 'none'; }
@@ -271,10 +296,10 @@
 
             const payload = {
                 number: num,
-                title: document.getElementById('edit-title').value,
-                planet: document.getElementById('edit-planet').value,
-                element: document.getElementById('edit-element').value,
-                search_queries: document.getElementById('edit-queries').value
+                title: document.getElementById('ed-title').value,
+                planet: document.getElementById('ed-planet').value,
+                element: document.getElementById('ed-element').value,
+                search_queries: document.getElementById('ed-queries').value
             };
 
             editorIds.forEach(id => {
@@ -290,14 +315,10 @@
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(payload)
                 });
-                if(res.ok) alert("Хроники Аркана " + num + " обновлены.");
-                else alert("Ошибка связи с сервером.");
-            } catch (e) {
-                console.error(e);
-            } finally {
-                btn.innerText = "СОХРАНИТЬ В ХРОНИКИ";
-                btn.disabled = false;
-            }
+                if(res.ok) alert("Аркан " + num + " сохранен.");
+                else alert("Ошибка сервера.");
+            } catch (e) { console.error(e); }
+            finally { btn.innerText = "СОХРАНИТЬ В ХРОНИКИ"; btn.disabled = false; }
         }
 
         function openArticleModal() {
