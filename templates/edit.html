@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Редактирование Архетипа</title>
+    <style>
+        body { background: #050505; color: #b0b0b0; font-family: sans-serif; padding: 40px; }
+        .form-container { max-width: 800px; margin: 0 auto; background: #111; padding: 20px; border: 1px solid #c5a059; }
+        label { display: block; margin-top: 15px; color: #c5a059; font-weight: bold; }
+        input, textarea { width: 100%; background: #222; border: 1px solid #444; color: #fff; padding: 10px; margin-top: 5px; box-sizing: border-box; }
+        textarea { height: 150px; }
+        button { background: #c5a059; color: #000; padding: 15px 30px; border: none; margin-top: 20px; cursor: pointer; font-weight: bold; }
+        .back { color: #666; text-decoration: none; display: inline-block; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <a href="{{ url_for('admin.admin_panel') }}" class="back">← Назад в список</a>
+        <h1>Редактирование: Архетип №{{ item.number }}</h1>
+
+        <form method="POST">
+            <label>Заголовок (Title)</label>
+            <input type="text" name="title" value="{{ item.title }}">
+
+            <label>Сила действия (action_power)</label>
+            <textarea name="action_power">{{ item.action_power }}</textarea>
+
+            <label>Теневая сторона (shadow_side)</label>
+            <textarea name="shadow_side">{{ item.shadow_side }}</textarea>
+
+            <label>Кармические задачи (karmic_tasks)</label>
+            <textarea name="karmic_tasks">{{ item.karmic_tasks }}</textarea>
+
+            <button type="submit">СОХРАНИТЬ ИЗМЕНЕНИЯ</button>
+        </form>
+    </div>
+</body>
+</html>

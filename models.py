@@ -1,6 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-db = SQLAlchemy() # Без привязки к app, её мы делаем в app.py через db.init_app(app)
+
+db = SQLAlchemy()  # Без привязки к app, её мы делаем в app.py через db.init_app(app)
+
 
 class ArchetypeContent(db.Model):
     __tablename__ = 'archetype_content'
@@ -26,14 +28,16 @@ class ArchetypeContent(db.Model):
     # Связь с советами коуча
     coach_tips = db.relationship('DailyCoachTip', backref='archetype', lazy=True)
 
+
 class Order(db.Model):
     __tablename__ = 'orders'
     id = db.Column(db.Integer, primary_key=True)
     order_id = db.Column(db.String(50), unique=True)
     user_email = db.Column(db.String(100))
     amount = db.Column(db.Float, default=0.0)
-    status = db.Column(db.String(20), default='pending') 
+    status = db.Column(db.String(20), default='pending')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
 
 class DailyCoachTip(db.Model):
     __tablename__ = 'daily_coach_tips'
@@ -44,6 +48,7 @@ class DailyCoachTip(db.Model):
     ment_content = db.Column(db.Text)
     harm_content = db.Column(db.Text)
 
+
 class Course(db.Model):
     __tablename__ = 'courses'
     id = db.Column(db.Integer, primary_key=True)
@@ -52,6 +57,7 @@ class Course(db.Model):
     platform = db.Column(db.String(100))
     link = db.Column(db.String(500))
     archetype_num = db.Column(db.String(10))
+
 
 class Article(db.Model):
     __tablename__ = 'articles'
@@ -62,11 +68,13 @@ class Article(db.Model):
     image_url = db.Column(db.String(500))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+
 class ProfessionContent(db.Model):
     __tablename__ = 'profession_content'
     id = db.Column(db.Integer, primary_key=True)
     number = db.Column(db.String(10))
     list_csv = db.Column(db.Text)
+
 
 class UserRecord(db.Model):
     __tablename__ = 'user_records'
