@@ -1,4 +1,39 @@
 import requests
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from models import db, ArchetypeContent
+
+NEON_URL = "postgresql://neondb_owner:npg_7uV2YfNbIeWd@ep-black-water-a2o4465m-pooler.eu-central-1.aws.neon.tech/neondb?sslmode=require"
+LOCAL_DB_URL = "sqlite:///backup_archetypes.db"
+
+
+def sync_data_to_local():
+    """Перенос всех данных (всех 18 полей) из облака в локальный бекап"""
+    remote_engine = create_engine(NEON_URL)
+    local_engine = create_engine(LOCAL_DB_URL)
+
+    # Создаем структуру таблиц в SQLite, если её нет
+    ArchetypeContent.__table__.create(bind=local_engine, checkfirst=True)
+
+    RemoteSession = sessionmaker(bind=remote_engine)
+    LocalSession = sessionmaker(bind=local_engine)
+
+    rem_session = RemoteSession()
+    loc_session = LocalSession()
+
+    try:
+        items = rem_session.query(ArchetypeContent).all()
+        for item in items:
+            # merge копирует все поля объекта по первичному ключу
+            loc_session.merge(item)
+        loc_session.commit()
+        return True
+    except Exception as e:
+        print(f"Sync error: {e}")
+        return False
+    finally:
+        rem_session.close()
+        loc_session.close()
 
 
 class CareerService:

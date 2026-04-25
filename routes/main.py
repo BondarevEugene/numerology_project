@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request
-from models import db, Article, ArchetypeContent, ProfessionContent, UserRecord
+from models import db, Article, ArchetypeContent, ProfessionContent, User
 from mind_logic import sum_digits, calculate_full_matrix_logic
 
 main_bp = Blueprint('main', __name__)
@@ -65,7 +65,7 @@ def index():
 
         # 5. Сохранение записи пользователя
         try:
-            new_rec = UserRecord(name=user_name, email=email, archetype=str(group_num))
+            new_rec = User(full_name=user_name, email=email, archetype_num=str(group_num))
             db.session.add(new_rec)
             db.session.commit()
         except Exception as e:

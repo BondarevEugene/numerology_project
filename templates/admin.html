@@ -2,68 +2,390 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>GENESIS ADMIN V5</title>
+    <title>GENESIS ADMIN | NEXUS ORCHESTRATOR</title>
     <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
-        body { background: #060709; color: #ccc; font-family: sans-serif; padding: 20px; }
-        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .card { background: #111; border: 1px solid #333; padding: 20px; text-align: center; cursor: pointer; }
-        #editor-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); padding: 20px; overflow-y: auto; }
-        .modal { background: #111; max-width: 800px; margin: auto; padding: 20px; border: 1px solid #d4af37; }
-        input { width: 100%; margin-bottom: 10px; padding: 10px; background: #000; color: #fff; border: 1px solid #444; }
+        :root {
+            --gold: #d4af37;
+            --bg: #060709;
+            --panel: #111;
+            --border: #333;
+        }
+        body { background: var(--bg); color: #ccc; font-family: 'Inter', sans-serif; padding: 20px; margin: 0; }
+
+        /* Навигация */
+        .admin-nav { display: flex; gap: 15px; margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 15px; }
+        .nav-btn {
+            background: var(--panel); border: 1px solid var(--border); color: #888;
+            padding: 12px 25px; cursor: pointer; font-family: 'Cinzel'; letter-spacing: 2px; transition: 0.3s;
+        }
+        .nav-btn.active { border-color: var(--gold); color: var(--gold); box-shadow: 0 0 10px rgba(212,175,55,0.1); }
+
+        /* Сетка редактора Арканов */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
+        .card { background: var(--panel); border: 1px solid var(--border); padding: 20px; text-align: center; cursor: pointer; transition: 0.3s; }
+        .card:hover { border-color: var(--gold); background: #1a1a1a; }
+
+        /* Nexus Панель */
+        #nexus-container {
+            display: none;
+            min-height: 80vh;
+            border: 1px solid #333;
+            background: #050505;
+            position: relative;
+            z-index: 1;
+        }
+        .main-layout { padding: 20px; }
+
+.nexus-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 350px; /* Карта занимает все место, Инспектор 350px справа */
+    gap: 30px;
+    align-items: start;
+}
+
+.nexus-map-area {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    background: rgba(255,255,255,0.02);
+    padding: 40px;
+    border: 1px dashed #333;
+    min-height: 500px;
+}
+
+.inspector-panel {
+    background: #0f1115;
+    border-left: 1px solid var(--gold);
+    padding: 20px;
+    height: 80vh;
+    position: sticky;
+    top: 20px;
+}
+
+.inspector-header {
+    font-family: 'Cinzel';
+    color: var(--gold);
+    border-bottom: 1px solid #333;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    font-size: 18px;
+}
+        #nexus-matrix {
+            flex-grow: 1;
+            padding: 40px;
+            display: flex;
+            gap: 20px;
+            position: relative;
+            display: flex !important;
+            flex-wrap: wrap !important;
+            min-height: 100px;
+            z-index: 10;
+        }
+        #nexus-matrix .card {
+            opacity: 1 !important;
+            display: block !important;
+            visibility: visible !important;
+            transform: none !important;
+        }
+
+        /* Витрувианский человек */
+        #nexus-matrix::after {
+            content: "";
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px; height: 600px;
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Da_Vinci_Vitruve_Luc_Viatour.jpg/800px-Da_Vinci_Vitruve_Luc_Viatour.jpg');
+            background-size: contain;
+            background-repeat: no-repeat;
+            filter: invert(1);
+            pointer-events: none;
+            z-index: -1; /* Уходим на задний план */
+        }
+        /* Эффект свечения для активного модуля */
+.card.active-link {
+    border-color: var(--gold);
+    box-shadow: 0 0 30px rgba(212, 175, 55, 0.4);
+    transform: scale(1.05);
+}
+
+/* Линии связи (через SVG на фоне) */
+#nexus-svg-canvas {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+        #nexus-inspector { width: 350px; border-left: 1px solid var(--border); padding: 25px; background: #080808; z-index: 2; }
+
+            .bp-node {
+                background: #111;
+                border: 1px solid #444;
+                border-left: 3px solid var(--gold);
+                padding: 15px;
+                width: 240px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            }
+
+        .nexus-btn {
+            background: transparent;
+            border: 1px solid #d4af37;
+            color: #d4af37;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            font-family: 'JetBrains Mono';
+        }
+
+        .mono { font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+
+        /* Модальное окно редактора */
+        #editor-overlay { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.95); padding: 20px; overflow-y: auto; z-index: 1000; }
+        .modal { background: #111; max-width: 900px; margin: 40px auto; padding: 30px; border: 1px solid var(--gold); }
+
+        /* Стили для полей внутри модалки */
+        .form-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+        .form-group label {
+        display: block;
+        margin-bottom: 10px;
+        color: var(--gold);
+        font-weight: bold;
+        font-size: 13px;
+        letter-spacing: 1px;
+    }
+    .form-group input {
+        width: 100%;
+        background: #000;
+        border: 1px solid #444;
+        color: #fff;
+        padding: 12px;
+        border-radius: 4px;
+        outline: none;
+    }
+    .form-group input:focus { border-color: var(--gold); }
+
+    /* Стили для CKEditor контейнера */
+    .cke_chrome {
+        border: 1px solid #444 !important;
+        background: #111 !important;
+    }
+        label { display: block; margin-bottom: 8px; color: var(--gold); font-family: 'Cinzel'; font-size: 12px; }
+        input, textarea { width: 100%; background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 10px; }
+
+        /* Типы узлов */
+        .node-heart { border-color: #ff4444 !important; box-shadow: 0 0 20px rgba(255, 68, 68, 0.2); }
+        .node-brain { border-color: #44aaff !important; box-shadow: 0 0 20px rgba(68, 170, 255, 0.2); }
+        .node-nerve { border-color: var(--gold) !important; }
+
+        /* Линии связей (псевдо-элементы) */
+        .nexus-node::before {
+            content: '';
+            position: absolute;
+            top: -20px; left: 50%;
+            width: 1px; height: 20px;
+            background: linear-gradient(to bottom, transparent, var(--gold));
+            opacity: 0.3;
+        }
+
+        /* Свечение при наведении */
+        .nexus-node:hover {
+            transform: scale(1.05) translateY(-5px);
+            z-index: 100;
+            filter: brightness(1.2);
+        }
+
     </style>
 </head>
 <body>
-    <h1>GENESIS CONTROL PANEL</h1>
-    <div class="grid">
-        {% for i in range(1, 10) %}
-        <div class="card" onclick="openEditor({{ i }})"><h2>{{ i }}</h2><p>АРХЕТИП</p></div>
-        {% endfor %}
+    <div class="header-nav" style="position: sticky; top: 0; z-index: 1000; background: var(--bg); padding: 15px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; gap: 10px;">
+            <button onclick="window.location.href='/'" class="nav-btn" style="border-color:#444;">← НА САЙТ</button>
+            <button onclick="switchTab('editor')" id="btn-editor" class="nav-btn active">ARCANE_EDITOR</button>
+            <button onclick="switchTab('nexus')" id="btn-nexus" class="nav-btn">GENESIS_NEXUS</button>
+        </div>
+        <div class="mono" style="font-size: 12px; color: var(--gold); letter-spacing: 1px;">
+            GENESIS_OS_RECON v8.2 // <span id="footer-server-time">00:00:00</span>
+        </div>
     </div>
 
-    <div id="editor-overlay">
-        <div class="modal">
-            <h2 id="m-title">АРКАН</h2>
-            <input type="hidden" id="m-num">
-            <input type="text" id="ed-title" placeholder="Титул">
-            <input type="text" id="ed-planet" placeholder="Планета">
-            <input type="text" id="ed-element" placeholder="Стихия">
-            <input type="text" id="ed-search_queries" placeholder="Запросы">
-
-            {% for id in ['action_power','shadow_side','exit_minus','growth_point','realization','karmic_tasks','development_cycle','life_result','mind_power','partner_type','financial_tip','health_tips'] %}
-            <textarea id="ed-{{ id }}"></textarea>
+    <div id="tab-editor" style="padding: 20px;">
+        <div class="grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px;">
+            {% for i in range(1, 23) %}
+            <div class="card" onclick="openEditor('{{ i }}')" style="cursor: pointer; transition: 0.3s; border: 1px solid var(--border); background: var(--panel); padding: 25px; text-align: center;">
+                <div style="font-size: 28px; color: var(--gold); font-family: 'Cinzel';">{{ i }}</div>
+                <div style="font-size: 10px; margin-top: 8px; color: #555; letter-spacing: 2px;">ARCANE_UNIT</div>
+            </div>
             {% endfor %}
+        </div>
+    </div>
 
-            <button onclick="saveData()" style="width:100%; padding:20px; background:#d4af37; margin-top:10px;">СОХРАНИТЬ</button>
-            <button onclick="location.reload()" style="width:100%; background:none; color:red; border:none; margin-top:10px;">ЗАКРЫТЬ</button>
+    <div id="tab-nexus" style="display: none; padding: 20px;">
+        <div class="nexus-layout" style="display: grid; grid-template-columns: 1fr 380px; gap: 20px; min-height: 80vh;">
+
+            <div id="nexus-matrix" style="background: rgba(0,0,0,0.2); border: 1px solid #222; padding: 25px; display: flex; flex-wrap: wrap; gap: 20px; align-content: flex-start; position: relative; border-radius: 4px;">
+                <div class="mono" style="color:var(--gold); opacity: 0.5;">[ INITIALIZING_CONNECTION... ]</div>
+            </div>
+
+            <div id="nexus-inspector-panel" style="border: 1px solid var(--border); background: #0a0a0a; padding: 25px; position: sticky; top: 100px; height: calc(100vh - 140px); overflow-y: auto;">
+                <h3 style="font-family: 'Cinzel'; color: var(--gold); border-bottom: 1px solid #333; padding-bottom: 12px; margin-top: 0; letter-spacing: 2px; font-size: 16px;">FIELD_INSPECTOR</h3>
+                <div id="inspector-result" class="mono" style="font-size: 12px; color: #888; line-height: 1.5;">
+                    [ SYSTEM_IDLE ]<br>Выберите модуль для захвата хуков...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="editor-overlay" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:2000; overflow-y:auto; padding: 40px 20px;">
+        <div class="modal" style="max-width: 900px; margin: 0 auto; background: #0d0d0d; padding: 35px; border: 1px solid var(--gold); box-shadow: 0 0 50px rgba(0,0,0,0.5);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid #222; padding-bottom: 15px;">
+                <h2 id="modal-title" style="font-family: 'Cinzel'; color: var(--gold); margin: 0;">АРКАН №</h2>
+                <button onclick="closeEditor()" class="nav-btn" style="border-color: #444;">ESC_EXIT</button>
+            </div>
+
+            <input type="hidden" id="m-num">
+            <div id="fields-container"></div>
+
+            <div style="margin-top: 40px; display: flex; gap: 15px;">
+                <button onclick="saveData()" class="nav-btn active" style="flex-grow: 2; background: var(--gold); color: #000; font-weight: bold;">СОХРАНИТЬ_ИЗМЕНЕНИЯ</button>
+                <button onclick="closeEditor()" class="nav-btn" style="flex-grow: 1;">ОТМЕНА</button>
+            </div>
         </div>
     </div>
 
     <script>
-        const fields = ['action_power','shadow_side','exit_minus','growth_point','realization','karmic_tasks','development_cycle','life_result','mind_power','partner_type','financial_tip','health_tips'];
-        async function openEditor(n) {
-            document.getElementById('m-num').value = n;
-            document.getElementById('m-title').innerText = "АРКАН " + n;
-            document.getElementById('editor-overlay').style.display = 'block';
-            const res = await fetch(`/admin/get/${n}`);
-            const d = await res.json();
-            const a = d.data;
-            document.getElementById('ed-title').value = a.title || '';
-            document.getElementById('ed-planet').value = a.planet || '';
-            document.getElementById('ed-element').value = a.element || '';
-            document.getElementById('ed-search_queries').value = a.search_queries || '';
-            fields.forEach(f => {
-                if (!CKEDITOR.instances['ed-'+f]) CKEDITOR.replace('ed-'+f, {height: 100});
-                setTimeout(() => { CKEDITOR.instances['ed-'+f].setData(a[f] || ''); }, 200);
-            });
+        const richFields = ['action_power', 'shadow_side', 'growth_point', 'realization', 'karmic_tasks', 'development_cycle', 'mind_power', 'life_result', 'partner_type', 'financial_tip', 'health_tips', 'exit_minus'];
+        const simpleFields = ['title', 'planet', 'element', 'tarot_arcane', 'search_queries'];
+
+        // Переключение вкладок
+        function switchTab(tab) {
+            const isEditor = tab === 'editor';
+            document.getElementById('tab-editor').style.display = isEditor ? 'block' : 'none';
+            document.getElementById('tab-nexus').style.display = isEditor ? 'none' : 'block';
+
+            document.getElementById('btn-editor').className = `nav-btn ${isEditor ? 'active' : ''}`;
+            document.getElementById('btn-nexus').className = `nav-btn ${!isEditor ? 'active' : ''}`;
+
+            if (!isEditor) {
+                loadNexusData();
+            }
         }
+
+        // Загрузка нод оркестратора
+        async function loadNexusData() {
+            const matrix = document.getElementById('nexus-matrix');
+            if (!matrix) return;
+
+            matrix.innerHTML = '<div class="mono" style="color:var(--gold);">[ SCANNING_BLUEPRINTS... ]</div>';
+
+            try {
+                const response = await fetch('/admin/nexus_data');
+                const blueprints = await response.json();
+
+                if (!blueprints || blueprints.length === 0) {
+                    matrix.innerHTML = '<div class="mono" style="color:red;">[ ERR: NULL_RESPONSE ]</div>';
+                    return;
+                }
+
+                matrix.innerHTML = '';
+                blueprints.forEach(bp => {
+                    const node = document.createElement('div');
+                    node.className = `card nexus-node`;
+                    node.style.cssText = `width: 280px; margin: 10px; border: 1px solid #222; background: #111; padding: 15px; position: relative;`;
+
+                    const capsHtml = bp.caps.map(c =>
+                        `<span style="font-size:8px; background:rgba(212,175,55,0.05); border:1px solid rgba(212,175,55,0.2); padding:2px 5px; margin:2px; color:var(--gold); display:inline-block; border-radius:2px;">${c}</span>`
+                    ).join('');
+
+                    node.innerHTML = `
+                        <div style="font-size:9px; color:#444; margin-bottom:10px; display:flex; justify-content:space-between;">
+                            <span>UNIT: ${bp.type.toUpperCase()}</span>
+                            <span>PRIORITY: ${bp.importance}</span>
+                        </div>
+                        <div style="font-family:'Cinzel'; color:var(--gold); font-size:16px; margin-bottom:10px;">${bp.file}</div>
+                        <div style="min-height:50px; margin-bottom:15px;">${capsHtml}</div>
+                        <button class="nav-btn"
+                                style="width: 100%; font-size: 10px; padding: 8px; border-color:var(--gold);"
+                                hx-get="/admin/nexus/inspect?path=${encodeURIComponent(bp.full_path)}"
+                                hx-target="#inspector-result">
+                            EXTRACT_HOOKS
+                        </button>
+                    `;
+                    matrix.appendChild(node);
+                });
+
+                if (typeof htmx !== 'undefined') htmx.process(matrix);
+            } catch (e) {
+                matrix.innerHTML = `<div class="mono" style="color:red;">[ CONNECTION_ERROR: ${e.message} ]</div>`;
+            }
+        }
+
+        // Логика редактора (CKEditor)
+        function openEditor(num) {
+            document.getElementById('m-num').value = num;
+            document.getElementById('modal-title').innerText = "РЕДАКТИРОВАНИЕ АРКАНА №" + num;
+            const container = document.getElementById('fields-container');
+            let htmlContent = '';
+
+            simpleFields.forEach(f => {
+                htmlContent += `<div class="form-group" style="margin-bottom:15px;"><label style="display:block; font-size:10px; color:#555; margin-bottom:5px;">${f.toUpperCase()}</label><input type="text" id="ed-${f}" style="width:100%; background:#1a1a1a; border:1px solid #333; color:#ccc; padding:10px;"></div>`;
+            });
+
+            richFields.forEach(f => {
+                htmlContent += `<div class="form-group" style="margin-bottom:20px;"><label style="display:block; font-size:10px; color:#555; margin-bottom:5px;">${f.toUpperCase()}</label><textarea id="ed-${f}"></textarea></div>`;
+            });
+
+            container.innerHTML = htmlContent;
+            document.getElementById('editor-overlay').style.display = 'block';
+
+            richFields.forEach(f => {
+                if (CKEDITOR.instances['ed-'+f]) CKEDITOR.instances['ed-'+f].destroy(true);
+                CKEDITOR.replace('ed-'+f, { height: 180, skin: 'moono-dark' });
+            });
+            loadData(num);
+        }
+
+        async function loadData(num) {
+            const res = await fetch('/admin/get/' + num);
+            const r = await res.json();
+            if (r.status === 'success') {
+                simpleFields.forEach(f => document.getElementById('ed-'+f).value = r.data[f] || '');
+                richFields.forEach(f => {
+                    setTimeout(() => { if (CKEDITOR.instances['ed-'+f]) CKEDITOR.instances['ed-'+f].setData(r.data[f] || ''); }, 400);
+                });
+            }
+        }
+
         async function saveData() {
             const n = document.getElementById('m-num').value;
-            const p = { number: n, title: document.getElementById('ed-title').value, planet: document.getElementById('ed-planet').value, element: document.getElementById('ed-element').value, search_queries: document.getElementById('ed-search_queries').value };
-            fields.forEach(f => { p[f] = CKEDITOR.instances['ed-'+f].getData(); });
-            await fetch('/admin/update', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(p) });
-            alert("OK"); location.reload();
+            let payload = { number: n };
+            simpleFields.forEach(f => payload[f] = document.getElementById('ed-'+f).value);
+            richFields.forEach(f => { if (CKEDITOR.instances['ed-'+f]) payload[f] = CKEDITOR.instances['ed-'+f].getData(); });
+
+            const res = await fetch('/admin/update', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (res.ok) { alert("GENESIS_DATA: UPDATE_SUCCESS"); closeEditor(); }
         }
+
+        function closeEditor() { document.getElementById('editor-overlay').style.display = 'none'; }
+
+        // Время сервера
+        setInterval(() => {
+            const now = new Date();
+            const time = now.toLocaleTimeString('ru-RU', { hour12: false });
+            const el = document.getElementById('footer-server-time');
+            if(el) el.innerText = time;
+        }, 1000);
     </script>
 </body>
 </html>

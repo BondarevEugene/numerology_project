@@ -1,5 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+import uuid
+from flask_login import UserMixin  # Важно для current_user
 
 db = SQLAlchemy()  # Без привязки к app, её мы делаем в app.py через db.init_app(app)
 
@@ -76,15 +78,44 @@ class ProfessionContent(db.Model):
     list_csv = db.Column(db.Text)
 
 
-class UserRecord(db.Model):
-    __tablename__ = 'user_records'
+# Импорт уже есть в начале вашего файла, просто используем его
+class User(db.Model, UserMixin):  # <--- Добавьте UserMixin сюда
+    __tablename__ = 'users'
+    __table_args__ = {'extend_existing': True}
+
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100))
-    email = db.Column(db.String(100))
-    archetype = db.Column(db.String(10))
-    s_leadership = db.Column(db.Integer, default=50)
-    s_comm = db.Column(db.Integer, default=50)
-    s_empathy = db.Column(db.Integer, default=50)
-    s_logic = db.Column(db.Integer, default=50)
-    s_agile = db.Column(db.Integer, default=50)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    pattern = db.Column(db.String(100), nullable=True)  # Храним последовательность точек, например "123"
+    full_name = db.Column(db.String(100))
+    phone = db.Column(db.String(20))  # Поле для регистрации
+    gender = db.Column(db.String(10))  # Поле для регистрации
+    birth_date = db.Column(db.Date, nullable=False)
+
+    is_verified = db.Column(db.Boolean, default=False)
+    verification_token = db.Column(db.String(100), unique=True)
+    reset_token = db.Column(db.String(100), unique=True, nullable=True)  # ДЛЯ ВОССТАНОВЛЕНИЯ
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    personal_notes = db.Column(db.Text, nullable=True)
+
+    def __repr__(self):
+        return f'<User {self.email}>'
+
+
+class NexusNode(db.Model):
+    __tablename__ = 'nexus_nodes'
+    id = db.Column(db.Integer, primary_key=True)
+    slug = db.Column(db.String(50), unique=True)  # например, 'calc_archetype'
+    module_path = db.Column(db.String(100))  # 'utils.sum_digits'
+    config_json = db.Column(db.Text)  # Настройки ноды
+    is_active = db.Column(db.Boolean, default=True)
+
+
+class UserLog(db.Model):
+    __tablename__ = 'user_logs'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    message = db.Column(db.String(255))
+    level = db.Column(db.String(20), default='INFO')  # INFO, WARNING, CRITICAL
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
