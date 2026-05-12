@@ -1,48 +1,54 @@
-import sqlite3
-import os
+from app import app
+from models import db, ArchetypeContent
 
 
-def migrate():
-    # Проверь имя файла базы! Если оно другое (например, 'instance/database.db'), исправь путь.
-    db_path = 'database.db'
+def populate_archetypes():
+    with app.app_context():
+        # 1. Проверяем, есть ли уже данные
+        if ArchetypeContent.query.count() > 0:
+            print("💡 В базе уже есть данные.")
+            return
 
-    if not os.path.exists(db_path):
-        print(f"Файл {db_path} не найден! Убедись, что скрипт лежит в той же папке.")
-        return
+        print("🚀 Инициализация текстов архетипов...")
 
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
+        # 2. Определяем доступные колонки в модели
+        columns = ArchetypeContent.__table__.columns.keys()
+        print(f"🔍 Найденные колонки в базе: {columns}")
 
-    # Полный список колонок из твоего Traceback, которых может не хватать
-    columns_to_add = [
-        ('element', 'TEXT'),
-        ('tarot_arcane', 'TEXT'),
-        ('development_cycle', 'TEXT'),
-        ('mind_power', 'TEXT'),
-        ('partner_type', 'TEXT'),
-        ('financial_tip', 'TEXT'),
-        ('health_tips', 'TEXT'),
-        ('exit_minus', 'TEXT'),
-        ('search_queries', 'TEXT')
-    ]
+        for i in range(1, 23):
+            # Создаем пустой объект
+            new_arcane = ArchetypeContent()
 
-    print(f"--- Запуск исправления базы данных {db_path} ---")
+            # 3. Заполняем только те поля, которые реально существуют
+            if 'number' in columns:
+                new_arcane.number = str(i)
 
-    for col_name, col_type in columns_to_add:
+            if 'title' in columns:
+                new_arcane.title = f"Архетип №{i}"
+
+            # Проверяем, как называется поле для текста (одно из этих)
+            text_fields = ['content', 'description', 'content_text', 'text']
+            for field in text_fields:
+                if field in columns:
+                    setattr(new_arcane, field,
+                            f"Это подробное описание для Аркана №{i}. Вы можете изменить его в админке.")
+                    break
+
+            # Поля для советов (shadow/advice)
+            if 'shadow' in columns:
+                new_arcane.shadow = "Теневые проявления в разработке..."
+            if 'advice' in columns:
+                new_arcane.advice = "Рекомендации по развитию в разработке..."
+
+            db.session.add(new_arcane)
+
         try:
-            # Пытаемся добавить колонку
-            cursor.execute(f"ALTER TABLE archetype_content ADD COLUMN {col_name} {col_type}")
-            print(f"[+] Добавлена колонка: {col_name}")
-        except sqlite3.OperationalError as e:
-            if "duplicate column name" in str(e).lower():
-                print(f"[-] Пропуск: {col_name} (уже есть)")
-            else:
-                print(f"[!] Ошибка на {col_name}: {e}")
-
-    conn.commit()
-    conn.close()
-    print("--- Исправление завершено! Попробуй запустить app.py ---")
+            db.session.commit()
+            print("✅ 22 заготовки созданы успешно!")
+        except Exception as e:
+            db.session.rollback()
+            print(f"❌ Ошибка при сохранении: {e}")
 
 
 if __name__ == "__main__":
-    migrate()
+    populate_archetypes()

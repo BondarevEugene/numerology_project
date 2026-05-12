@@ -4,39 +4,32 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6eb95a8b-e607-44a0-8ef5-a6183af34a1e" name="Changes" comment="пред ФИНАЛЬНАЯ РАБОЧАЯ ВЕРСИЯ 9.13 220426">
-      <change afterPath="$PROJECT_DIR$/init_db_LK.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/nexus/nexus_core.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/nexus/nexus_engine.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/nexus/nexus_hub.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/nexus/nexus_modules.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/nexus/profile.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/routes/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/routes/auth.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/routes/profile.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/emails/Access Recovery.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/emails/Welcome Protocol.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/emails/dayly_report.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/emails/reset_password.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/index_backup_230426.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/index_first_one.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/login.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/nexus_admin.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/nexus_hub.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/profile.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/profile_full.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/register.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/reset_request.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/разовые сервисные/force_update.py" afterDir="false" />
+    <list default="true" id="6eb95a8b-e607-44a0-8ef5-a6183af34a1e" name="Changes" comment="Genesys .2.0-PRO 25\04\2026&#10;full working">
+      <change afterPath="$PROJECT_DIR$/admin/evolution.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docs/public_offer.docx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/components/BotBuilder.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/src/config/bot_modules.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/frontend/tailwind.config.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mobile_app/main.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/initiation.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/profile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/profile_back_up_300426.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database.db" beforeDir="false" afterPath="$PROJECT_DIR$/compatibility_logic.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/genesis_v2.db" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/instance/genesis_v2.db" beforeDir="false" afterPath="$PROJECT_DIR$/instance/genesis_v2.db" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nexus/nexus_hub.html" beforeDir="false" afterPath="$PROJECT_DIR$/nexus/nexus_hub.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nexus/profile.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/auth.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services.py" beforeDir="false" afterPath="$PROJECT_DIR$/services.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/admin.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/profile.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/profile.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/email_template.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/emails/email_template.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/profile.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/разовые сервисные/fix_db.py" beforeDir="false" afterPath="$PROJECT_DIR$/разовые сервисные/fix_db.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/разовые сервисные/seed_genesis.py" beforeDir="false" afterPath="$PROJECT_DIR$/seed_genesis.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -75,30 +68,37 @@
   </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="openDirectoriesWithSingleClick" value="true" />
     <option name="showLibraryContents" value="true" />
     <option name="showMembers" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "DefaultHtmlFileTemplate": "HTML File",
-    "Python.admin.executor": "Run",
-    "Python.app.executor": "Run",
-    "Python.force_update.executor": "Run",
-    "Python.init_db_LK.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "Shell Script.deploy.sh.executor": "Run",
-    "git-widget-placeholder": "#3 on master__new__fetch",
-    "last_opened_file_path": "C:/Users/bonda/PycharmProjects/numerology_project/templates",
-    "settings.editor.selected.configurable": "editor.preferences.appearance"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;Python.admin.executor&quot;: &quot;Run&quot;,
+    &quot;Python.app.executor&quot;: &quot;Run&quot;,
+    &quot;Python.fix_db.executor&quot;: &quot;Run&quot;,
+    &quot;Python.force_update.executor&quot;: &quot;Run&quot;,
+    &quot;Python.init_db_LK.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.seed_genesis.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;Shell Script.deploy.sh.executor&quot;: &quot;Run&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;#3 on master__new__fetch&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/bonda/PycharmProjects/Personal_Web_Spase&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.appearance&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\bonda\PycharmProjects\numerology_project\templates" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\bonda\PycharmProjects\numerology_project\templates\emails" />
+      <recent name="C:\Users\bonda\PycharmProjects\numerology_project\frontend\src\components" />
       <recent name="C:\Users\bonda\PycharmProjects\numerology_project" />
+      <recent name="C:\Users\bonda\PycharmProjects\numerology_project\static\docs" />
+      <recent name="C:\Users\bonda\PycharmProjects\numerology_project\разовые сервисные" />
+      <recent name="C:\Users\bonda\PycharmProjects\numerology_project\templates\emails" />
     </key>
   </component>
   <component name="RunManager" selected="Python.app">
@@ -146,7 +146,51 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="force_update" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="fix_db" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="numerology_project" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="C:\Users\bonda\PycharmProjects\numerology_project\разовые сервисные\fix_db.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="numerology_project" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/mobile_app" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/mobile_app/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="seed_genesis" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="numerology_project" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -159,59 +203,22 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/разовые сервисные/force_update.py" />
+      <option name="SCRIPT_NAME" value="C:\Users\bonda\PycharmProjects\numerology_project\seed_genesis.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
       <option name="REDIRECT_INPUT" value="false" />
       <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="init_db_LK" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="numerology_project" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/разовые сервисные" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="C:\Users\bonda\PycharmProjects\numerology_project\init_db_LK.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="deploy.sh" type="ShConfigurationType" temporary="true">
-      <option name="SCRIPT_TEXT" value="" />
-      <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
-      <option name="SCRIPT_PATH" value="$PROJECT_DIR$/deploy.sh" />
-      <option name="SCRIPT_OPTIONS" value="" />
-      <option name="INDEPENDENT_SCRIPT_WORKING_DIRECTORY" value="true" />
-      <option name="SCRIPT_WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="INDEPENDENT_INTERPRETER_PATH" value="true" />
-      <option name="INTERPRETER_PATH" value="/bin/bash" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="EXECUTE_IN_TERMINAL" value="true" />
-      <option name="EXECUTE_SCRIPT_FILE" value="true" />
-      <envs />
       <method v="2" />
     </configuration>
     <recent_temporary>
       <list>
         <item itemvalue="Python.app" />
+        <item itemvalue="Python.fix_db" />
+        <item itemvalue="Python.seed_genesis" />
+        <item itemvalue="Python.main" />
         <item itemvalue="Python.admin" />
-        <item itemvalue="Python.force_update" />
-        <item itemvalue="Python.init_db_LK" />
-        <item itemvalue="Shell Script.deploy.sh" />
       </list>
     </recent_temporary>
   </component>
@@ -247,7 +254,23 @@
       <option name="project" value="LOCAL" />
       <updated>1776828428268</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Genesys .2.0-PRO 25\04\2026&#10;full working">
+      <option name="closed" value="true" />
+      <created>1777108343623</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1777108343623</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Genesys .2.0-PRO 25\04\2026&#10;full working">
+      <option name="closed" value="true" />
+      <created>1777108384893</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1777108384893</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -264,6 +287,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="&quot;fix error 500 and update lila portal&quot;" />
     <MESSAGE value="пред ФИНАЛЬНАЯ РАБОЧАЯ ВЕРСИЯ 9.13 220426" />
-    <option name="LAST_COMMIT_MESSAGE" value="пред ФИНАЛЬНАЯ РАБОЧАЯ ВЕРСИЯ 9.13 220426" />
+    <MESSAGE value="Genesys .2.0-PRO 25\04\2026&#10;full working" />
+    <option name="LAST_COMMIT_MESSAGE" value="Genesys .2.0-PRO 25\04\2026&#10;full working" />
   </component>
 </project>
