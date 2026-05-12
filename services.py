@@ -1,4 +1,39 @@
 import requests
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from models import db, ArchetypeContent
+
+NEON_URL = "postgresql://neondb_owner:npg_7uV2YfNbIeWd@ep-black-water-a2o4465m-pooler.eu-central-1.aws.neon.tech/neondb?sslmode=require"
+LOCAL_DB_URL = "sqlite:///backup_archetypes.db"
+
+
+def sync_data_to_local():
+    """Перенос всех данных (всех 18 полей) из облака в локальный бекап"""
+    remote_engine = create_engine(NEON_URL)
+    local_engine = create_engine(LOCAL_DB_URL)
+
+    # Создаем структуру таблиц в SQLite, если её нет
+    ArchetypeContent.__table__.create(bind=local_engine, checkfirst=True)
+
+    RemoteSession = sessionmaker(bind=remote_engine)
+    LocalSession = sessionmaker(bind=local_engine)
+
+    rem_session = RemoteSession()
+    loc_session = LocalSession()
+
+    try:
+        items = rem_session.query(ArchetypeContent).all()
+        for item in items:
+            # merge копирует все поля объекта по первичному ключу
+            loc_session.merge(item)
+        loc_session.commit()
+        return True
+    except Exception as e:
+        print(f"Sync error: {e}")
+        return False
+    finally:
+        rem_session.close()
+        loc_session.close()
 
 
 class CareerService:
@@ -54,3 +89,57 @@ class CareerService:
         except Exception as e:
             print(f"DEBUG: [❌] HH.ru Error: {e}")
         return []
+
+
+def sync_neon_to_local():
+    """Копирует данные из облака в локальный SQLite"""
+    """Эту функцию можно запускать вручную или по расписанию."""
+    with app.app_context():
+        print("🔄 Начинаю синхронизацию Neon -> Local...")
+        try:
+            # 1. Получаем данные из облака (пока мы подключены к Neon)
+            cloud_data = ArchetypeContent.query.all()
+
+            # 2. Здесь сложный момент: чтобы писать в ДРУГУЮ базу,
+            # проще всего временно переключить URI или использовать отдельный engine.
+            # Но для начала давай убедимся, что облако отдало данные:
+            if not cloud_data:
+                print("❌ Данные в Neon не найдены.")
+                return
+
+            print(f"📦 Считано {len(cloud_data)} архетипов из облака.")
+            # Логика записи в SQLite... (реализуем вторым шагом)
+
+        except Exception as e:
+            print(f"❌ Ошибка синхронизации: {e}")
+
+
+def sync_data_to_local():
+    """Служебная функция для копирования всех архетипов из Neon в локальный SQLite"""
+    # 1. Принудительно подключаемся к Neon
+    remote_engine = create_engine(NEON_URL)
+    local_engine = create_engine(LOCAL_DB_URL)
+
+    from sqlalchemy.orm import sessionmaker
+    RemoteSession = sessionmaker(bind=remote_engine)
+    LocalSession = sessionmaker(bind=local_engine)
+
+    rem_session = RemoteSession()
+    loc_session = LocalSession()
+
+    try:
+        print("📥 Загрузка данных из Neon...")
+        items = rem_session.query(ArchetypeContent).all()
+
+        print(f"📤 Перенос {len(items)} записей в локальную базу...")
+        for item in items:
+            # Делаем объект "чистым" для вставки в новую базу
+            loc_session.merge(item)
+
+        loc_session.commit()
+        print("✅ Синхронизация завершена успешно!")
+    except Exception as e:
+        print(f"❌ Ошибка при синхронизации: {e}")
+    finally:
+        rem_session.close()
+        loc_session.close()

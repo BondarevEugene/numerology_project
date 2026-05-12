@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Genesis | Initialization Protocol v9.0</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=JetBrains+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --gold: #b89b5e; --bg: #030303; --panel: #0a0a0a; --border: rgba(184, 155, 94, 0.2); --text: #dcdcdc; --sub-text: #666; }
+
+        /* ИСПРАВЛЕНО: убран overflow hidden, чтобы можно было крутить до футера */
+        body {
+            background: var(--bg);
+            color: var(--gold);
+            font-family: 'JetBrains Mono', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-size: 12px;
+            overflow-x: hidden;
+        }
+
+        .grid-bg { position: fixed; inset: 0; background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px); background-size: 50px 50px; z-index: -1; opacity: 0.1; }
+        .scanline { position: fixed; top: 0; left: 0; width: 100%; height: 2px; background: rgba(184, 155, 94, 0.1); box-shadow: 0 0 10px var(--gold); animation: scan 4s linear infinite; z-index: 100; }
+        @keyframes scan { 0% { top: -10%; } 100% { top: 110%; } }
+
+        .login-container { width: 400px; background: var(--panel); padding: 40px; border: 1px solid var(--border); position: relative; box-shadow: 0 0 50px rgba(0,0,0,0.5); z-index: 10; margin: 100px 0; }
+        .login-container::before { content: ''; position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px; background: linear-gradient(45deg, var(--gold), transparent, var(--gold)); z-index: -1; opacity: 0.3; }
+
+        h2 { font-family: 'Cinzel'; text-align: center; letter-spacing: 5px; margin-bottom: 30px; color: #fff; text-shadow: 0 0 10px var(--gold); }
+        .input-group { margin-bottom: 20px; position: relative; }
+        label { display: block; font-size: 8px; letter-spacing: 2px; margin-bottom: 8px; color: var(--gold); opacity: 0.8; text-transform: uppercase; }
+
+        input { width: 100%; background: rgba(255,255,255,0.03); border: 1px solid #222; padding: 12px; color: #fff; font-family: 'JetBrains Mono'; font-size: 11px; box-sizing: border-box; transition: 0.3s; border-radius: 0; }
+        input:focus { border-color: var(--gold); outline: none; background: rgba(184,155,94,0.05); box-shadow: 0 0 15px rgba(184, 155, 94, 0.1); }
+
+        #patternCanvas { background: rgba(0,0,0,0.3); border-radius: 8px; cursor: crosshair; border: 1px solid #222; touch-action: none; margin-top: 10px; }
+
+        button { width: 100%; padding: 15px; background: transparent; border: 1px solid var(--gold); color: var(--gold); font-family: 'Cinzel'; cursor: pointer; transition: 0.4s; letter-spacing: 3px; font-weight: bold; margin-top: 20px; position: relative; overflow: hidden; }
+        button:hover { background: var(--gold); color: #000; box-shadow: 0 0 20px var(--gold); }
+
+        .links { text-align: center; margin-top: 20px; font-size: 9px; }
+        .links a { color: #fff; text-decoration: none; opacity: 0.6; transition: 0.3s; }
+        .links a:hover { opacity: 1; color: var(--gold); }
+
+        .physics-bg { position: fixed; top: 50%; left: 50%; width: 600px; height: 600px; transform: translate(-50%, -50%); z-index: -1; opacity: 0.15; pointer-events: none; }
+        .orbit { position: absolute; top: 50%; left: 50%; border: 1px solid var(--gold); border-radius: 50%; transform: translate(-50%, -50%); animation: rotate linear infinite; }
+        .orbit-1 { width: 200px; height: 200px; animation-duration: 10s; }
+        .orbit-2 { width: 400px; height: 150px; animation-duration: 15s; transform: translate(-50%, -50%) rotate(60deg); }
+        .orbit-3 { width: 400px; height: 150px; animation-duration: 20s; transform: translate(-50%, -50%) rotate(-60deg); }
+
+        @keyframes rotate { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+        footer { background: #030303; border-top: 1px solid var(--border); padding: 60px 20px 20px; font-family: 'Inter', sans-serif; width: 100%; position: relative; z-index: 10; margin-top: auto; }
+        .footer-content { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; }
+        .footer-section h4 { color: var(--gold); font-family: 'Cinzel'; font-size: 14px; letter-spacing: 2px; margin-bottom: 20px; border-left: 2px solid var(--gold); padding-left: 10px; }
+        .footer-section p, .footer-section a { color: var(--sub-text); text-decoration: none; font-size: 12px; line-height: 1.8; display: block; transition: 0.3s; }
+        .footer-section a:hover { color: var(--gold); padding-left: 5px; }
+        .footer-bottom { max-width: 1200px; margin: 40px auto 0; padding-top: 20px; border-top: 1px solid rgba(184, 155, 94, 0.1); display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: #444; }
+    </style>
+</head>
+<body>
+    <div class="grid-bg"></div>
+    <div class="scanline"></div>
+
+    <div class="physics-bg">
+        <div class="orbit orbit-1"></div>
+        <div class="orbit orbit-2"></div>
+        <div class="orbit orbit-3"></div>
+    </div>
+
+    <div class="login-container">
+        <h2>IDENTIFICATION</h2>
+        <form action="{{ url_for('auth.login') }}" method="POST">
+            <div class="input-group">
+                <label>DIGITAL_ID [EMAIL]</label>
+                <input type="email" name="email" placeholder="SUBJECT@DOMAIN.COM" required>
+            </div>
+            <div class="input-group">
+                <label>ACCESS_PHRASE [PASSWORD]</label>
+                <input type="password" name="password" placeholder="•••••••••" required>
+            </div>
+            <div class="input-group" style="text-align: center;">
+                <label>GRAPHIC_KEY [BIOMETRIC]</label>
+                <canvas id="patternCanvas" width="240" height="240"></canvas>
+                <input type="hidden" name="pattern" id="pattern-input">
+                <div id="status" style="font-size: 8px; margin-top: 10px; opacity: 0.5;">STATUS: AWAITING_KEY</div>
+            </div>
+            <button type="submit">INITIALIZE_SESSION</button>
+        </form>
+        <div class="links">
+            <a href="{{ url_for('auth.register') }}">// NEW_SUBJECT? CREATE_IDENTITY</a>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>GENESIS_SYSTEM</h4>
+                <p>Advanced Numerological Intelligence</p>
+                <p>Version 8.2 PRO "Vinci"</p>
+                <p>Secure Neural Gateway</p>
+            </div>
+            <div class="footer-section">
+                <h4>PROTOCOLS</h4>
+                <a href="#">Matrix Calculation</a>
+                <a href="#">Synastry Analysis</a>
+                <a href="#">Archetype Mapping</a>
+                <a href="#">Biorhythm Sync</a>
+            </div>
+            <div class="footer-section">
+                <h4>SECURITY</h4>
+                <p>Encryption: AES-256</p>
+                <p>Status: <span style="color: #00ff41;">ACTIVE</span></p>
+            </div>
+            <div class="footer-section">
+                <h4>CONTACT</h4>
+                <p>Support: projectnumerology@gmail.com</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div>© 2026 GENESIS HR® | INTELLIGENCE SYSTEMS</div>
+            <div id="footer-time">00:00:00</div>
+            <div>STRICTLY CONFIDENTIAL</div>
+        </div>
+    </footer>
+<script>
+        const canvas = document.getElementById('patternCanvas');
+        const ctx = canvas.getContext('2d');
+        const patternInput = document.getElementById('pattern-input');
+        const statusText = document.getElementById('status');
+        let isDrawing = false;
+        let points = [];
+        let selectedPoints = [];
+
+        const initGrid = () => {
+            const step = canvas.width / 4;
+            for (let r = 1; r <= 3; r++) {
+                for (let c = 1; c <= 3; c++) {
+                    points.push({ x: c * step, y: r * step, id: points.length + 1 });
+                }
+            }
+        };
+        initGrid();
+
+        const draw = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (selectedPoints.length > 0) {
+                ctx.beginPath(); ctx.strokeStyle = '#b89b5e'; ctx.lineWidth = 3;
+                const start = points[selectedPoints[0]-1];
+                ctx.moveTo(start.x, start.y);
+                selectedPoints.forEach(id => { const p = points[id-1]; ctx.lineTo(p.x, p.y); });
+                ctx.stroke();
+            }
+            points.forEach(p => {
+                ctx.beginPath(); ctx.arc(p.x, p.y, 10, 0, Math.PI*2);
+                ctx.fillStyle = selectedPoints.includes(p.id) ? '#b89b5e' : '#1a1a1a';
+                ctx.fill();
+            });
+        };
+
+        const getPos = (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return { x: clientX - rect.left, y: clientY - rect.top };
+        };
+
+        const handleMove = (e) => {
+            if (!isDrawing) return;
+            const pos = getPos(e);
+            points.forEach(p => {
+                const dx = p.x - pos.x; const dy = p.y - pos.y;
+                const dist = Math.sqrt(dx*dx + dy*dy);
+                if (dist < 25 && !selectedPoints.includes(p.id)) {
+                    selectedPoints.push(p.id);
+                    draw();
+                }
+            });
+        };
+
+        canvas.addEventListener('mousedown', () => { isDrawing = true; selectedPoints = []; });
+        window.addEventListener('mousemove', handleMove);
+        window.addEventListener('mouseup', () => {
+            isDrawing = false;
+            patternInput.value = selectedPoints.join('');
+            statusText.innerText = "> КЛЮЧ СФОРМИРОВАН: [ " + selectedPoints.length + " NODES ]";
+        });
+
+        function updateFooterTime() {
+            const now = new Date();
+            const el = document.getElementById('footer-time');
+            if(el) el.innerText = now.toLocaleTimeString('ru-RU') + " UTC";
+        }
+        setInterval(updateFooterTime, 1000);
+        updateFooterTime();
+        draw();
+    </script>
+</body>
+</html>

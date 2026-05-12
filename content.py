@@ -179,6 +179,7 @@ ARCHETYPES = {
     }
 }
 
+
 def sync_archetypes():
     mapping = {
         "1": ["10", "19", "28"],
@@ -195,6 +196,7 @@ def sync_archetypes():
         if base in ARCHETYPES:
             for s in slaves:
                 ARCHETYPES[s] = ARCHETYPES[base].copy()
+
 
 sync_archetypes()
 

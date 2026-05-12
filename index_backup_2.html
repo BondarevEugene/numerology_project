@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Genesis Psychology | Digital Analysis v4.0</title>
+    <link href="https://fonts.googleapis.com/css2?family=Almendra&family=Inter:wght@300;400;600&family=Cinzel:wght@400;700&display=swap"
+          rel="stylesheet">
+    <script src="{{ url_for('static', filename='js/nicEdit.js') }}" type="text/javascript"></script>
+    <script src="{{ url_for('static', filename='js/chart.js') }}"></script>
+    <meta http-equiv="Content-Security-Policy"
+          content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: *;">
+    <style>
+        :root {
+            --bg: #050505; --panel: rgba(10, 10, 10, 0.95); --gold: #c5a059;
+            --gold-glow: rgba(197, 160, 89, 0.4); --border: rgba(197, 160, 89, 0.15);
+            --text: #b8b8b8; --blue: #00b4d8; --red: #e63946; --purple: #9b59b6;
+            --green: #2ecc71; --copper: #d97706;
+        }
+
+        body {
+            background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif;
+            margin: 0; display: flex; height: 100vh; overflow: hidden;
+            background-image: radial-gradient(circle at 50% 50%, #111 0%, #050505 100%);
+        }
+
+        /* Декоративный анимированный фон */
+        body::before {
+            content: "ᚠ ᚢ ᚦ ᚨ ᚱ ᚲ ᚷ ᚹ ᚺ ᚻ ᛁ ᛃ ᛈ ᛉ ᛋ ᛏ ᛒ ᛖ ᛗ ᛚ ᛜ ᛞ ᛟ";
+            position: fixed; width: 200%; height: 200%; top: -50%; left: -50%;
+            z-index: -1; color: rgba(197, 160, 89, 0.02); font-size: 4rem;
+            display: flex; flex-wrap: wrap; gap: 60px; transform: rotate(-10deg);
+            animation: backgroundScroll 180s linear infinite; pointer-events: none;
+        }
+
+        .aura-container {
+            position: fixed; width: 100vw; height: 100vh; z-index: -1;
+            overflow: hidden; filter: blur(100px); opacity: 0.3; pointer-events: none;
+        }
+        .aura-sphere { position: absolute; border-radius: 50%; animation: floatAura 20s infinite alternate ease-in-out; }
+        .aura-1 { width: 500px; height: 500px; background: var(--gold-glow); top: 10%; left: 10%; }
+        .aura-2 { width: 600px; height: 600px; background: rgba(0, 180, 216, 0.2); bottom: 10%; right: 10%; animation-delay: -5s; }
+
+        @keyframes floatAura { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(100px, 50px) scale(1.1); } }
+        @keyframes backgroundScroll { from { transform: rotate(-10deg) translateY(0); } to { transform: rotate(-10deg) translateY(1000px); } }
+
+        aside {
+            width: 340px; min-width: 340px; background: var(--panel); backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border); padding: 25px;
+            display: flex; flex-direction: column; z-index: 1000; box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+            overflow-y: auto;
+        }
+
+        .logo-container { width: 100%; height: 120px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; position: relative; cursor: pointer; }
+        .brain-core { width: 35px; height: 35px; background: var(--gold); border-radius: 50%; position: absolute; box-shadow: 0 0 20px var(--gold-glow); z-index: 10; animation: pulse 2s infinite alternate; }
+        .brain-core::after { content: "✦"; position: absolute; top:50%; left:50%; transform:translate(-50%,-50%); color: #000; font-weight: bold; }
+
+        .atom-orbit { position: absolute; border: 1px solid rgba(197, 160, 89, 0.3); border-radius: 50%; animation: orbitRotate linear infinite; }
+        .orbit-1 { width: 90px; height: 40px; transform: rotateX(70deg) rotateY(10deg); animation-duration: 4s; }
+        .orbit-2 { width: 90px; height: 40px; transform: rotateX(70deg) rotateY(130deg); animation-duration: 3s; }
+        .orbit-3 { width: 90px; height: 40px; transform: rotateX(70deg) rotateY(-110deg); animation-duration: 5s; }
+        .electron { position: absolute; width: 6px; height: 6px; background: #fff; border-radius: 50%; box-shadow: 0 0 10px #fff; top: 50%; left: -3px; }
+
+        @keyframes orbitRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes pulse { from { transform: scale(1); opacity: 0.8; } to { transform: scale(1.1); opacity: 1; } }
+
+        .label-sm { font-size: 0.65rem; color: #555; letter-spacing: 2px; text-transform: uppercase; margin: 15px 0 5px; }
+        input, select, button { background: #000; border: 1px solid var(--border); color: #fff; padding: 12px; font-size: 0.8rem; border-radius: 4px; outline: none; width: 100%; box-sizing: border-box; margin-bottom: 8px; }
+        button { background: linear-gradient(135deg, #c5a059 0%, #8a6d35 100%); color: #000; font-weight: 700; cursor: pointer; text-transform: uppercase; border: none; margin-top: 10px; }
+
+        main { flex-grow: 1; padding: 50px 80px; overflow-y: auto; scroll-behavior: smooth; position: relative; z-index: 10; }
+
+        .vinci-matrix-wrapper { width: 100%; max-width: 600px; height: 500px; margin: 30px auto; position: relative; border: 1px solid var(--border); background: rgba(10, 10, 10, 0.5); backdrop-filter: blur(5px); border-radius: 8px; }
+        .human-figure { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 1; pointer-events: none; }
+        .golden-vinci { height: 90%; width: auto; object-fit: contain; filter: invert(1) sepia(1) saturate(5) hue-rotate(15deg) brightness(1.1) contrast(1.3); opacity: 0.25; }
+        .m-dot { position: absolute; transform: translate(-50%, -50%); background: #000; color: var(--gold); border: 2px solid var(--gold); width: 44px; height: 44px; border-radius: 50%; font-size: 1.4rem; font-weight: 900; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px var(--gold-glow); z-index: 100; transition: 0.3s; }
+        .m-dot:hover { transform: translate(-50%, -50%) scale(1.1); box-shadow: 0 0 30px var(--gold); }
+
+        .matrix-legend { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin: 0 auto 40px; max-width: 1000px; }
+        .legend-item { font-size: 0.75rem; color: #888; border: 1px solid var(--border); padding: 15px; text-align: left; border-radius: 8px; background: rgba(197, 160, 89, 0.02); }
+        .legend-item b { display: block; color: var(--gold); font-size: 1.2rem; margin-bottom: 4px; }
+        .legend-title { color: #fff; font-weight: 600; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 1px; display: block; margin-bottom: 5px; }
+
+        .energy-chart-container { height: 300px; margin: 20px 0; background: rgba(0,0,0,0.3); border-radius: 8px; padding: 15px; border: 1px solid var(--border); }
+        .distortion-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px; }
+        .distortion-card { padding: 20px; border-radius: 12px; border: 1px solid var(--border); }
+        .academy-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; margin-top: 20px; }
+        .academy-item { background: rgba(197, 160, 89, 0.05); border: 1px solid var(--border); padding: 20px; border-radius: 10px; transition: 0.3s; cursor: pointer; text-decoration: none; display: block; }
+        .academy-item:hover { border-color: var(--gold); transform: translateY(-3px); background: rgba(197,160,89,0.1); }
+
+        .box {
+            background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid var(--border);
+            padding: 30px; margin-bottom: 30px; border-radius: 10px; font-size: 0.95rem; line-height: 1.8;
+            position: relative; overflow: hidden;
+        }
+        .box::after {
+            content: ""; position: absolute; top: 0; left: -100%; width: 100%; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            animation: scanLine 6s linear infinite;
+        }
+        @keyframes scanLine { 0% { left: -100%; } 100% { left: 100%; } }
+
+        .box h3 { font-family: 'Almendra'; color: var(--gold); margin: 0 0 15px; font-size: 1.4rem; letter-spacing: 2px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+        .box-power { border-top: 4px solid var(--blue); }
+        .box-shadow { border-top: 4px solid var(--red); }
+        .box-growth { border-top: 4px solid var(--gold); }
+
+        .pythagoras-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; max-width: 450px; margin: 20px auto; }
+        .py-node { background: rgba(0,0,0,0.6); border: 1px solid var(--border); padding: 20px; text-align: center; border-radius: 8px; transition: 0.4s; }
+        .py-node.active { border-color: var(--gold); background: rgba(197, 160, 89, 0.05); box-shadow: inset 0 0 15px var(--gold-glow); }
+        .py-node span { display: block; font-size: 0.6rem; text-transform: uppercase; color: #666; margin-bottom: 5px; }
+        .py-node b { font-size: 1.5rem; color: var(--gold); letter-spacing: 2px; }
+
+        .skills-radar-box { max-width: 500px; margin: 40px auto; background: rgba(10,10,10,0.8); border: 1px solid var(--border); padding: 20px; border-radius: 15px; }
+        .job-card { background: linear-gradient(145deg, rgba(20,20,20,0.8) 0%, rgba(10,10,10,0.9) 100%); border: 1px solid var(--border); border-radius: 12px; padding: 20px; position: relative; transition: 0.3s; display: flex; flex-direction: column; justify-content: space-between; text-decoration: none; border-left: 4px solid var(--gold); }
+        .job-card:hover { border-color: var(--gold); transform: translateY(-3px); }
+
+        .compatibility-input-box { background: rgba(197, 160, 89, 0.05); border: 1px solid var(--border); padding: 15px; border-radius: 8px; margin-top: 20px; }
+        .animate-reveal { animation: revealEffect 0.8s ease-out forwards; }
+        @keyframes revealEffect { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Кнопки действий */
+        .sacred-actions-bar { display: flex; gap: 20px; margin: 40px 0; justify-content: center; }
+        .genesis-btn {
+            font-family: 'Cinzel', serif; font-weight: 700; font-size: 0.85rem; letter-spacing: 2px;
+            padding: 15px 35px; cursor: pointer; transition: all 0.4s; position: relative;
+            display: flex; align-items: center; justify-content: center; gap: 10px; border-radius: 0;
+            text-transform: uppercase; border: none; min-width: 250px;
+        }
+        .btn-filled { background: linear-gradient(135deg, #442b1d 0%, #d97706 100%); color: #fff; }
+        .btn-gold { background: var(--gold); color: #000; }
+        .genesis-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+
+        /* PRINT STYLES --- ЕДИНЫЙ БЛОК ПЕЧАТИ */
+@media print {
+    /* Скрываем абсолютно всё, что есть на экране */
+    body * {
+        display: none !important;
+    }
+
+    /* Показываем только наш специальный контейнер для печати */
+    #print-report, #print-report * {
+        display: block !important;
+        background: white !important;
+        color: black !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        position: static !important;
+        width: 100% !important;
+    }
+
+    #print-report {
+        padding: 20mm !important;
+    }
+
+    .print-box {
+        border-bottom: 1px solid #ccc !important;
+        margin-bottom: 20px !important;
+        padding-bottom: 10px !important;
+        page-break-inside: avoid !important;
+    }
+
+    .print-header {
+        font-size: 24pt !important;
+        text-align: center !important;
+        margin-bottom: 30px !important;
+        text-transform: uppercase !important;
+    }
+
+    .print-grid {
+        display: table !important; /* Таблица надежнее для принтера */
+        width: 100% !important;
+        border-collapse: collapse !important;
+        margin: 20px 0 !important;
+    }
+
+    .print-grid td {
+        border: 1px solid black !important;
+        padding: 10px !important;
+        text-align: center !important;
+        width: 33.3% !important;
+    }
+}
+
+    </style>
+</head>
+<body>
+
+<div class="aura-container">
+    <div class="aura-sphere aura-1"></div>
+    <div class="aura-sphere aura-2"></div>
+</div>
+
+<aside>
+    <div id="lila-trigger" class="logo-container" onclick="triggerLila()">
+        <div class="brain-core"></div>
+        <div class="atom-orbit orbit-1">
+            <div class="electron"></div>
+        </div>
+        <div class="atom-orbit orbit-2">
+            <div class="electron"></div>
+        </div>
+        <div class="atom-orbit orbit-3">
+            <div class="electron"></div>
+        </div>
+    </div>
+
+    <form method="POST" id="main-form">
+        <div class="label-sm">Subject Identification</div>
+        <input type="text" name="user_name" placeholder="Имя" value="{{ request.form.get('user_name', '') }}" required>
+        <input type="email" name="email" id="user_email" placeholder="Email" value="{{ request.form.get('email', '') }}"
+               required>
+
+        <div class="label-sm">Birth Date</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1.5fr; gap: 8px;">
+            <input type="text" name="day" placeholder="ДД" value="{{ request.form.get('day', '') }}" required>
+            <input type="text" name="month" placeholder="ММ" value="{{ request.form.get('month', '') }}" required>
+            <input type="text" name="year" placeholder="ГГГГ" value="{{ request.form.get('year', '') }}" required>
+        </div>
+
+        <div class="compatibility-input-box">
+            <div class="label-sm" style="color: var(--gold); margin-top: 0;"><span style="color: #ff4d4d;">❤</span>
+                Partner Data (Optional)
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1.5fr; gap: 8px;">
+                <input type="text" name="partner_day" placeholder="ДД"
+                       value="{{ request.form.get('partner_day', '') }}">
+                <input type="text" name="partner_month" placeholder="ММ"
+                       value="{{ request.form.get('partner_month', '') }}">
+                <input type="text" name="partner_year" placeholder="ГГГГ"
+                       value="{{ request.form.get('partner_year', '') }}">
+            </div>
+        </div>
+        <button type="submit">Открыть Хроники</button>
+    </form>
+</aside>
+
+<main id="capture-area">
+    {% if result %}
+    <div class="animate-reveal">
+        <div style="text-align: center; margin-bottom: 40px;">
+            <h1 style="font-family: 'Almendra'; font-size: 4.2rem; color: #fff; margin: 0;">{{ result.title }}</h1>
+            <div style="display: flex; justify-content: center; gap: 20px; margin-top: 10px;">
+                <div style="color: var(--gold); letter-spacing: 3px; text-transform: uppercase; font-size: 0.8rem;">🪐
+                    Управитель: {{ result.planet }}
+                </div>
+                <div style="color: var(--blue); letter-spacing: 3px; text-transform: uppercase; font-size: 0.8rem;">🔥
+                    Стихия: {{ result.element }}
+                </div>
+                <div style="color: var(--purple); letter-spacing: 3px; text-transform: uppercase; font-size: 0.8rem;">🃏
+                    Аркан: {{ result.tarot_arcane }}
+                </div>
+            </div>
+        </div>
+
+        {% if synastry_result %}
+        <div class="box"
+             style="border: 2px solid var(--gold); background: rgba(197, 160, 89, 0.05); text-align: center; margin-bottom: 50px;">
+            <h3 style="font-family: 'Cinzel'; letter-spacing: 5px; border: none;">СИНАСТРИЯ СОЮЗА</h3>
+            <div style="font-size: 5rem; color: var(--gold); font-weight: 900; line-height: 1;">{{
+                synastry_result.union_number }}
+            </div>
+            <p style="font-size: 1.1rem; color: #eee; font-style: italic;">"{{ synastry_result.description }}"</p>
+        </div>
+        {% endif %}
+
+        <div class="box">
+            <h3>📈 График Жизненной Энергии (Циклы 0-72 года)</h3>
+            <div class="energy-chart-container">
+                <canvas id="energyChart"></canvas>
+            </div>
+        </div>
+
+        <div class="vinci-matrix-wrapper">
+            <div class="human-figure">
+                <img src="/static/images/vitruvian.png" class="golden-vinci">
+            </div>
+            <div class="m-dot" style="top: 8%; left: 50%;">{{ matrix_desc['1'].visual if '1' in matrix_desc else '-'
+                }}
+            </div>
+            <div class="m-dot" style="top: 32%; left: 22%;">{{ matrix_desc['2'].visual if '2' in matrix_desc else '-'
+                }}
+            </div>
+            <div class="m-dot" style="top: 32%; left: 78%;">{{ matrix_desc['3'].visual if '3' in matrix_desc else '-'
+                }}
+            </div>
+            <div class="m-dot" style="top: 50%; left: 50%;">{{ matrix_desc['4'].visual if '4' in matrix_desc else '-'
+                }}
+            </div>
+            <div class="m-dot" style="top: 72%; left: 26%;">{{ matrix_desc['5'].visual if '5' in matrix_desc else '-'
+                }}
+            </div>
+            <div class="m-dot" style="top: 72%; left: 74%;">{{ matrix_desc['6'].visual if '6' in matrix_desc else '-'
+                }}
+            </div>
+            <div class="m-dot" style="top: 92%; left: 50%;">{{ matrix_desc['7'].visual if '7' in matrix_desc else '-'
+                }}
+            </div>
+        </div>
+
+        <div class="matrix-legend">
+            {% for n_id, data in matrix_desc.items() %}
+            <div class="legend-item">
+                <span class="legend-title">{{ n_id }}. {{ data.name }}</span>
+                <b>{{ data.visual }}</b> {{ data.text[:100] }}...
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="box box-shadow">
+            <h3>🧠 Когнитивные искажения по Числу Сознания</h3>
+            <div class="distortion-grid">
+                <div class="distortion-card" style="background: rgba(230, 57, 70, 0.05);">
+                    <strong style="color: var(--red);">Основной баг (Искажение):</strong>
+                    <p>{{ result.shadow_side|safe }}</p>
+                </div>
+                <div class="distortion-card" style="background: rgba(46, 204, 113, 0.05);">
+                    <strong style="color: var(--green);">Патч (Алгоритм выхода):</strong>
+                    <p>{{ result.exit_minus|safe }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="skills-radar-box">
+            <h3 style="text-align: center; border: none;">Soft Skills Radar</h3>
+            <canvas id="skillsRadarChart"></canvas>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+            <div class="box box-power"><h3>⚡ Вектор Силы</h3>{{ result.action_power|safe }}</div>
+            <div class="box box-growth"><h3>🎯 Точка Роста</h3>{{ result.growth_point|safe }}</div>
+            <div class="box" style="border-top: 4px solid var(--purple);"><h3>🧠 Сила Разума</h3>{{
+                result.mind_power|safe }}
+            </div>
+        </div>
+
+        <div class="box">
+            <h3 style="text-align: center;">📊 Цифровая Карта (Психоматрица)</h3>
+            <div class="pythagoras-grid">
+                {% for i, label in
+                [('1','Характер'),('4','Здоровье'),('7','Удача'),('2','Энергия'),('5','Логика'),('8','Долг'),('3','Интерес'),('6','Труд'),('9','Память')]
+                %}
+                <div class="py-node" data-num="{{i}}"><span>{{label}}</span><b id="py-{{i}}">-</b></div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="sacred-actions-bar">
+            <button type="button" class="genesis-btn btn-filled" onclick="window.print()">
+                <span class="btn-icon">📥</span> ПЕЧАТЬ / СОХРАНИТЬ PDF
+            </button>
+            <button type="button" id="send-btn" class="genesis-btn btn-gold" onclick="prepareAndSend()">
+                <span class="btn-icon">✉️</span> ОТПРАВИТЬ НА EMAIL
+            </button>
+        </div>
+
+        <div class="box">
+            <h3>🏛 Академия Genesis: Образовательная траектория</h3>
+            <div class="academy-grid">
+                <a href="#" class="academy-item">
+                    <b style="color: var(--gold);">💎 Алхимия Личности</b>
+                    <p style="font-size: 0.75rem; color: #777; margin-top: 5px;">Глубинная проработка теневых аспектов
+                        вашего архетипа.</p>
+                </a>
+                <a href="#" class="academy-item">
+                    <b style="color: var(--gold);">📈 Цифровой Психоанализ</b>
+                    <p style="font-size: 0.75rem; color: #777; margin-top: 5px;">Профессиональное обучение методологии
+                        Genesis.</p>
+                </a>
+            </div>
+        </div>
+
+        <div class="box">
+            <h3 style="font-family: 'Cinzel';">💼 Сакральный Путь Реализации</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                {% if jobs %}
+                {% for job in jobs %}
+                <a href="{{ job.alternate_url }}" target="_blank" class="job-card">
+                    <div>
+                        <div style="color: var(--gold); font-weight: bold; margin-bottom: 5px;">{{ job.name }}</div>
+                        <div style="color: #666; font-size: 0.8rem;">{{ job.employer.name }}</div>
+                    </div>
+                    <div style="margin-top: 15px; font-size: 0.7rem; color: var(--gold); text-align: right; text-transform: uppercase;">
+                        Открыть вакансию →
+                    </div>
+                </a>
+                {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="box"><h3>⚖️ Кармические задачи</h3>{{ result.karmic_tasks|safe }}</div>
+        <div class="box" style="border-top: 4px solid var(--green);"><h3>📜 Итог жизненного пути</h3>{{
+            result.life_result|safe }}
+        </div>
+    </div>
+    {% endif %}
+</main>
+
+<div id="admin-panel"
+     style="display: none; position: fixed; inset: 0; background: rgba(5,5,5,0.98); z-index: 99999; padding: 40px; overflow-y: auto;">
+    <button onclick="document.getElementById('admin-panel').style.display='none'"
+            style="float: right; width: auto; padding: 10px 20px;">← НАЗАД
+    </button>
+    <h2 style="color:var(--gold);">Genesis Master CMS</h2>
+    <select id="group-select" onchange="loadGroupData()" style="padding:15px; margin-bottom:20px;">
+        <option value="">Выберите архетип...</option>
+        {% for i in range(1,10) %}
+        <option value="{{i}}">Архетип {{i}}</option>
+        {% endfor %}
+    </select>
+    <div id="editor-fields" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;"></div>
+    <button onclick="saveAdminData()" style="margin-top: 30px;">СИНХРОНИЗИРОВАТЬ ДАННЫЕ</button>
+</div>
+
+<div id="admin-trigger" onclick="checkLeelaSecret()"
+     style="position:fixed; bottom:20px; right:20px; opacity:0.3; cursor:pointer; color:var(--gold); font-size: 1.5rem; z-index: 100001;">
+    ✺
+</div>
+
+<div class="action-box">
+    <h3>Твой Архетип: {{ result.number }}</h3>
+    <p>Готов проработать это состояние в игре?</p>
+    <a href="{{ url_for('leela.play', arch=result.number) }}" class="roll-btn">
+        Войти в Лилу с Архетипом {{ result.number }}
+    </a>
+</div>
+
+<script>
+    let clickCount = 0;
+    let lilaClicks = 0; // Счетчик для Лилы
+
+function triggerLila() {
+    lilaClicks++;
+
+    // Если нажали 7 раз
+    if (lilaClicks === 7) {
+        lilaClicks = 0;
+        alert("Путь Лилы открыт...");
+        window.location.href = "/lila"; // Переход на страницу игры
+        return;
+    }
+
+    // Если прошло больше 2 секунд между кликами - сбрасываем (защита от случайных нажатий)
+    clearTimeout(window.lilaTimer);
+    window.lilaTimer = setTimeout(() => { lilaClicks = 0; }, 2000);
+}
+
+// Старую функцию resetPage() можно оставить ниже или удалить,
+// если вы хотите, чтобы логотип вел только в Лилу.
+function resetPage() { window.location.href = '/'; }
+    const FIELDS_CONFIG = {
+        'title':'Заголовок','planet':'Планета','element':'Стихия','tarot_arcane':'Сила аркана','search_queries':'Ключи вакансий',
+        'action_power':'Вектор Силы','shadow_side':'Теневая Ловушка','exit_minus':'Выход из минуса','growth_point':'Точка Роста',
+        'mind_power':'Сила разума','partner_type':'Тип партнера','financial_tip':'Финансы','health_tips':'Здоровье',
+        'karmic_tasks':'Кармические задачи','development_cycle':'Цикл развития','life_result':'Итог жизни'
+    };
+
+    function resetPage() { window.location.href = '/'; }
+    function checkLeelaSecret() { clickCount++; if (clickCount >= 5) { const code = prompt("Код доступа:"); if (code === "0602" || code === "admin") document.getElementById('admin-panel').style.display = 'block'; clickCount = 0; } }
+
+    function calculatePythagoras() {
+        const d = "{{ request.form.get('day','') }}", m = "{{ request.form.get('month','') }}", y = "{{ request.form.get('year','') }}";
+        if (!d || !m || !y) return;
+        let s = d.padStart(2,'0') + m.padStart(2,'0') + y;
+        let n1 = s.split('').reduce((a,b)=>a + (parseInt(b)||0), 0);
+        let n2 = n1.toString().split('').reduce((a,b)=>a + (parseInt(b)||0), 0);
+        let firstDigit = parseInt(d[0] !== '0' ? d[0] : d[1]);
+        let n3 = Math.abs(n1 - (firstDigit * 2));
+        let n4 = n3.toString().split('').reduce((a,b)=>a + (parseInt(b)||0), 0);
+        let allStr = s + n1 + n2 + n3 + n4;
+        document.querySelectorAll('.py-node').forEach(node => {
+            const num = node.dataset.num;
+            const count = allStr.split('').filter(c => c === num).length;
+            const bEl = document.getElementById(`py-${num}`);
+            if(bEl) { bEl.innerText = count > 0 ? num.repeat(count) : '-'; if(count > 0) node.classList.add('active'); }
+        });
+    }
+
+    function initCharts() {
+        {% if result %}
+        // График Энергии
+        const eCtx = document.getElementById('energyChart');
+        if(eCtx) {
+            new Chart(eCtx, {
+                type: 'line',
+                data: {
+                    labels: ['0', '12', '24', '36', '48', '60', '72'],
+                    datasets: [{
+                        data: {{ energy_data|tojson|safe if energy_data else '[]' }},
+                        borderColor: '#c5a059',
+                        backgroundColor: 'rgba(197, 160, 89, 0.2)',
+                        fill: true, tension: 0.4
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: {legend: {display:false}} }
+            });
+        }
+
+        // Радар способностей
+        const rCtx = document.getElementById('skillsRadarChart');
+        if(rCtx) {
+            new Chart(rCtx, {
+                type: 'radar',
+                data: {
+                    labels: {{ user_skills.labels|tojson|safe if user_skills else '[]' }},
+                    datasets: [{
+                        data: {{ user_skills.data|tojson|safe if user_skills else '[]' }},
+                        backgroundColor: 'rgba(197, 160, 89, 0.3)', borderColor: '#c5a059'
+                    }]
+                },
+                options: { scales: { r: { beginAtZero: true, max: 100, ticks: {display: false} } }, plugins: {legend: {display:false}} }
+            });
+        }
+        {% endif %}
+    }
+
+    async function loadGroupData() {
+        const num = document.getElementById('group-select').value;
+        if(!num) return;
+        const res = await fetch(`/admin/get/${num}`).then(r => r.json());
+        const container = document.getElementById('editor-fields'); container.innerHTML = '';
+        const data = res.data || {};
+        Object.entries(FIELDS_CONFIG).forEach(([key, label]) => {
+            const wrap = document.createElement('div');
+            wrap.innerHTML = `<label style="color:var(--gold); font-size:0.7rem;">${label}</label><textarea id="edit-${key}" style="width:100%; height:120px; background:#111; color:#fff;">${data[key]||''}</textarea>`;
+            container.appendChild(wrap);
+            if(!['title','planet','element','tarot_arcane','search_queries'].includes(key)) new nicEditor({fullPanel: true}).panelInstance(`edit-${key}`);
+        });
+    }
+
+    async function saveAdminData() {
+        const num = document.getElementById('group-select').value;
+        const data = { number: num };
+        Object.keys(FIELDS_CONFIG).forEach(key => {
+            const ed = nicEditors.findEditor(`edit-${key}`);
+            data[key] = ed ? ed.getContent() : document.getElementById(`edit-${key}`).value;
+        });
+        await fetch('/admin/update', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) });
+        alert('Данные сохранены!');
+    }
+
+    function prepareAndSend() {
+        const btn = document.getElementById('send-btn');
+        const email = document.getElementById('user_email').value;
+
+        // Собираем данные из основной формы
+        const name = document.getElementsByName('user_name')[0].value;
+        const day = document.getElementsByName('day')[0].value;
+        const month = document.getElementsByName('month')[0].value;
+        const year = document.getElementsByName('year')[0].value;
+
+        if (!email || !day) {
+            alert("Заполните Email и дату рождения!");
+            return;
+        }
+
+        btn.innerText = "ОТПРАВКА...";
+        btn.disabled = true;
+
+        const formData = new FormData();
+        formData.append('email', email);
+        formData.append('user_name', name);
+        formData.append('day', day);
+        formData.append('month', month);
+        formData.append('year', year);
+
+        fetch('/send_email', { method: 'POST', body: formData })
+        .then(r => r.json())
+        .then(data => {
+            if(data.status === 'success') alert("Отчет успешно отправлен!");
+            else alert("Ошибка сервера: " + data.message);
+        })
+        .catch(err => alert("Ошибка сети: " + err))
+        .finally(() => {
+            btn.innerText = "✉️ ОТПРАВИТЬ НА EMAIL";
+            btn.disabled = false;
+        });
+    }
+
+    window.onload = () => {
+        {% if result %}
+        calculatePythagoras();
+        initCharts();
+        {% endif %}
+    };
+</script>
+<div id="print-report" style="display: none;">
+    <h1 style="text-align: center; font-family: 'Cinzel', serif;">ГЕНЕЗИС: ПСИХОЛОГИЧЕСКИЙ ОТЧЕТ</h1>
+    <p style="text-align: center;"><strong>Клиент:</strong> {{ name }} | <strong>Дата рождения:</strong> {{ day }}.{{ month }}.{{ year }}</p>
+    <hr>
+
+    {% if cells %}
+        {% set names = ['ЭГО И ХАРИЗМА', 'БИОЭНЕРГИЯ', 'ЛОГИКА И ЗНАНИЯ', 'ДИСЦИПЛИНА И ТЕЛО', 'ИНТУИЦИЯ И СЕРДЦЕ', 'МАСТЕРСТВО И ТРУД', 'УДАЧА И ОПЫТ', 'ВЛАСТЬ И ДОЛГ', 'ПАМЯТЬ И ГИБКОСТЬ'] %}
+        {% for i in range(1, 10) %}
+        <div class="print-box" style="margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; color: #000;">
+            <h3 style="color: #000;">{{ i }}. {{ names[i-1] }} ({{ cells[i|string] if cells[i|string] else '—' }})</h3>
+            <p>{{ matrix_desc[i|string] if matrix_desc[i|string] else '' }}</p>
+        </div>
+        {% endfor %}
+
+        <div class="print-box" style="margin-top: 30px;">
+            <h3 style="text-align: center; color: #000;">ЦИФРОВАЯ МАТРИЦА</h3>
+            <table style="width: 100%; border-collapse: collapse; text-align: center; border: 2px solid #000; color: #000;">
+                <tr style="height: 80px;">
+                    <td style="border: 1px solid #000;">{{ cells['1'] }}<br><small>Характер</small></td>
+                    <td style="border: 1px solid #000;">{{ cells['4'] }}<br><small>Здоровье</small></td>
+                    <td style="border: 1px solid #000;">{{ cells['7'] }}<br><small>Удача</small></td>
+                </tr>
+                <tr style="height: 80px;">
+                    <td style="border: 1px solid #000;">{{ cells['2'] }}<br><small>Энергия</small></td>
+                    <td style="border: 1px solid #000;">{{ cells['5'] }}<br><small>Логика</small></td>
+                    <td style="border: 1px solid #000;">{{ cells['8'] }}<br><small>Долг</small></td>
+                </tr>
+                <tr style="height: 80px;">
+                    <td style="border: 1px solid #000;">{{ cells['3'] }}<br><small>Интерес</small></td>
+                    <td style="border: 1px solid #000;">{{ cells['6'] }}<br><small>Труд</small></td>
+                    <td style="border: 1px solid #000;">{{ cells['9'] }}<br><small>Память</small></td>
+                </tr>
+            </table>
+        </div>
+    {% endif %}
+
+    {% if result and result.destiny_text %}
+    <div class="print-box" style="margin-top: 30px; background: #f9f9f9; padding: 15px; border: 1px dashed #000; color: #000;">
+        <h3>ИТОГ ЖИЗНЕННОГО ПУТИ (Число {{ result.destiny_number }})</h3>
+        <p>{{ result.destiny_text }}</p>
+    </div>
+    {% endif %}
+</div>
+
+    <div class="print-box" style="margin-top: 30px; border: 1px solid #000; padding: 15px; color: #000;">
+        <h3>ИТОГ ЖИЗНЕННОГО ПУТИ (Число {{ result.destiny_number }})</h3>
+        <p>{{ result.destiny_text }}</p>
+    </div>
+    {% endif %}
+</div>
+</body>
+</html>

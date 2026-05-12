@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        .email-body { background-color: #030303; color: #dcdcdc; font-family: 'Courier New', Courier, monospace; padding: 40px; }
+        .container { max-width: 600px; margin: 0 auto; border: 1px solid #b89b5e; padding: 30px; background-color: #0a0a0a; }
+        .header { text-align: center; border-bottom: 1px solid rgba(184, 155, 94, 0.2); padding-bottom: 20px; }
+        .gold-text { color: #b89b5e; }
+        .btn { display: inline-block; padding: 15px 25px; border: 1px solid #b89b5e; color: #b89b5e; text-decoration: none; margin-top: 20px; text-transform: uppercase; letter-spacing: 2px; }
+        .footer { font-size: 10px; opacity: 0.5; margin-top: 30px; text-align: center; }
+    </style>
+</head>
+<body class="email-body">
+    <div class="container">
+        <div class="header">
+            <h1 style="color: #ffffff; letter-spacing: 5px;">GENESIS</h1>
+            <p class="gold-text">INITIALIZATION SUCCESSFUL</p>
+        </div>
+        <div style="padding: 20px 0;">
+            <p>Приветствуем, <span class="gold-text">{{ user_name }}</span>.</p>
+            <p>Ваша цифровая личность успешно интегрирована в систему Genesis. Теперь вам доступны протоколы нумерологического анализа и предсказательные матрицы.</p>
+            <p>Для завершения активации канала связи подтвердите свой Email:</p>
+            <center>
+                <a href="{{ confirm_link }}" class="btn">Подтвердить доступ</a>
+            </center>
+        </div>
+        <div class="footer">
+            SYSTEM_ID: {{ user_id }} | NO_REPLY_PROTOCOL_V.9.0
+        </div>
+    </div>
+</body>
+</html>

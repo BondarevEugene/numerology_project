@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>GENESIS | NEXUS MECHANICA</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.21.1/cytoscape.min.js"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --gold: #b89b5e;
+            --gold-dim: rgba(184, 155, 94, 0.1);
+            --bg: #050505;
+            --panel: rgba(10, 10, 10, 0.95);
+            --border: rgba(184, 155, 94, 0.2);
+            --text: #dcdcdc;
+            --sub-text: #666;
+        }
+
+        body, html {
+            margin: 0; padding: 0; width: 100%; min-height: 100%;
+            background-color: var(--bg); color: var(--text);
+            font-family: 'Inter', sans-serif; overflow-x: hidden;
+        }
+
+        /* Фоновая сетка как на главной */
+        .grid-bg {
+            position: fixed; inset: 0;
+            background-image: linear-gradient(var(--border) 1px, transparent 1px),
+                              linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size: 50px 50px; z-index: -1; opacity: 0.15;
+        }
+
+        header {
+            padding: 20px 40px;
+            border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+            background: var(--panel); backdrop-filter: blur(10px);
+        }
+
+        .logo { font-family: 'Cinzel'; font-size: 20px; letter-spacing: 8px; color: var(--gold); }
+
+        #cy { width: 100%; height: 60vh; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--border); }
+
+        .nexus-controls {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 2px; background: var(--border); border-bottom: 1px solid var(--border);
+        }
+
+        .control-panel { background: var(--panel); padding: 30px; }
+
+        h3 { font-family: 'Cinzel'; font-size: 14px; letter-spacing: 3px; color: var(--gold); margin-bottom: 20px; }
+
+        .btn-vinci {
+            background: transparent; border: 1px solid var(--gold);
+            color: var(--gold); padding: 10px 20px; cursor: pointer;
+            font-family: 'JetBrains Mono'; transition: 0.3s;
+        }
+        .btn-vinci:hover { background: var(--gold); color: #000; box-shadow: 0 0 15px var(--gold); }
+
+        /* Стили футера с главной */
+        footer {
+            background: #030303; border-top: 1px solid var(--border);
+            padding: 60px 20px 20px; margin-top: 0;
+        }
+        .footer-content {
+            max-width: 1200px; margin: 0 auto;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px;
+        }
+        .footer-section h4 {
+            color: var(--gold); font-family: 'Cinzel'; font-size: 14px;
+            letter-spacing: 2px; margin-bottom: 20px; border-left: 2px solid var(--gold); padding-left: 10px;
+        }
+        .footer-section p, .footer-section a {
+            color: var(--sub-text); text-decoration: none; font-size: 12px; line-height: 1.8; display: block;
+        }
+        .footer-bottom {
+            max-width: 1200px; margin: 40px auto 0; padding-top: 20px;
+            border-top: 1px solid rgba(184, 155, 94, 0.1);
+            display: flex; justify-content: space-between; font-size: 10px; color: #444;
+        }
+        /* Дополнительные стили для интеграции Engine-панели */
+    .engine-panel {
+        border-right: 1px solid var(--border);
+        padding-right: 30px;
+    }
+    .engine-status-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 15px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 9px;
+        text-transform: uppercase;
+    }
+    .status-item { color: var(--sub-text); }
+    .status-value { color: var(--gold); opacity: 0.8; }
+
+    /* Убеждаемся, что футер растягивается правильно */
+    body { display: flex; flex-direction: column; min-height: 100vh; }
+    footer { margin-top: auto; }
+    </style>
+</head>
+<body>
+    <div class="grid-bg"></div>
+
+    <header>
+        <div class="logo">NEXUS_MECHANICA</div>
+        <div style="font-size: 9px; opacity: 0.5;">CORE_LOGIC: ACTIVE</div>
+    </header>
+
+    <div id="cy"></div>
+
+    <div class="nexus-controls">
+        <div class="control-panel">
+            <h3>NODE_INSPECTOR</h3>
+            <div id="node-name" style="font-size: 18px; margin-bottom: 10px;">AWAITING_SELECTION...</div>
+            <div id="inspect-out" style="font-family: 'JetBrains Mono'; font-size: 11px; color: var(--sub-text);">
+                Select a neural node to inspect internal parameters.
+            </div>
+        </div>
+        <div class="control-panel">
+            <h3>COMMAND_INTERFACE</h3>
+            <div id="node-actions">
+                <p style="opacity: 0.3; font-size: 10px;">NO_ACTIVE_COMMANDS</p>
+            </div>
+        </div>
+    </div>
+
+<footer>
+    <div class="footer-content">
+        <div class="footer-section engine-panel">
+            <h4>SYSTEM_CORE</h4>
+            <div style="font-family: 'JetBrains Mono'; font-size: 11px; letter-spacing: 1px;">
+                <span style="color: #fff;">GENESIS ENGINE</span>
+                <span style="color: var(--gold);">v3.0_RELEASE</span>
+            </div>
+            <p style="font-size: 10px; margin: 5px 0;">LOCATION: [ NEXUS_ORCHESTRATOR ]</p>
+
+            <div class="engine-status-grid">
+                <div class="status-item">Uptime:</div>
+                <div class="status-value">99.998%</div>
+                <div class="status-item">Logic:</div>
+                <div class="status-value">Neural_Flow</div>
+                <div class="status-item">Auth:</div>
+                <div class="status-value">AES-256_GCM</div>
+                <div class="status-item">Load:</div>
+                <div class="status-value">Optimal</div>
+            </div>
+        </div>
+
+        <div class="footer-section">
+            <h4>PROTOCOLS</h4>
+            <a href="#">Matrix Calculation</a>
+            <a href="#">Synastry Analysis</a>
+            <a href="#">Archetype Mapping</a>
+            <a href="#">Neural Biorhythms</a>
+        </div>
+
+        <div class="footer-section">
+            <h4>DATABASE</h4>
+            <p>Nodes: <span id="node-count">32,402</span></p>
+            <p>Registry: Decentralized</p>
+            <p>Sync: <span style="color: #00ff41;">In Progress</span></p>
+            <p>Region: Global_Nexus</p>
+        </div>
+
+        <div class="footer-section">
+            <h4>CONTACT_GATE</h4>
+            <p>Support: projectnumerology@gmail.com</p>
+            <p>Direct: 0xDEADBEEF</p>
+            <a href="#" style="margin-top: 10px; border: 1px solid var(--border); padding: 5px; text-align: center;">TERMINAL_HELP</a>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <div style="display: flex; gap: 20px; align-items: center;">
+            <span style="color: var(--gold); font-weight: bold;">2024-2026 © ARCHITECTURAL CORE</span>
+            <span style="opacity: 0.3;">|</span>
+            <span>GENESIS HR® INTELLIGENCE SYSTEMS</span>
+        </div>
+        <div id="footer-time" style="font-family: 'JetBrains Mono'; color: var(--gold);">00:00:00 UTC</div>
+        <div style="letter-spacing: 3px; font-size: 9px; opacity: 0.5;">STRICTLY_CONFIDENTIAL_ACCESS</div>
+    </div>
+</footer>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function(){
+        fetch('/admin/nexus/data')
+            .then(res => res.json())
+            .then(data => {
+                const cy = cytoscape({
+                    container: document.getElementById('cy'),
+                    elements: data,
+                    style: [
+                        { selector: 'node', style: {
+                            'background-color': '#000',
+                            'label': 'data(label)',
+                            'color': '#b89b5e', // Золотой текст узлов
+                            'font-family': 'JetBrains Mono',
+                            'font-size': '8px',
+                            'width': 30, 'height': 30,
+                            'border-width': 1, 'border-color': '#b89b5e' // Золотая рамка
+                        }},
+                        { selector: 'edge', style: {
+                            'width': 1,
+                            'line-color': 'rgba(184, 155, 94, 0.2)', // Тусклое золото для связей
+                            'curve-style': 'bezier',
+                            'target-arrow-shape': 'chevron',
+                            'target-arrow-color': '#b89b5e'
+                        }},
+                        { selector: ':selected', style: {
+                            'border-width': 3, 'border-color': '#fff', 'line-color': '#fff'
+                        }}
+                    ],
+                    layout: { name: 'cose', padding: 50 }
+                });
+
+                cy.on('tap', 'node', function(evt){
+                    const node = evt.target.data();
+                    document.getElementById('node-name').innerText = node.label;
+                    if(node.full_path) {
+                        htmx.ajax('GET', `/admin/nexus/inspect?path=${encodeURIComponent(node.full_path)}`, {
+                            target: '#inspect-out'
+                        });
+                    }
+                });
+            });
+
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('footer-time').innerText = now.toLocaleTimeString('ru-RU') + " UTC";
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+    });
+    </script>
+</body>
+</html>

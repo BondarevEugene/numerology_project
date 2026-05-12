@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genesis Psychology | Digital Analysis v6.0</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Almendra&family=Inter:wght@300;400;600&family=Cinzel:wght@400;700&family=JetBrains+Mono:wght@300&display=swap" rel="stylesheet">
+    <script src="{{ url_for('static', filename='js/nicEdit.js') }}" type="text/javascript"></script>
+    <script src="{{ url_for('static', filename='js/chart.js') }}"></script>
+
+    <style>
+        :root {
+            --bg: #050505;
+            --panel: rgba(12, 12, 12, 0.98);
+            --gold: #c5a059;
+            --gold-glow: rgba(197, 160, 89, 0.2);
+            --border: rgba(197, 160, 89, 0.15);
+            --text: #b0b0b0;
+        }
+
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; font-size: 13px; display: flex; height: 100vh; overflow: hidden; }
+
+        /* [САЙДБАР] */
+        aside { width: 320px; min-width: 320px; background: var(--panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 25px; box-sizing: border-box; z-index: 100; overflow-y: auto; }
+
+        /* [ГЛАВНЫЙ ЭКРАН] */
+        main { flex-grow: 1; overflow-y: auto; background: radial-gradient(circle at 50% 20%, #1a1a1a 0%, #050505 100%); scroll-behavior: smooth; position: relative; }
+        .content-container { max-width: 1100px; margin: 0 auto; padding: 20px 30px 40px; }
+
+        /* [SYSTEM MONITOR - LIVE] */
+        .system-monitor {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(197, 160, 89, 0.03);
+            border-bottom: 1px solid var(--border);
+            padding: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: var(--gold);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 110;
+        }
+        .stat-item span { color: #fff; margin-left: 5px; }
+
+        /* [ВЕРХНЯЯ НАВИГАЦИЯ] */
+        .top-nav { display: flex; justify-content: space-between; align-items: center; margin: 20px 0 30px; }
+
+        /* Атом (Админка) */
+        .atom { width: 50px; height: 50px; position: relative; cursor: pointer; }
+        .atom-core { position: absolute; top: 50%; left: 50%; width: 6px; height: 6px; background: var(--gold); border-radius: 50%; transform: translate(-50%,-50%); }
+        .electron { position: absolute; border: 1px solid var(--gold); border-radius: 50%; top: 0; left: 0; width: 100%; height: 100%; animation: rotate linear infinite; }
+        .e1 { transform: rotateX(70deg); animation-duration: 2s; }
+        .e2 { transform: rotateY(70deg); animation-duration: 3s; }
+
+        /* Лила (Солнечная система) */
+        .lila-system { width: 70px; height: 70px; position: relative; cursor: pointer; text-align: center; }
+        .suns { position: absolute; top: 40%; left: 50%; width: 10px; height: 10px; transform: translate(-50%,-50%); display: flex; gap: 2px; }
+        .sun { width: 5px; height: 5px; background: #ffcc00; border-radius: 50%; box-shadow: 0 0 8px #ff9900; }
+        .orbit { position: absolute; top: 40%; left: 50%; border: 1px solid rgba(255,255,255,0.05); border-radius: 50%; transform: translate(-50%, -50%); animation: rotate linear infinite; }
+        .planet { position: absolute; top: 0; left: 50%; width: 2px; height: 2px; background: var(--gold); border-radius: 50%; }
+
+        @keyframes rotate { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+        /* [БЛОКИ] */
+        .box { background: rgba(20, 20, 20, 0.7); border: 1px solid var(--border); padding: 25px; border-radius: 10px; margin-bottom: 25px; backdrop-filter: blur(10px); }
+        .box h3 { font-family: 'Almendra', serif; color: var(--gold); font-size: 1.4rem; margin: 0 0 15px 0; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+        /* [ПСИХОМАТРИЦА] */
+        .py-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 260px; margin: 10px auto; }
+        .py-cell { background: rgba(0,0,0,0.4); border: 1px solid var(--border); padding: 12px; text-align: center; border-radius: 6px; }
+        .py-cell span { font-size: 8px; opacity: 0.5; text-transform: uppercase; display: block; }
+        .py-cell b { color: var(--gold); font-size: 1.2rem; display: block; margin-top: 3px; }
+        .legend { font-size: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 15px; opacity: 0.6; }
+
+        /* [СХЕМА ЧЕЛОВЕКА] */
+        .vitruvian-box { text-align: center; position: relative; }
+        .vitruvian-img { max-width: 100%; opacity: 0.6; filter: sepia(1) hue-rotate(330deg) brightness(0.8); }
+
+        input, button { background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: #fff; padding: 10px; width: 100%; border-radius: 4px; margin-bottom: 10px; }
+        button { background: var(--gold); color: #000; font-weight: bold; cursor: pointer; transition: 0.3s; text-transform: uppercase; }
+        button:hover { filter: brightness(1.2); box-shadow: 0 0 15px var(--gold-glow); }
+        .btn-outline { background: transparent; border: 1px solid var(--gold); color: var(--gold); }
+
+        footer { text-align: center; padding: 50px 20px 20px; font-size: 9px; opacity: 0.2; letter-spacing: 2px; text-transform: uppercase; line-height: 1.8; }
+    </style>
+</head>
+<body>
+
+<aside>
+    <div style="text-align: center; margin-bottom: 20px;">
+        <h2 style="font-family: 'Cinzel'; color: var(--gold); letter-spacing: 4px;">GENESIS</h2>
+    </div>
+
+    <form method="POST">
+        <div style="font-size: 9px; color: var(--gold); margin-bottom: 5px; letter-spacing: 1px;">USER_ID</div>
+        <input type="text" name="user_name" placeholder="Имя Фамилия" value="{{ request.form.get('user_name','') }}" required>
+        <input type="email" name="email" id="user_email" placeholder="Email для отчета" value="{{ request.form.get('email','') }}" required>
+
+        <div style="font-size: 9px; color: var(--gold); margin-bottom: 5px; letter-spacing: 1px;">BIRTH_DATE</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px;">
+            <input type="text" name="day" placeholder="ДД" value="{{ request.form.get('day','') }}">
+            <input type="text" name="month" placeholder="ММ" value="{{ request.form.get('month','') }}">
+            <input type="text" name="year" placeholder="ГГГГ" value="{{ request.form.get('year','') }}">
+        </div>
+        <button type="submit">ЗАПУСТИТЬ АНАЛИЗ</button>
+    </form>
+
+    {% if result %}
+    <button class="btn-outline" onclick="prepareAndSend()">✉️ ОТПРАВИТЬ EMAIL</button>
+    <button class="btn-outline" style="margin-top: 5px;" onclick="window.print()">📥 СКАЧАТЬ PDF</button>
+    {% endif %}
+</aside>
+
+<main>
+    <div class="system-monitor">
+        <div class="stat-item">SYNC: <span id="sync-val">97.1%</span></div>
+        <div class="stat-item">NEURO: <span id="neuro-val">OPTIMAL</span></div>
+        <div class="stat-item">LOAD: <span id="load-val">STABLE</span></div>
+        <div class="stat-item">PULSE: <span id="pulse-val">0.85 Hz</span></div>
+    </div>
+
+    <div class="content-container">
+        <div class="top-nav">
+            <div class="atom" onclick="handleNav('admin')" title="Admin Access">
+                <div class="atom-core"></div><div class="electron e1"></div><div class="electron e2"></div>
+            </div>
+            <div class="lila-system" onclick="handleNav('lila')" title="Lila System">
+                <div class="suns"><div class="sun"></div><div class="sun"></div></div>
+                {% for i in range(1, 10) %}<div class="orbit" style="width:{{20+i*4.5}}px; height:{{20+i*4.5}}px; animation-duration:{{4+i}}s;"><div class="planet"></div></div>{% endfor %}
+                <div style="margin-top: 55px; color: var(--gold); font-size: 9px; font-family: 'Cinzel';">LiLa</div>
+            </div>
+        </div>
+
+        {% if result %}
+        <div style="text-align: center; margin-bottom: 40px;">
+            <h1 style="font-family: 'Almendra'; font-size: 3.2rem; color: #fff; margin: 0;">{{ result.title }}</h1>
+            <p style="color: var(--gold); letter-spacing: 5px; font-size: 11px;">{{ result.tarot_arcane }} • {{ result.planet }} • {{ result.element }}</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1.2fr 1.8fr; gap: 25px;">
+            <div class="box">
+                <h3>🧠 Психоматрица</h3>
+                <div class="py-grid">
+                    {% for i, label in [('1','Эго'),('4','Здоровье'),('7','Удача'),('2','Энергия'),('5','Логика'),('8','Долг'),('3','Интерес'),('6','Труд'),('9','Память')] %}
+                    <div class="py-cell"><span>{{label}}</span><b id="py-{{i}}">-</b></div>
+                    {% endfor %}
+                </div>
+                <div class="legend">
+                    <div>1-Характер</div><div>2-Энергия</div><div>3-Интерес</div>
+                    <div>4-Здоровье</div><div>5-Логика</div><div>6-Труд</div>
+                    <div>7-Удача</div><div>8-Долг</div><div>9-Память</div>
+                </div>
+            </div>
+            <div class="box vitruvian-box">
+                <h3>🧬 Системная Карта Человека</h3>
+                <img src="{{ url_for('static', filename='img/vitruvian.png') }}" class="vitruvian-img" alt="Human Map">
+            </div>
+        </div>
+
+        <div class="box"><h3>⚡ Вектор Реализации</h3><div>{{ result.action_power|safe }}</div></div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="box"><h3>📈 Цикл Энергии</h3><canvas id="energyChart"></canvas></div>
+            <div class="box"><h3>💼 Карьера и Профессии</h3><div>{{ result.career_business|safe }}<hr style="border:0; border-top:1px solid var(--border); margin:10px 0;">{{ result.professions|safe }}</div></div>
+        </div>
+
+        <div class="box"><h3>❤️ Семья и Отношения</h3><div>{{ result.family_relations|safe }}</div></div>
+        <div class="box"><h3>💰 Финансовый Протокол</h3><div>{{ result.finance_health|safe }}</div></div>
+
+        <div class="box" style="background: rgba(185, 28, 28, 0.05); border-left: 5px solid #b91c1c;">
+            <h3>⚠️ Когнитивные Искажения (Баги Системы)</h3>
+            <div>{{ result.cognitive_distortions|safe }}</div>
+        </div>
+
+        <div class="box"><h3>👁️ Теневой Аспект</h3><div>{{ result.shadow_side|safe }}</div></div>
+        <div class="box"><h3>⚖️ Кармический Алгоритм</h3><div>{{ result.karmic_tasks|safe }}</div></div>
+        {% endif %}
+    </div>
+
+    <footer>
+        inspired by you<br>
+        Created by Voloshka_Olga & Eugene_B
+    </footer>
+</main>
+
+<script>
+    // [ LIVE STATS ENGINE ]
+    function updateLiveStats() {
+        const sync = (95 + Math.random() * 3).toFixed(1);
+        const neuro = ["HIGH", "OPTIMAL", "STABLE", "FLUID"][Math.floor(Math.random() * 4)];
+        const load = ["MINIMAL", "STABLE", "BALANCED"][Math.floor(Math.random() * 3)];
+        const pulse = (0.80 + Math.random() * 0.15).toFixed(2);
+        if(document.getElementById('sync-val')) {
+            document.getElementById('sync-val').innerText = sync + "%";
+            document.getElementById('neuro-val').innerText = neuro;
+            document.getElementById('load-val').innerText = load;
+            document.getElementById('pulse-val').innerText = pulse + " Hz";
+        }
+    }
+    setInterval(updateLiveStats, 5000);
+    updateLiveStats();
+
+    // [ NAVIGATION LOGIC ]
+    let clicks = { admin: 0, lila: 0 };
+    function handleNav(type) {
+        clicks[type]++;
+        if (clicks[type] >= 3) window.location.href = "/" + type;
+        setTimeout(() => clicks[type] = 0, 2000);
+    }
+
+    // [ PYTHAGORAS CALCULATION ]
+    function calculatePythagoras(d, m, y) {
+        if(!d || !m || !y) return;
+        let s1 = Array.from(d + m + y).reduce((a, b) => a + parseInt(b), 0);
+        let s2 = Array.from(s1.toString()).reduce((a, b) => a + parseInt(b), 0);
+        let s3 = s1 - (2 * parseInt(d[0] === '0' ? d[1] : d[0]));
+        let s4 = Array.from(s3.toString()).reduce((a, b) => a + parseInt(b), 0);
+        let full = d + m + y + s1 + s2 + s3 + s4;
+        for (let i = 1; i <= 9; i++) {
+            let count = Array.from(full).filter(x => x == i).length;
+            let el = document.getElementById(`py-${i}`);
+            if(el) el.innerText = count > 0 ? i.toString().repeat(count) : '---';
+        }
+    }
+
+    // [ CHARTING ]
+    function drawChart(d, m, y) {
+        const ctx = document.getElementById('energyChart');
+        if(!ctx) return;
+        let num = (parseInt(d + m) * parseInt(y)).toString().padEnd(7, '0');
+        let points = Array.from(num).map(x => parseInt(x));
+        new Chart(ctx.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: ['0','12','24','36','48','60','72'],
+                datasets: [{ label: 'Энергия', data: points, borderColor: '#c5a059', backgroundColor: 'rgba(197,160,89,0.1)', fill: true, tension: 0.4 }]
+            },
+            options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#222' } }, x: { grid: { color: '#222' } } } }
+        });
+    }
+
+    {% if result %}
+    window.onload = () => {
+        calculatePythagoras("{{result.day}}", "{{result.month}}", "{{result.year}}");
+        drawChart("{{result.day}}", "{{result.month}}", "{{result.year}}");
+    };
+    {% endif %}
+
+    // [ EMAIL SERVICE ]
+    function prepareAndSend() {
+        const btn = event.target;
+        btn.innerText = "ОТПРАВКА..."; btn.disabled = true;
+        const formData = new FormData();
+        formData.append('email', document.getElementById('user_email').value);
+        formData.append('user_name', document.getElementsByName('user_name')[0].value);
+        formData.append('day', "{{result.day if result else ''}}");
+        formData.append('month', "{{result.month if result else ''}}");
+        formData.append('year', "{{result.year if result else ''}}");
+        fetch('/send_email', { method: 'POST', body: formData })
+            .then(r => r.json()).then(data => alert(data.status === 'success' ? "Отчет успешно отправлен!" : "Ошибка при отправке"))
+            .finally(() => { btn.innerText = "✉️ ОТПРАВИТЬ EMAIL"; btn.disabled = false; });
+    }
+</script>
+</body>
+</html>

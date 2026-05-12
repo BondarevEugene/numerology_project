@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genesis | Nexus Profile v8.2</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --gold: #b89b5e;
+            --gold-bright: #f4cf6d;
+            --bg: #050505;
+            --panel: rgba(10, 10, 10, 0.95);
+            --border: rgba(184, 155, 94, 0.2);
+            --text: #dcdcdc;
+            --side-width: 280px;
+        }
+
+        * { box-sizing: border-box; outline: none; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            /* Викторианский паттерн */
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 20c-5 0-9 4-9 9 0 3 2 6 4 8l-5 13h10l-5-13c2-2 4-5 4-8 0-5-4-9-9-9zm0 60c5 0 9-4 9-9 0-3-2-6-4-8l5-13H50l5 13c-2 2-4 5-4 8 0 5 4 9 9 9z' fill='%23b89b5e' fill-opacity='0.015'/%3E%3C/svg%3E");
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: var(--side-width);
+            border-right: 1px solid var(--border);
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            padding: 40px 0;
+            z-index: 100;
+        }
+
+        .sidebar-brand {
+            font-family: 'Cinzel', serif;
+            color: var(--gold);
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 60px;
+            letter-spacing: 6px;
+        }
+
+        .nav-group { display: flex; flex-direction: column; }
+
+        .nav-link {
+            padding: 18px 35px;
+            color: #555;
+            text-decoration: none;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: 0.4s;
+            border-left: 4px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-transform: uppercase;
+        }
+
+        .nav-link i { font-size: 1rem; width: 20px; }
+        .nav-link:hover, .nav-link.active {
+            color: var(--gold);
+            background: rgba(184, 155, 94, 0.05);
+            border-left: 4px solid var(--gold);
+        }
+
+        /* --- MAIN WRAPPER --- */
+        .main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            background: rgba(5, 5, 5, 0.7);
+        }
+
+        .content-area {
+            padding: 50px;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            flex: 1;
+        }
+
+        .tab-content { display: none; animation: fadeIn 0.6s ease; }
+        .tab-content.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- CARDS & GRID --- */
+        .nexus-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            padding: 25px;
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+
+        .label-mono {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: block;
+            margin-bottom: 15px;
+        }
+
+        /* --- ПСИХОМАТРИЦА --- */
+        .matrix-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        .m-cell {
+            aspect-ratio: 1/1;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cinzel', serif;
+            font-size: 1.4rem;
+            background: rgba(255,255,255,0.01);
+        }
+        .m-index { font-size: 0.6rem; color: #444; font-family: 'JetBrains Mono'; margin-bottom: 5px; }
+
+        /* --- FOOTER (ШТВУЧ STYLE) --- */
+        .footer-sh {
+            border-top: 1px solid var(--border);
+            padding: 20px 50px;
+            background: #000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 9px;
+            color: #444;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .f-status { display: flex; align-items: center; gap: 20px; }
+        .dot { width: 6px; height: 6px; background: #00ff41; border-radius: 50%; display: inline-block; box-shadow: 0 0 8px #00ff41; margin-right: 5px; }
+        #footer-clock { color: #888; font-weight: bold; }
+
+        /* --- INPUTS --- */
+        input {
+            width: 100%;
+            background: #0d0d0d;
+            border: 1px solid #222;
+            padding: 12px;
+            color: white;
+            font-family: 'JetBrains Mono';
+            margin-bottom: 20px;
+        }
+        .btn-action {
+            background: var(--gold);
+            color: black;
+            border: none;
+            padding: 12px 25px;
+            font-family: 'Cinzel';
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-action:hover { background: var(--gold-bright); box-shadow: 0 0 15px var(--glow); }
+
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="sidebar-brand">GENESIS</div>
+        <div class="nav-group">
+            <div class="nav-link active" onclick="switchTab('account', this)">
+                <i class="fas fa-id-card"></i> 01_ACCOUNT_INFO
+            </div>
+            <div class="nav-link" onclick="switchTab('analysis', this)">
+                <i class="fas fa-atom"></i> 02_METAPHYSIC_REPORT
+            </div>
+            <div class="nav-link" onclick="switchTab('security', this)">
+                <i class="fas fa-shield-alt"></i> 03_SECURITY_VAULT
+            </div>
+            <div class="nav-link" onclick="location.href='/'">
+                <i class="fas fa-home"></i> 04_MAIN_GATE
+            </div>
+        </div>
+
+        <div style="margin-top: auto;">
+            <a href="/logout" class="nav-link" style="color: #944;">
+                <i class="fas fa-power-off"></i> LOGOUT_PROTOCOL
+            </a>
+        </div>
+    </nav>
+
+    <div class="main-container">
+
+        <div class="content-area">
+
+            <section id="account" class="tab-content active">
+                <h1 style="font-family: 'Cinzel'; margin: 0;">SUBJECT: {{ user.full_name }}</h1>
+                <div class="nexus-grid">
+                    <div class="card">
+                        <span class="label-mono">> IDENTIFICATION_DATA</span>
+                        <form action="/profile/update" method="POST">
+                            <label class="label-mono">FULL_NAME</label>
+                            <input type="text" value="{{ user.full_name }}" name="full_name">
+                            <label class="label-mono">E_MAIL</label>
+                            <input type="text" value="{{ user.email }}" disabled>
+                            <button class="btn-action">SAVE_CHANGES</button>
+                        </form>
+                    </div>
+                    <div class="card">
+                        <span class="label-mono">> BIOMETRIC_LOCK</span>
+                        <p>B_DATE: <span style="color: var(--gold);">{{ user.birth_date.strftime('%d.%m.%Y') }}</span></p>
+                        <p>SEX: <span style="color: var(--gold);">{{ user.gender or 'UNDEFINED' }}</span></p>
+                        <p>PHASE: <span style="color: var(--gold);">PREMIUM_SUBJECT</span></p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="analysis" class="tab-content">
+                <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                    <h1 style="font-family: 'Cinzel'; margin: 0;">META_ANALYSIS</h1>
+                    <span class="label-mono" style="color: {{ temp_advice.color if temp_advice else '#fff' }}">
+                        STATUS: {{ temp_advice.status if temp_advice else 'CALIBRATING' }}
+                    </span>
+                </div>
+
+                <div class="nexus-grid">
+                    <div class="card">
+                        <span class="label-mono">> PYTHAGORAS_MATRIX</span>
+                        <div class="matrix-container">
+                            {% for i in ['1','4','7','2','5','8','3','6','9'] %}
+                            <div class="m-cell">
+                                <span class="m-index">{{ i }}</span>
+                                {{ matrix[i] if matrix else '-' }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <span class="label-mono">> ARCHETYPE_CODE</span>
+                        <div style="display: flex; align-items: center; gap: 30px;">
+                            <div style="font-size: 4rem; font-family: 'Cinzel'; color: var(--gold);">{{ arc_num or '?' }}</div>
+                            <div>
+                                <p class="label-mono" style="margin:2px;">PLANET: {{ extras.planet if extras else 'N/A' }}</p>
+                                <p class="label-mono" style="margin:2px;">ARCANE: {{ extras.arcane if extras else 'N/A' }}</p>
+                                <p class="label-mono" style="margin:2px; color: var(--gold-bright);">LUNA: {{ moon_phase or 'Unknown' }}</p>
+                            </div>
+                        </div>
+                        <p style="font-size: 0.8rem; border-top: 1px solid var(--border); padding-top: 15px; color: #888;">
+                            {{ temp_advice.msg if temp_advice else 'System data ready.' }}
+                        </p>
+                    </div>
+
+                    <div class="card">
+                        <span class="label-mono">> POTENTIAL_RADAR</span>
+                        <canvas id="profileRadar" style="max-height: 250px;"></canvas>
+                    </div>
+
+                    <div class="card">
+                        <span class="label-mono">> BIORHYTHMS</span>
+                        {% if bio_data %}
+                            {% for type, val in bio_data.items() %}
+                            <div style="margin-bottom: 15px;">
+                                <div style="display: flex; justify-content: space-between; font-size: 0.6rem;" class="label-mono">
+                                    <span>{{ type|upper }}</span><span>{{ val }}%</span>
+                                </div>
+                                <div style="height: 3px; background: #111; width: 100%;">
+                                    <div style="height: 100%; width: {{ val }}%; background: var(--gold); box-shadow: 0 0 8px var(--gold);"></div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            </section>
+
+            <section id="security" class="tab-content">
+                <h1 style="font-family: 'Cinzel'; margin: 0;">SECURITY_VAULT</h1>
+                <div class="card" style="max-width: 500px; margin-top: 30px;">
+                    <span class="label-mono">> ACCESS_KEY_ROTATION</span>
+                    <form action="/profile/change-password" method="POST">
+                        <label class="label-mono">CURRENT_KEY</label>
+                        <input type="password" name="old_password">
+                        <label class="label-mono">NEW_KEY</label>
+                        <input type="password" name="new_password">
+                        <button class="btn-action">ROTATE_KEY</button>
+                    </form>
+                </div>
+            </section>
+
+        </div>
+
+        <footer class="footer-sh">
+            <div class="f-status">
+                <span>GENESIS INTELLIGENCE v8.2 PRO</span>
+                <span><span class="dot"></span> SYSTEM_ONLINE</span>
+                <span>SECURE_NODE: ENCRYPTED</span>
+            </div>
+            <div id="footer-clock">00:00:00</div>
+            <div>
+                &copy; 2024-2026 GENESIS HR &bull; BEYOND HUMAN
+            </div>
+        </footer>
+
+    </div>
+
+    <script>
+        // Tab Switcher Logic
+        function switchTab(tabId, el) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+
+            document.getElementById(tabId).classList.add('active');
+            el.classList.add('active');
+        }
+
+        // Live Clock
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('footer-clock').innerText = now.toLocaleTimeString('ru-RU');
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Chart.js Radar Initialization
+        const ctx = document.getElementById('profileRadar').getContext('2d');
+        new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: {{ user_skills.labels|tojson if user_skills else "['A','B','C','D','E']"|safe }},
+                datasets: [{
+                    data: {{ user_skills.data|tojson if user_skills else "[50,50,50,50,50]"|safe }},
+                    backgroundColor: 'rgba(184, 155, 94, 0.1)',
+                    borderColor: '#b89b5e',
+                    borderWidth: 2,
+                    pointRadius: 0
+                }]
+            },
+            options: {
+                scales: {
+                    r: {
+                        grid: { color: 'rgba(184, 155, 94, 0.1)' },
+                        angleLines: { color: 'rgba(184, 155, 94, 0.1)' },
+                        ticks: { display: false },
+                        pointLabels: { color: '#666', font: { family: 'JetBrains Mono', size: 9 } }
+                    }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+    </script>
+
+</body>
+</html>

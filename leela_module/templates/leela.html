@@ -2,377 +2,335 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Genesis | LEELA Game</title>
-    <link href="https://fonts.googleapis.com/css2?family=Almendra&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genesis | LEELA Mastery v4.0 (3D Edition)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Almendra&family=Cinzel:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --gold: #c5a059;
-            --gold-glow: rgba(197, 160, 89, 0.4);
-            --bg: #050505;
-            --cell-border: rgba(197, 160, 89, 0.15);
-            --text-main: #b8b8b8;
-            --text-highlight: #ffffff;
+            --bg: #030303; --panel: #0a0a0a; --gold: #c5a059; --gold-glow: rgba(197, 160, 89, 0.4);
+            --border: rgba(197, 160, 89, 0.2); --text: #b8b8b8;
+            /* Цвета чакр для рядов */
+            --c1: #5e1919; --c2: #5e3b19; --c3: #5e5e19; --c4: #195e2d;
+            --c5: #194e5e; --c6: #191c5e; --c7: #3d195e; --c8: #5e195e;
         }
 
         body {
-            background: var(--bg); color: var(--text-main);
-            font-family: 'Inter', sans-serif; margin: 0;
-            display: flex; height: 100vh; overflow: hidden;
-            background-image: radial-gradient(circle at 50% 50%, #111 0%, #050505 100%);
+            background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif;
+            margin: 0; display: flex; height: 100vh; overflow: hidden;
+            background-image: radial-gradient(circle at 50% 50%, #111 0%, #030303 100%);
         }
 
-        .board-container { flex-grow: 1; display: flex; align-items: center; justify-content: center; padding: 40px; }
+        /* 3D Пространство для доски */
+        .stage {
+            flex-grow: 1; display: flex; align-items: center; justify-content: center;
+            perspective: 1500px; /* Глубина 3D */
+            position: relative; overflow: hidden;
+        }
 
-        .leela-grid {
+        /* Изометрическая доска */
+        .leela-board {
             display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(9, 1fr);
-            width: 90vh; height: 90vh; gap: 4px; padding: 10px;
-            background: rgba(10, 10, 10, 0.5); border: 1px solid var(--cell-border);
-            backdrop-filter: blur(10px); border-radius: 8px; position: relative;
+            width: 80vh; height: 80vh; gap: 8px; padding: 20px;
+            background: #000; border: 2px solid var(--gold); border-radius: 15px;
+            transform: rotateX(45deg) rotateZ(-15deg) translateY(-10%); /* Магия 3D */
+            box-shadow: 0 50px 100px rgba(0,0,0,0.9), 0 0 30px var(--gold-glow);
+            transition: transform 0.5s ease;
         }
+        .leela-board:hover { transform: rotateX(40deg) rotateZ(-10deg) translateY(-8%); }
 
+        /* Клетка доски */
         .cell {
-            background: rgba(0, 0, 0, 0.3); position: relative;
+            background: rgba(255,255,255,0.01); border: 1px solid var(--border);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 8px; text-align: center; transition: 0.4s;
-            border: 1px solid var(--cell-border); border-radius: 4px;
+            font-size: 0.65rem; text-align: center; color: #888;
+            position: relative; transition: all 0.3s; transform-style: preserve-3d;
+            border-radius: 4px;
         }
 
-        .cell.active { background: rgba(197, 160, 89, 0.12); border-color: var(--gold); box-shadow: 0 0 20px var(--gold-glow); }
+        /* Цвета рядов (чакры) */
+        .row-1 { border-left: 3px solid var(--c1); } .row-2 { border-left: 3px solid var(--c2); }
+        .row-3 { border-left: 3px solid var(--c3); } .row-4 { border-left: 3px solid var(--c4); }
+        .row-5 { border-left: 3px solid var(--c5); } .row-6 { border-left: 3px solid var(--c6); }
+        .row-7 { border-left: 3px solid var(--c7); } .row-8, .row-9 { border-left: 3px solid var(--c8); }
 
-        .cell-num { position: absolute; top: 4px; left: 6px; font-size: 1rem; color: #fff; font-weight: 900; opacity: 0.2; }
+        .cell.active {
+            background: rgba(197, 160, 89, 0.15); border-color: var(--gold);
+            box-shadow: 0 0 20px var(--gold-glow); transform: translateZ(15px); /* Приподнимаем активную */
+        }
+        .cell.archetype-highlight { border-color: #38bdf8; box-shadow: inset 0 0 10px rgba(56, 189, 248, 0.2); }
 
-        .cell-name { font-size: 0.7rem; color: var(--text-highlight); text-transform: uppercase; font-weight: 600; }
+        .cell-num { position: absolute; top: 2px; left: 4px; font-size: 0.6rem; opacity: 0.3; }
+        .cell-name { font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #eee; padding: 0 4px; }
 
+        /* Игровой Токен (Фишка) */
         #player-token {
-            width: 28px; height: 28px; background: #fff; border-radius: 50%;
-            position: absolute; z-index: 100; pointer-events: none;
-            box-shadow: 0 0 15px #fff, 0 0 30px var(--gold);
-            transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1);
-            display: none; border: 2px solid var(--gold);
+            width: 30px; height: 30px; background: #fff; border-radius: 50%;
+            position: absolute; border: 4px solid var(--gold);
+            box-shadow: 0 0 20px #fff, 0 0 40px var(--gold);
+            z-index: 100; transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: none; transform: translateZ(20px); /* Всегда над доской */
         }
 
+        /* Правая панель: Журнал Трансформации */
         .sidebar {
-            width: 380px; background: #0a0a0a; border-left: 1px solid rgba(197, 160, 89, 0.2);
-            padding: 30px; display: flex; flex-direction: column; box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+            width: 450px; background: var(--panel); border-left: 1px solid var(--border);
+            display: flex; flex-direction: column; padding: 30px; box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+            z-index: 1000;
         }
 
-        .logo-small { font-family: 'Almendra'; color: var(--gold); font-size: 2rem; letter-spacing: 7px; text-align: center; margin-bottom: 20px; }
+        .sidebar-header { font-family: 'Cinzel'; font-weight: 700; color: var(--gold); font-size: 1.8rem; text-align: center; margin-bottom: 25px; text-shadow: 0 0 10px var(--gold-glow); }
 
-        .desc-card {
-            background: rgba(255, 255, 255, 0.03); border: 1px solid var(--cell-border);
-            padding: 20px; border-radius: 8px; margin-bottom: 20px; min-height: 150px;
+        /* Панель Коучинга */
+        .coach-panel {
+            background: rgba(197, 160, 89, 0.05); border: 1px solid var(--gold);
+            padding: 20px; border-radius: 12px; margin-bottom: 20px;
+            animation: panelFadeIn 0.5s ease-out;
         }
+        @keyframes panelFadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .desc-card h3 { font-family: 'Almendra'; color: var(--gold); margin: 0 0 10px 0; font-size: 1.3rem; }
+        .coach-panel h3 { font-family: 'Almendra'; color: var(--gold); margin: 0 0 12px; font-size: 1.5rem; letter-spacing: 1px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        .coach-panel p { font-size: 0.9rem; line-height: 1.7; margin: 0 0 15px; }
 
-        .path-journal {
-            flex-grow: 1; background: rgba(255, 255, 255, 0.02);
-            border: 1px dashed rgba(197, 160, 89, 0.2); border-radius: 4px;
-            margin-bottom: 20px; display: flex; flex-direction: column; overflow: hidden;
+        .insight-block { font-style: italic; color: #eee; border-left: 3px solid var(--border); padding-left: 15px; margin: 15px 0; }
+        .action-block { color: var(--gold); font-weight: 600; font-size: 0.95rem; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 4px; }
+
+        textarea {
+            width: 100%; height: 70px; background: #000; color: #fff; border: 1px solid #333;
+            padding: 10px; border-radius: 6px; resize: none; margin-top: 15px; box-sizing: border-box; font-family: inherit;
         }
+        textarea:focus { border-color: var(--gold); outline: none; }
 
-        .journal-header { background: rgba(197, 160, 89, 0.1); color: var(--gold); font-size: 0.7rem; padding: 5px; text-align: center; }
+        /* Журнал действий */
+        .journal-container { flex-grow: 1; overflow-y: auto; padding-right: 10px; margin-top: 10px; }
+        .journal-entry {
+            border-left: 3px solid var(--gold); padding: 12px 18px; margin-bottom: 15px;
+            background: rgba(255,255,255,0.02); border-radius: 0 8px 8px 0;
+            animation: entrySlide 0.4s ease-out;
+        }
+        @keyframes entrySlide { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
 
-        .journal-content { padding: 10px; font-size: 0.8rem; overflow-y: auto; color: #888; flex-grow: 1; }
-
-        .journal-entry { margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
-
-        .dice-section { text-align: center; padding-top: 20px; border-top: 1px solid #222; }
-
-        #dice-result { font-size: 4rem; font-family: 'Almendra'; color: var(--gold); margin-bottom: 10px; }
-
-        .btn-roll {
+        /* Панель управления (Кубик) */
+        .control-bar { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border); }
+        .dice-display { font-family: 'Cinzel'; font-size: 3.5rem; color: var(--gold); text-shadow: 0 0 15px var(--gold-glow); width: 60px; text-align: center; }
+        .roll-btn {
             background: linear-gradient(135deg, #c5a059 0%, #8a6d35 100%);
-            color: #000; border: none; padding: 15px; font-weight: 900;
-            cursor: pointer; width: 100%; border-radius: 4px; text-transform: uppercase;
+            color: #000; border: none; padding: 18px 45px; font-weight: 700;
+            cursor: pointer; border-radius: 6px; text-transform: uppercase; letter-spacing: 2px;
+            font-family: 'Cinzel'; transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
+        .roll-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+        .roll-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
-        @keyframes diceRoll { 0% { transform: rotate(0); } 100% { transform: rotate(360deg); } }
-        .rolling { animation: diceRoll 0.5s infinite; }
+        .btn-print { background: none; border: 1px solid var(--border); color: #666; padding: 8px; font-size: 0.7rem; cursor: pointer; margin-top: 10px; width: 100%; text-transform: uppercase; letter-spacing: 1px; }
+        .btn-print:hover { color: #fff; border-color: #fff; }
 
-        .cell.snake { border-bottom: 3px solid #ff4d4d; }
-        .cell.arrow { border-bottom: 3px solid #00ffcc; }
+        /* Адаптация для печати */
+        @media print {
+            .stage, .control-bar, textarea, .btn-print, #admin-trigger { display: none !important; }
+            body { background: white !important; color: black !important; display: block !important; height: auto !important; }
+            .sidebar { width: 100% !important; border: none !important; background: white !important; padding: 0 !important; }
+            .journal-entry { border-color: #ccc !important; background: #f9f9f9 !important; color: black !important; page-break-inside: avoid; }
+        }
     </style>
 </head>
 <body>
 
 <div id="player-token"></div>
 
-<div class="board-container">
-    <div class="leela-grid" id="board"></div>
+<div class="stage">
+    <div class="leela-board" id="board">
+        </div>
 </div>
 
 <aside class="sidebar">
-    <div class="logo-small">LEELA</div>
+    <div class="sidebar-header">LEELA Transformation</div>
 
-    <div class="desc-card">
-        <h3 id="cell-name-display">Подготовка...</h3>
-        <p id="game-log">Для рождения нужна 6.</p>
-    </div>
-
-    <div class="path-journal">
-        <div class="journal-header">ДНЕВНИК ПУТИ</div>
-        <div id="journal-content" class="journal-content">
-            <div class="journal-entry">Ожидание воплощения...</div>
+    <div class="coach-panel" id="coach-area">
+        <h3 id="display-name">Точка входа</h3>
+        <div id="cell-content">
+            <p id="display-desc">Сформулируйте ваш запрос к игре. Чего вы хотите достичь в реальности? Нажмите на кубик, когда будете готовы.</p>
         </div>
+        <textarea id="user-insight" placeholder="Запишите вашу мысль или текущую ситуацию перед ходом..."></textarea>
     </div>
 
-    <div class="dice-section">
-        <div id="dice-result">?</div>
-        <button class="btn-roll" id="roll-btn" onclick="rollDice()">Бросить кость</button>
+    <div class="journal-container" id="journal">
+        <div style="text-align: center; font-size: 0.7rem; opacity: 0.4; margin-top: 20px;">ВАША ДОРОЖНАЯ КАРТА ДЕЙСТВИЙ</div>
     </div>
+
+    <div class="control-bar">
+        <div class="dice-display" id="dice-result">?</div>
+        <button class="roll-btn" id="roll-button" onclick="playTurn()">Сделать шаг</button>
+    </div>
+    <button class="btn-print" onclick="window.print()">📥 Скачать План Действий (PDF)</button>
 </aside>
 
 <script>
+    // Данные передаются из Flask (main.py роут /lila)
     const cellsData = {{ cells_info|tojson }};
-    const snakes = {{ snakes|tojson }};
-    const arrows = {{ arrows|tojson }};
+    const snakesData = {{ snakes|tojson }};
+    const arrowsData = {{ arrows|tojson }};
+    const userArchetype = "{{ user_archetype or '0' }}";
 
     let currentPos = 0;
-    let isRolling = false;
-    const board = document.getElementById('board');
+    let isMoving = false;
 
+    // Инициализация изометрической доски
     function createBoard() {
-        for (let row = 9; row >= 1; row--) {
-            let rowCells = [];
-            for (let col = 1; col <= 8; col++) { rowCells.push((row - 1) * 8 + col); }
-            if (row % 2 === 0) rowCells.reverse();
-            rowCells.forEach(num => {
+        const board = document.getElementById('board');
+        // Генерируем ряды с 9 по 1 (сверху вниз)
+        for (let r = 9; r >= 1; r--) {
+            let rowNums = [];
+            for (let c = 1; c <= 8; c++) rowNums.push((r - 1) * 8 + c);
+
+            // Зигзагообразное движение
+            if (r % 2 === 0) rowNums.reverse();
+
+            rowNums.forEach(n => {
                 const cell = document.createElement('div');
-                cell.className = 'cell';
-                if (snakes[num]) cell.classList.add('snake');
-                if (arrows[num]) cell.classList.add('arrow');
-                cell.id = `cell-${num}`;
-                cell.innerHTML = `<div class="cell-num">${num}</div><div class="cell-name">${cellsData[num] ? cellsData[num].name : 'Поток'}</div>`;
+                // Подсвечиваем клетки, кратные Архетипу пользователя
+                const isArchCell = (userArchetype !== '0' && n % 9 === parseInt(userArchetype));
+
+                cell.className = `cell row-${r} ${isArchCell ? 'archetype-highlight' : ''}`;
+                cell.id = `cell-${n}`;
+
+                // Проверяем наличие змей и стрел для иконок
+                let icon = '';
+                if (snakesData[n]) icon = '<span style="color:#ff4d4d; opacity:0.5;">🐍</span>';
+                if (arrowsData[n]) icon = '<span style="color:#2ecc71; opacity:0.5;">🏹</span>';
+
+                cell.innerHTML = `
+                    <div class="cell-num">${n}</div>
+                    <div class="cell-name">${cellsData[n] ? cellsData[n].name : ''}</div>
+                    <div style="font-size: 0.7rem; margin-top:3px;">${icon}</div>
+                `;
                 board.appendChild(cell);
             });
         }
     }
-    createBoard();
 
-    function addToJournal(message) {
-        const journal = document.getElementById('journal-content');
-        const entry = document.createElement('div');
-        entry.className = 'journal-entry';
-        entry.innerHTML = `<b>${message}</b>`;
-        journal.appendChild(entry);
-        journal.scrollTop = journal.scrollHeight;
-    }
+    async function playTurn() {
+        if (isMoving) return;
 
-    function rollDice() {
-        if (isRolling) return;
-        isRolling = true;
-        const btn = document.getElementById('roll-btn');
-        const diceDisplay = document.getElementById('dice-result');
-        btn.disabled = true;
-        diceDisplay.classList.add('rolling');
+        // Сначала сохраняем мысль изtextarea
+        saveInsight();
 
-        setTimeout(() => {
-            const roll = Math.floor(Math.random() * 6) + 1;
-            diceDisplay.classList.remove('rolling');
-            diceDisplay.innerText = roll;
-            processMove(roll);
-            btn.disabled = false;
-            isRolling = false;
-        }, 600);
-    }
+        isMoving = true;
+        document.getElementById('roll-button').disabled = true;
 
-    function processMove(roll) {
-        const log = document.getElementById('game-log');
-        const nameDisplay = document.getElementById('cell-name-display');
+        // Бросок кубика
+        const roll = Math.floor(Math.random() * 6) + 1;
+        document.getElementById('dice-result').innerText = roll;
+        document.getElementById('dice-result').style.animation = 'pulse 0.3s';
 
+        await new Promise(r => setTimeout(r, 400)); // Задержка для анимации кубика
+        document.getElementById('dice-result').style.animation = 'none';
+
+        // Логика Рождения (нужна 6)
         if (currentPos === 0) {
             if (roll === 6) {
                 currentPos = 1;
-                nameDisplay.innerText = "РОЖДЕНИЕ!";
-                log.innerText = "Вы вошли в игру на клетку 1.";
-                addToJournal("Рождение на клетке 1");
                 document.getElementById('player-token').style.display = 'block';
+                await updateUI();
             } else {
-                nameDisplay.innerText = "ОЖИДАНИЕ";
-                log.innerText = `Выпало ${roll}. Нужна 6.`;
+                alert("Чтобы родиться в игре, нужно чистое намерение (выпадение 6).");
             }
         } else {
-            let nextPos = currentPos + roll;
-            if (nextPos > 72) {
-                addToJournal(`Бросок ${roll}: Перелёт. Остался на ${currentPos}`);
-            } else {
-                currentPos = nextPos;
-                addToJournal(`Ход на ${roll}. Клетка ${currentPos}`);
+            // Обычный ход
+            let targetPos = currentPos + roll;
+
+            // Анимация плавного перемещения
+            for(let i = currentPos + 1; i <= targetPos && i <= 72; i++) {
+                currentPos = i;
+                await updateUI(true); // true = режим перемещения (без обновления текста)
+                await new Promise(r => setTimeout(r, 150)); // Скорость шага
+            }
+
+            // Финальное обновление текста клетки
+            await updateUI();
+
+            // Проверка Змей и Стрел
+            await new Promise(r => setTimeout(r, 600)); // Задержка перед спуском/взлетом
+
+            if (snakesData[currentPos]) {
+                currentPos = snakesData[currentPos];
+                alert("Змея! Ваше заблуждение тянет вас вниз для повторного урока.");
+                await updateUI();
+            } else if (arrowsData[currentPos]) {
+                currentPos = arrowsData[currentPos];
+                alert("Стрела! Ваше осознание ускоряет ваш Путь.");
+                await updateUI();
             }
         }
-        updateUI();
-        checkSpecialSquares();
+
+        isMoving = false;
+        document.getElementById('roll-button').disabled = false;
     }
 
-    function updateUI() {
+    // Сохранение записи в Журнал
+    function saveInsight() {
+        const note = document.getElementById('user-insight').value;
+        if (!note || currentPos === 0) return; // Не сохраняем пустое или до старта
+
+        const journal = document.getElementById('journal');
+        const entry = document.createElement('div');
+        entry.className = 'journal-entry';
+
+        entry.innerHTML = `
+            <small style="color:var(--gold); font-weight: bold;">
+                Клетка ${currentPos} (${cellsData[currentPos].name})
+            </small>
+            <p style="margin: 5px 0 0; font-size: 0.85rem;">${note}</p>
+        `;
+
+        journal.prepend(entry); // Добавляем наверх
+        document.getElementById('user-insight').value = ''; // Очищаем
+    }
+
+    // Обновление интерфейса (Фишка + Текст)
+    async function updateUI(onlyToken = false) {
         if (currentPos === 0) return;
+
+        // 1. Перемещение фишки
         const targetCell = document.getElementById(`cell-${currentPos}`);
-        const token = document.getElementById('player-token');
+        if (!targetCell) return;
         const rect = targetCell.getBoundingClientRect();
+        const token = document.getElementById('player-token');
 
-        token.style.top = (rect.top + rect.height / 2 - 14) + 'px';
-        token.style.left = (rect.left + rect.width / 2 - 14) + 'px';
+        // Центрируем фишку относительно клетки
+        token.style.top = `${rect.top + rect.height/2 - 15}px`;
+        token.style.left = `${rect.left + rect.width/2 - 15}px`;
 
+        // Подсветка активной клетки
         document.querySelectorAll('.cell').forEach(c => c.classList.remove('active'));
         targetCell.classList.add('active');
 
-        if (cellsData[currentPos]) {
-            document.getElementById('cell-name-display').innerText = cellsData[currentPos].name;
-            document.getElementById('game-log').innerText = cellsData[currentPos].desc;
-        }
-    }
+        if (onlyToken) return; // Если просто шагаем, текст не меняем
 
-    function checkSpecialSquares() {
-        setTimeout(() => {
-            let oldPos = currentPos;
-            if (snakes[currentPos]) {
-                currentPos = snakes[currentPos];
-                addToJournal(`Змея! Падение с ${oldPos} на ${currentPos}`);
-                updateUI();
-            } else if (arrows[currentPos]) {
-                currentPos = arrows[currentPos];
-                addToJournal(`Стрела! Взлёт с ${oldPos} на ${currentPos}`);
-                updateUI();
-            }
+        // 2. Обновление панели коучинга (твои полные описания)
+        const data = cellsData[currentPos];
+        document.getElementById('display-name').innerText = data.name;
 
-            if (currentPos === 68) {
-                alert("КОСМИЧЕСКОЕ СОЗНАНИЕ! Игра завершена.");
-                location.reload();
-            }
-        }, 1000);
-    }
-</script>
-<section class="mind-map-section">
-    <button class="map-toggle" onclick="toggleMindMap()">
-        <span>ЦИФРОВАЯ КАРТА СОЗНАНИЯ</span>
-        <i id="toggle-icon">▼</i>
-    </button>
-
-    <div class="map-content" id="map-content">
-        <div class="matrix-grid" id="matrix-display">
+        // Формируем HTML с Insight и Action
+        document.getElementById('cell-content').innerHTML = `
+            <p><strong>Суть:</strong> ${data.desc}</p>
+            <div class="insight-block">
+                <strong>Вопрос:</strong> ${data.insight}
             </div>
+            <div class="action-block">
+                <strong>Действие:</strong> ${data.action}
+            </div>
+        `;
 
-        <div class="analysis-board">
-            <h3>Психологический профиль</h3>
-            <div id="full-report" class="report-grid">
-                </div>
-        </div>
-    </div>
-</section>
-
-<style>
-    .mind-map-section {
-        position: fixed;
-        bottom: 0; left: 0; right: 0;
-        background: #080808;
-        border-top: 1px solid var(--gold);
-        z-index: 1000;
-        transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        // Фокус наtextarea для записи мысли
+        document.getElementById('user-insight').focus();
     }
 
-    .map-toggle {
-        width: 100%;
-        padding: 15px;
-        background: none;
-        border: none;
-        color: var(--gold);
-        font-family: 'Almendra';
-        letter-spacing: 4px;
-        cursor: pointer;
-        display: flex;
-        justify-content: center;
-        gap: 20px;
-        align-items: center;
-        background: rgba(197, 160, 89, 0.05);
-    }
-
-    .map-content {
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 0.5s ease;
-        padding: 0 40px;
-        display: grid;
-        grid-template-columns: 1fr 2fr;
-        gap: 40px;
-    }
-
-    .mind-map-section.open .map-content {
-        max-height: 80vh;
-        padding-bottom: 40px;
-        overflow-y: auto;
-    }
-
-    /* Стили матрицы */
-    .matrix-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 10px;
-        margin-top: 20px;
-    }
-
-    .matrix-node {
-        background: rgba(255,255,255,0.02);
-        border: 1px solid rgba(197, 160, 89, 0.1);
-        padding: 15px;
-        text-align: center;
-        border-radius: 5px;
-    }
-
-    .matrix-node.active { border-color: var(--gold); background: rgba(197, 160, 89, 0.05); }
-
-    .node-title { font-size: 0.6rem; color: #666; display: block; margin-bottom: 5px; }
-    .node-val { font-size: 1.5rem; color: var(--gold); font-family: 'Almendra'; }
-
-    /* Стили отчета */
-    .report-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-        color: #888;
-        font-size: 0.85rem;
-    }
-
-    .report-item b { color: var(--gold); display: block; margin-bottom: 5px; }
-</style>
-
-<script>
-    function toggleMindMap() {
-        const section = document.querySelector('.mind-map-section');
-        const icon = document.getElementById('toggle-icon');
-        section.classList.toggle('open');
-        icon.innerText = section.classList.contains('open') ? '▲' : '▼';
-    }
-
-    // Эта функция вызывается при загрузке или вводе даты
-    function renderMindMap(data) {
-        const grid = document.getElementById('matrix-display');
-        const report = document.getElementById('full-report');
-
-        grid.innerHTML = '';
-        report.innerHTML = '';
-
-        // Номера в матрице идут не по порядку (3-6-9, 2-5-8, 1-4-7 - классика)
-        const order = ['3','6','9','2','5','8','1','4','7'];
-
-        order.forEach(num => {
-            const count = data.matrix[num];
-            const node = document.createElement('div');
-            node.className = `matrix-node ${count > 0 ? 'active' : ''}`;
-            node.innerHTML = `
-                <span class="node-title">${nodesInfo[num].name}</span>
-                <span class="node-val">${count > 0 ? num.repeat(count) : '-'}</span>
-            `;
-            grid.appendChild(node);
-
-            // Добавляем текст в отчет
-            const level = count === 0 ? 'low' : (count < 3 ? 'mid' : 'high');
-            const item = document.createElement('div');
-            item.className = 'report-item';
-            item.innerHTML = `<b>${nodesInfo[num].name}</b> ${nodesInfo[num][level]}`;
-            report.appendChild(item);
-        });
-    }
+    window.onload = () => {
+        createBoard();
+        // Легкое смещение токена при изменении размера окна
+        window.onresize = () => updateUI(true);
+    };
 </script>
+
 </body>
 </html>
