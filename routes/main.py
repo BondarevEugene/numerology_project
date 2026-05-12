@@ -1,9 +1,9 @@
 from flask import Blueprint, render_template, request
 from models import db, Article, ArchetypeContent, ProfessionContent, User
-from mind_logic import sum_digits, calculate_full_matrix_logic
+from utils import sum_digits, calculate_full_matrix_logic
 
 main_bp = Blueprint('main', __name__)
-
+app.register_blueprint(bridge_bp)
 
 @main_bp.route('/', methods=['GET', 'POST'])
 def index():
@@ -86,3 +86,4 @@ def index():
                            day=day,
                            month=month,
                            year=year)
+

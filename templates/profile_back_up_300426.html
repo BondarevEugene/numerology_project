@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genesis | Nexus Terminal v8.5 PRO (Ultimate Edition)</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&family=Cinzel:wght@400;700&family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --gold: #b89b5e; --gold-bright: #f4cf6d; --gold-dark: #8c7647;
+            --bg: #050505; --panel: rgba(12, 12, 12, 0.98);
+            --border: rgba(184, 155, 94, 0.25); --text: #dcdcdc;
+            --side-width: 300px; --terminal-green: #00ff41;
+            --glow: rgba(184, 155, 94, 0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: var(--bg); color: var(--text);
+            font-family: 'Inter', sans-serif; overflow-x: hidden; line-height: 1.5;
+        }
+
+        /* Эффект мерцания терминала */
+        @keyframes scanline { 0% { bottom: 100%; } 80% { bottom: 100%; } 100% { bottom: 0%; } }
+        body::after {
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 1000; background-size: 100% 2px, 3px 100%; pointer-events: none;
+        }
+
+        .pane { display: none; animation: nexusFade 0.6s ease forwards; }
+        .pane.active { display: block; }
+        @keyframes nexusFade { from { opacity: 0; filter: blur(10px); } to { opacity: 1; filter: blur(0); } }
+
+        .nexus-container { display: flex; min-height: 100vh; }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--side-width); background: var(--panel);
+            border-right: 1px solid var(--border); display: flex;
+            flex-direction: column; padding: 30px; position: fixed; height: 100vh; z-index: 50;
+        }
+
+        .brand {
+            font-family: 'Cinzel', serif; font-size: 1.6rem; color: var(--gold-bright);
+            letter-spacing: 5px; margin-bottom: 40px; text-align: center;
+            border-bottom: 1px double var(--border); padding-bottom: 20px;
+        }
+
+        .nav-item {
+            display: flex; align-items: center; padding: 15px; margin-bottom: 8px;
+            cursor: pointer; transition: 0.3s; border: 1px solid transparent; filter: grayscale(0.8);
+        }
+        .nav-item:hover, .nav-item.active {
+            background: rgba(184, 155, 94, 0.08); border-color: var(--border); filter: grayscale(0);
+            box-shadow: 0 0 15px var(--glow);
+        }
+
+        .nav-num { font-family: 'JetBrains Mono'; font-size: 0.7rem; color: var(--gold); margin-right: 15px; }
+        .nav-text { font-family: 'Cinzel'; font-size: 0.85rem; letter-spacing: 2px; }
+
+        /* Main */
+        .main-content { margin-left: var(--side-width); flex: 1; padding: 40px; max-width: 1500px; }
+
+        .panel-genesis {
+            background: rgba(10, 10, 10, 0.8); border: 1px solid var(--border);
+            padding: 25px; position: relative; margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .label-da-vinci {
+            position: absolute; top: -10px; left: 20px; background: var(--bg);
+            padding: 0 12px; font-family: 'JetBrains Mono'; font-size: 0.65rem;
+            color: var(--gold); text-transform: uppercase; letter-spacing: 2px;
+        }
+
+        /* Лог терминала */
+        .terminal-log {
+            background: rgba(0,0,0,0.8); border: 1px solid #1a1a1a;
+            font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+            color: var(--terminal-green); padding: 15px; height: 120px;
+            overflow-y: auto; line-height: 1.4; margin-top: 20px;
+        }
+
+        /* Матрица */
+        .matrix-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 10px; max-width: 380px; margin: 0 auto;
+        }
+        .matrix-cell {
+            aspect-ratio: 1; border: 1px solid var(--border);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: rgba(184, 155, 94, 0.02); transition: 0.3s;
+        }
+        .matrix-cell:hover { background: rgba(184, 155, 94, 0.1); border-color: var(--gold); }
+        .matrix-n { font-size: 0.6rem; color: var(--gold-dark); }
+        .matrix-v { font-family: 'JetBrains Mono'; font-size: 1.5rem; color: var(--gold-bright); }
+
+        .nexus-table { width: 100%; border-collapse: collapse; font-family: 'JetBrains Mono'; font-size: 0.75rem; }
+        .nexus-table th { color: var(--gold); text-align: left; padding: 10px; border-bottom: 1px solid var(--border); }
+        .nexus-table td { padding: 10px; border-bottom: 1px solid rgba(184, 155, 94, 0.05); }
+
+        input[type="date"], input[type="text"] {
+            background: #000; border: 1px solid var(--border); color: var(--gold);
+            padding: 10px; font-family: 'JetBrains Mono'; width: 100%; outline: none;
+        }
+    </style>
+    </style>
+</head>
+<body>
+
+<div class="nexus-container">
+    <aside class="sidebar">
+        <div class="brand">GENESIS</div>
+        <nav>
+            <div class="nav-item active" onclick="showTab('overview', this)">
+                <span class="nav-num">01</span><span class="nav-text">OVERVIEW</span>
+            </div>
+            <div class="nav-item" onclick="showTab('dossier', this)">
+                <span class="nav-num">02</span><span class="nav-text">PSY_MATRIX</span>
+            </div>
+            <div class="nav-item" onclick="showTab('resonance', this)">
+                <span class="nav-num">03</span><span class="nav-text">RESONANCE</span>
+            </div>
+            <div class="nav-item" onclick="showTab('sync', this)">
+                <span class="nav-num">04</span><span class="nav-text">PARTNER_SYNC</span>
+            </div>
+            <div class="nav-item" onclick="showTab('security', this)">
+                <span class="nav-num">05</span><span class="nav-text">SYSTEM_LOGS</span>
+            </div>
+        </nav>
+
+        <div class="terminal-log" id="log-body">
+            > [SYSTEM] Инициализация...<br>
+            > [AUTH] Субъект идентифицирован.<br>
+            > [READY] Ожидание команд_
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1 style="font-family: 'Cinzel'; font-size: 2rem; color: var(--gold-bright); letter-spacing: 4px;">
+                    {{ user.full_name if user else 'SUBJECT_UNKNOWN' }}
+                </h1>
+                <p style="font-family: 'JetBrains Mono'; font-size: 0.65rem; color: var(--gold-dark);">
+                    GENESIS_ID: {{ user.id if user else '000' }} | LVL: 8.5 PRO | ARCANE: {{ arcane_key if arcane_key else '?' }}
+                </p>
+            </div>
+            <div id="header-clock" style="font-family: 'JetBrains Mono'; color: var(--gold); font-size: 1.1rem;">00:00:00</div>
+        </header>
+
+        <section id="overview" class="pane active">
+            <div style="display: grid; grid-template-columns: 1fr 320px; gap: 25px;">
+                <div class="panel-genesis">
+                    <span class="label-da-vinci">BIORYTHM_CORE</span>
+                    <div style="height: 280px;"><canvas id="biorhythmChart"></canvas></div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 20px;">
+                    <div class="panel-genesis" style="text-align: center;">
+                        <span class="label-da-vinci">CURRENT_FOCUS</span>
+                        <div id="focus-msg" style="font-family: 'JetBrains Mono'; font-size: 0.75rem; color: var(--terminal-green);">
+                            АНАЛИЗ ЦИКЛОВ...
+                        </div>
+                    </div>
+                    <div class="panel-genesis" style="background: rgba(184,155,94,0.05);">
+                        <span class="label-da-vinci">ARCANE_POWER</span>
+                        <div style="font-family: 'Cinzel'; font-size: 2.2rem; text-align: center; color: var(--gold-bright);">
+                            {{ matrix.get('1', '').length if matrix else '0' }}
+                        </div>
+                        <div style="font-size: 0.6rem; text-align: center; color: var(--gold-dark);">WILLPOWER_UNITS</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="dossier" class="pane">
+            <div style="display: grid; grid-template-columns: 400px 1fr; gap: 30px;">
+                <div class="panel-genesis">
+                    <span class="label-da-vinci">PYTHAGOREAN_SQUARE</span>
+                    <div class="matrix-grid">
+                        {% for i in ['1','2','3','4','5','6','7','8','9'] %}
+                        <div class="matrix-cell">
+                            <span class="matrix-n">{{ i }}</span>
+                            <span class="matrix-v">{{ matrix.get(i, '-') }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="panel-genesis">
+                    <span class="label-da-vinci">KARMA_&_FINANCE_DECODER</span>
+                    <div class="terminal-text" style="font-size: 0.85rem; height: 350px; overflow-y: auto; padding-right: 10px;">
+                        <h3 style="color:var(--gold); font-family:'Cinzel'; margin-bottom:10px;">{{ content.title if content else 'ARCHETYPE' }}</h3>
+                        <p style="margin-bottom:15px;">{{ content.full_text | safe if content else 'Загрузка...' }}</p>
+                        <div style="border-top: 1px solid var(--border); padding-top:10px; color: var(--gold-bright);">
+                            <strong>FINANCE:</strong> {{ content.finance if content else '---' }}<br><br>
+                            <strong>KARMA:</strong> {{ content.karma | safe if content else '---' }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="sync" class="pane">
+            <div class="panel-genesis" style="max-width: 600px; margin: 0 auto;">
+                <span class="label-da-vinci">PARTNER_RESONANCE_SCANNER</span>
+                <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                    <input type="date" id="partner-date">
+                    <button onclick="checkSync()" style="background: var(--gold); border: none; color: #000; padding: 0 20px; cursor: pointer; font-family: 'Cinzel'; font-weight: bold;">SCAN</button>
+                </div>
+                <div id="sync-result" style="border: 1px dashed var(--border); padding: 20px; text-align: center; font-family: 'JetBrains Mono'; min-height: 100px;">
+                    ОЖИДАНИЕ ВВОДА ДАННЫХ ПАРТНЕРА...
+                </div>
+            </div>
+        </section>
+        <section id="security" class="pane">
+            <div class="panel-genesis">
+                <span class="label-da-vinci">CORE_PROTOCOL_LOGS</span>
+                <table class="nexus-table">
+                    <thead>
+                        <tr>
+                            <th>TIMESTAMP</th>
+                            <th>ACTION_EVENT</th>
+                            <th>ACCESS_LEVEL</th>
+                            <th>STATUS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="security-log-table">
+                        {% for log in user_sessions %}
+                        <tr>
+                            <td>{{ log.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>{{ log.session_type }}</td>
+                            <td>ALPHA-7</td>
+                            <td style="color: var(--terminal-green);">[ EXECUTED ]</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" style="text-align: center; padding: 40px; color: var(--gold-dark);">АРХИВНЫЕ ДАННЫЕ ОТСУТСТВУЮТ</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <footer style="margin-top: auto; padding-top: 50px;">
+            <div class="panel-genesis" style="border-top: 2px solid var(--gold); background: rgba(8,8,8,0.95);">
+                <span class="label-da-vinci">IKIGAI_PRO_VECTOR_ANALYSIS</span>
+                <div style="display: grid; grid-template-columns: 1.2fr 0.8fr 1fr; gap: 40px;">
+
+                    <div>
+                        <h4 style="font-family: 'Cinzel'; color: var(--gold); font-size: 0.75rem; margin-bottom: 15px; letter-spacing: 2px;">RECOMMENDED_PATHways</h4>
+                        <table style="width: 100%; font-family: 'JetBrains Mono'; font-size: 0.65rem;">
+                            <tbody id="ikigai-table-body">
+                                <tr><td style="padding: 5px 0;">INIT_NEURAL_LINK...</td><td style="text-align: right;">[WAIT]</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div style="border-left: 1px solid var(--border); border-right: 1px solid var(--border); padding: 0 20px; text-align: center;">
+                        <div style="font-family: 'Cinzel'; font-size: 0.8rem; color: var(--gold-bright); letter-spacing: 2px;">NEXUS_OS v8.5 PRO</div>
+                        <div id="footer-clock" style="font-family: 'JetBrains Mono'; font-size: 1.6rem; color: var(--gold); margin: 12px 0; text-shadow: 0 0 10px rgba(184,155,94,0.3);">00:00:00</div>
+                        <div style="font-family: 'JetBrains Mono'; font-size: 0.6rem; color: var(--gold-dark);">
+                            SYNC_STABILITY: <span style="color: var(--terminal-green);">99.9%</span><br>
+                            UPTIME: 144:12:08
+                        </div>
+                    </div>
+
+                    <div style="text-align: right; display: flex; flex-direction: column; justify-content: space-between;">
+                        <p style="font-size: 0.65rem; color: #666; font-family: 'JetBrains Mono'; line-height: 1.6;">
+                            [AUTHORIZED_USER_ONLY]<br>
+                            BIOMETRIC_DATA_ENCRYPTED<br>
+                            GENESIS_LABS_2024
+                        </p>
+                        <div style="font-family: 'Almendra'; font-size: 1.2rem; color: var(--gold-dark); opacity: 0.6;">
+                            Da Vinci Core <span style="font-size: 0.7rem;">®</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </main>
+</div>
+
+<script>
+    // 1. ТЕРМИНАЛЬНЫЙ ЛОГ (из profile_full)
+    function logAction(msg) {
+        const log = document.getElementById('log-body');
+        const time = new Date().toLocaleTimeString('en-GB', { hour12: false });
+        log.innerHTML += `<br>> [${time}] ${msg}`;
+        log.scrollTop = log.scrollHeight;
+    }
+
+    // 2. ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК
+    function showTab(tabId, btn) {
+        document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+
+        const target = document.getElementById(tabId);
+        if (target) {
+            target.classList.add('active');
+            btn.classList.add('active');
+            logAction(`Переход в сектор: ${tabId.toUpperCase()}`);
+        }
+    }
+
+    // 3. СОВМЕСТИМОСТЬ (из вашего backup-файла)
+    function checkSync() {
+        const pDate = document.getElementById('partner-date').value;
+        if(!pDate) {
+            logAction("!!! ОШИБКА: ДАТА НЕ ВВЕДЕНА");
+            return;
+        }
+        logAction("Запуск резонанса частот...");
+        const syncBox = document.getElementById('sync-result');
+        syncBox.innerHTML = "CALCULATING_RESONANCE...";
+
+        setTimeout(() => {
+            const res = Math.floor(Math.random() * 45 + 50);
+            syncBox.innerHTML = `
+                <div style="font-size: 2.5rem; color: var(--gold-bright); font-family: 'Cinzel';">${res}%</div>
+                <div style="color: var(--terminal-green); font-size: 0.7rem;">[ РЕЗОНАНС СИНХРОНИЗИРОВАН ]</div>
+            `;
+            logAction(`Результат синхронизации: ${res}%`);
+        }, 1500);
+    }
+
+    // 4. ОБНОВЛЕНИЕ ЧАСОВ
+    setInterval(() => {
+        const time = new Date().toLocaleTimeString('ru-RU', { hour12: false });
+        document.getElementById('header-clock').innerText = time;
+        document.getElementById('footer-clock').innerText = time;
+    }, 1000);
+
+    // 5. ГРАФИК БИОРИТМОВ
+    const ctx = document.getElementById('biorhythmChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: Array.from({length: 30}, (_, i) => i + 1),
+            datasets: [{
+                label: 'PHYSICAL',
+                data: Array.from({length: 30}, () => Math.sin(Math.random()) * 100),
+                borderColor: '#b89b5e', borderWidth: 2, tension: 0.4, pointRadius: 0
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { grid: { color: 'rgba(184,155,94,0.05)' }, ticks: { display: false } },
+                x: { grid: { display: false }, ticks: { color: '#444', font: { size: 8 } } }
+            }
+        }
+    });
+
+    // 6. ИНИЦИАЛИЗАЦИЯ ИКИГАЙ
+    document.addEventListener('DOMContentLoaded', () => {
+        const tableBody = document.getElementById('ikigai-table-body');
+        // Пример профессий на основе вашего content.py/backup
+        const profs = ["Квантовый Аналитик", "Специалист по кибер-праву", "Архитектор смыслов", "Нейродизайнер"];
+        tableBody.innerHTML = profs.map(p => `
+            <tr style="border-bottom: 1px solid rgba(184,155,94,0.05);">
+                <td style="padding: 8px 0; color: #aaa;">${p.toUpperCase()}</td>
+                <td style="text-align: right; color: var(--terminal-green);">${Math.floor(Math.random()*15+80)}%</td>
+            </tr>
+        `).join('');
+        logAction("Система готова к работе.");
+    });
+</script>
+
+</body>
+</html>

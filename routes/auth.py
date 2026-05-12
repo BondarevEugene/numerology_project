@@ -1,10 +1,15 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User
-from flask_mail import Message
+from flask_mail import Message  # Предполагается, что в app.py написано: mail = Mail(app)
+# Импортируем mail из расширений, а не из app (чтобы избежать циклического импорта)
 from datetime import datetime
 import uuid
 from flask_login import login_user, logout_user, login_required, current_user
+
+auth_bp = Blueprint('auth', __name__)
+
+from flask_mail import Message
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -12,14 +17,13 @@ auth_bp = Blueprint('auth', __name__)
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        # 1. Сбор данных из формы
+        # 1. Сбор данных
         email = request.form.get('email')
         password = request.form.get('password')
         full_name = request.form.get('full_name')
         phone = request.form.get('phone')
         gender = request.form.get('gender')
         birth_date_str = request.form.get('birth_date')
-        # НОВОЕ: Получаем графический ключ
         pattern = request.form.get('pattern')
 
         print(f"--- [REG_PROTOCOL] Инициация субъекта: {email} ---")
@@ -28,16 +32,14 @@ def register():
         if User.query.filter_by(email=email).first():
             print(f"⚠️ Ошибка: Субъект {email} уже существует.")
             flash('Этот Email уже зарегистрирован в системе.')
-            # ИСПРАВЛЕНО: возвращаем на регистрацию, а не в профиль
             return redirect(url_for('auth.register'))
 
         try:
-            # 3. Создание пользователя
+            # 3. Создание объекта пользователя
             token = str(uuid.uuid4())
             new_user = User(
                 email=email,
-                password_hash=generate_password_hash(password),
-                pattern=pattern,  # НОВОЕ: Сохраняем паттерн (нужно поле в models.py!)
+                pattern=pattern,
                 full_name=full_name,
                 phone=phone,
                 gender=gender,
@@ -45,34 +47,17 @@ def register():
                 verification_token=token,
                 is_verified=False
             )
+            new_user.set_password(password)  # Используем метод из models.py
 
             db.session.add(new_user)
             db.session.commit()
-            # В файле auth.py внутри def register():
-            if not User.query.filter_by(email=email).first():
-                new_user = User(...)
-                db.session.add(new_user)
-                db.session.commit()
+            print("✅ [SYSTEM]: Данные успешно синхронизированы.")
 
-                # ВОТ ЗДЕСЬ ВСТАВЛЯЕМ ОТПРАВКУ
-                try:
-                    msg = Message("Genesis | Initialization Protocol",
-                                  sender=current_app.config['MAIL_USERNAME'],
-                                  recipients=[email])
-                    msg.html = render_template('emails/welcome.html', user_name=full_name)
-                    mail.send(msg)
-                except Exception as e:
-                    print(f"Ошибка отправки почты: {e}")
-
-                flash('Протокол завершен. Добро пожаловать.')
-                return redirect(url_for('auth.login'))
-            print("✅ [SYSTEM]: Данные успешно синхронизированы с Neon.")
-
-            # 4. Отправка почты (фоновый процесс)
+            # 4. Отправка почты (через try/except, чтобы не ломать регистрацию если почта упадет)
             try:
+                # Берем mail из current_app, если он там инициализирован
                 from app import mail
                 msg = Message("Genesis | Подтверждение доступа",
-                              sender="projectnumerology@gmail.com",
                               recipients=[email])
                 link = url_for('auth.verify_email', token=token, _external=True)
                 msg.body = f"Субъект {full_name}, подтвердите ваш доступ по ссылке: {link}"
@@ -81,18 +66,19 @@ def register():
             except Exception as mail_err:
                 print(f"⚠️ [MAIL_WARN]: Сервер почты недоступен: {mail_err}")
 
-            # 5. Авторизация
+            # 5. Авторизация и переход в профиль
             login_user(new_user, remember=True)
-            session['user_id'] = new_user.id  # Для совместимости с profile.py
 
             print(f"🚀 [SYSTEM]: Протокол завершен. Добро пожаловать, {full_name}")
-            flash(f'Протокол инициализирован. Добро пожаловать, {full_name}')
-            return redirect(url_for('profile.dashboard'))
+            flash(f'Протокол инициализирован. Добро пожаловать!')
+
+            # ВАЖНО: убедись, что роут называется именно 'profile' в app.py
+            return redirect(url_for('profile'))
 
         except Exception as e:
             db.session.rollback()
             print(f"❌ [CRITICAL_ERROR]: {e}")
-            flash("Критический сбой инициализации. Попробуйте позже.")
+            flash("Критический сбой инициализации.")
             return redirect(url_for('auth.register'))
 
     return render_template('register.html')
@@ -159,7 +145,7 @@ def login():
 @login_required
 def logout():
     logout_user()
-    session.clear() # Полная очистка
+    session.clear()  # Полная очистка
     flash("Сессия завершена. Доступ ограничен.")
     return redirect(url_for('main.index'))
 

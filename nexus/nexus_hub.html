@@ -2,239 +2,300 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>GENESIS | NEXUS MECHANICA</title>
+    <title>GENESIS | NEXUS ORCHESTRATOR v8.2 PRO</title>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.21.1/cytoscape.min.js"></script>
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&family=Inter:wght@300;400;600;700&family=Cinzel:wght@700&family=Cinzel+Decorative:wght@700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --gold: #b89b5e;
-            --gold-dim: rgba(184, 155, 94, 0.1);
             --bg: #050505;
-            --panel: rgba(10, 10, 10, 0.95);
+            --panel: rgba(10, 10, 10, 0.98);
+            --gold: #b89b5e;
+            --gold-dim: rgba(184, 155, 94, 0.2);
             --border: rgba(184, 155, 94, 0.2);
             --text: #dcdcdc;
             --sub-text: #666;
+            --danger: #8b0000;
+            --success: #2d5a27;
         }
 
+        * { box-sizing: border-box; }
         body, html {
-            margin: 0; padding: 0; width: 100%; min-height: 100%;
-            background-color: var(--bg); color: var(--text);
-            font-family: 'Inter', sans-serif; overflow-x: hidden;
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background: var(--bg); color: var(--text);
+            font-family: 'Inter', sans-serif; overflow: hidden;
         }
 
-        /* Фоновая сетка как на главной */
-        .grid-bg {
-            position: fixed; inset: 0;
-            background-image: linear-gradient(var(--border) 1px, transparent 1px),
-                              linear-gradient(90deg, var(--border) 1px, transparent 1px);
-            background-size: 50px 50px; z-index: -1; opacity: 0.15;
+        /* Витрувианская подложка */
+        .vitruvian-overlay {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 75vh; height: 75vh; z-index: 0;
+            background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Da_Vinci_Vitruve_Luc_Viatour.jpg/800px-Da_Vinci_Vitruve_Luc_Viatour.jpg') no-repeat center;
+            background-size: contain; opacity: 0.03; filter: invert(1) sepia(1);
+            animation: pulse-slow 20s ease-in-out infinite;
+            pointer-events: none;
+        }
+        @keyframes pulse-slow {
+            0%, 100% { opacity: 0.02; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.05; transform: translate(-50%, -50%) scale(1.05); }
         }
 
-        header {
-            padding: 20px 40px;
-            border-bottom: 1px solid var(--border);
-            display: flex; justify-content: space-between; align-items: center;
-            background: var(--panel); backdrop-filter: blur(10px);
+        #cy { position: absolute; width: 100vw; height: calc(100vh - 70px); z-index: 5; }
+
+        /* Панели */
+        .side-panel {
+            position: fixed; background: var(--panel); border: 1px solid var(--border);
+            z-index: 100; padding: 20px; backdrop-filter: blur(20px);
+            box-shadow: 0 0 40px rgba(0,0,0,0.8); display: flex; flex-direction: column;
+        }
+        .left-panel { top: 20px; left: 20px; bottom: 90px; width: 360px; }
+        .right-panel { top: 20px; right: 20px; bottom: 90px; width: 440px; }
+
+        .header-title {
+            font-family: 'Cinzel', serif; font-size: 15px; color: var(--gold);
+            border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 20px;
+            letter-spacing: 2px; text-transform: uppercase; display: flex; justify-content: space-between;
         }
 
-        .logo { font-family: 'Cinzel'; font-size: 20px; letter-spacing: 8px; color: var(--gold); }
+        /* Элементы метрик */
+        .stat-row { margin-bottom: 15px; font-family: 'JetBrains Mono', monospace; }
+        .stat-header { display: flex; justify-content: space-between; font-size: 10px; color: var(--sub-text); margin-bottom: 5px; text-transform: uppercase; }
+        .progress-bar { width: 100%; height: 3px; background: rgba(255,255,255,0.05); overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--gold); box-shadow: 0 0 10px var(--gold); transition: width 1.5s ease-in-out; }
 
-        #cy { width: 100%; height: 60vh; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--border); }
+        .chart-box { height: 140px; border: 1px solid var(--border); background: rgba(0,0,0,0.3); margin: 15px 0; padding: 5px; }
 
-        .nexus-controls {
-            display: grid; grid-template-columns: 1fr 1fr;
-            gap: 2px; background: var(--border); border-bottom: 1px solid var(--border);
+        /* Инспектор и Терминал */
+        .terminal {
+            background: rgba(0,0,0,0.6); border: 1px solid var(--border);
+            padding: 15px; flex-grow: 1; overflow-y: auto;
+            font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #aaa;
+            line-height: 1.6; border-radius: 2px;
         }
+        .terminal b { color: var(--gold); }
+        .node-name-large { font-family: 'Almendra', serif; font-size: 26px; color: var(--gold); margin-bottom: 5px; }
 
-        .control-panel { background: var(--panel); padding: 30px; }
-
-        h3 { font-family: 'Cinzel'; font-size: 14px; letter-spacing: 3px; color: var(--gold); margin-bottom: 20px; }
-
-        .btn-vinci {
-            background: transparent; border: 1px solid var(--gold);
-            color: var(--gold); padding: 10px 20px; cursor: pointer;
-            font-family: 'JetBrains Mono'; transition: 0.3s;
+        /* Кнопки */
+        .btn-nexus {
+            background: rgba(184, 155, 94, 0.05); border: 1px solid var(--border); color: var(--gold);
+            padding: 12px; font-family: 'JetBrains Mono', monospace; font-size: 11px; cursor: pointer;
+            width: 100%; transition: 0.3s; margin-top: 10px; text-transform: uppercase; font-weight: 700;
         }
-        .btn-vinci:hover { background: var(--gold); color: #000; box-shadow: 0 0 15px var(--gold); }
+        .btn-nexus:hover { background: var(--gold); color: #000; box-shadow: 0 0 15px var(--gold-dim); }
+        .btn-danger { border-color: var(--danger); color: var(--danger); margin-top: auto; }
 
-        /* Стили футера с главной */
+        /* Футер (Клон index.html) */
         footer {
-            background: #030303; border-top: 1px solid var(--border);
-            padding: 60px 20px 20px; margin-top: 0;
+            position: fixed; bottom: 0; width: 100%; height: 70px;
+            background: #0a0a0a; border-top: 1px solid var(--border);
+            display: grid; grid-template-columns: 1fr 2fr 1fr; align-items: center;
+            padding: 0 30px; z-index: 1000;
         }
-        .footer-content {
-            max-width: 1200px; margin: 0 auto;
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px;
-        }
-        .footer-section h4 {
-            color: var(--gold); font-family: 'Cinzel'; font-size: 14px;
-            letter-spacing: 2px; margin-bottom: 20px; border-left: 2px solid var(--gold); padding-left: 10px;
-        }
-        .footer-section p, .footer-section a {
-            color: var(--sub-text); text-decoration: none; font-size: 12px; line-height: 1.8; display: block;
-        }
-        .footer-bottom {
-            max-width: 1200px; margin: 40px auto 0; padding-top: 20px;
-            border-top: 1px solid rgba(184, 155, 94, 0.1);
-            display: flex; justify-content: space-between; font-size: 10px; color: #444;
-        }
-        /* Дополнительные стили для интеграции Engine-панели */
-    .engine-panel {
-        border-right: 1px solid var(--border);
-        padding-right: 30px;
-    }
-    .engine-status-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-        margin-top: 15px;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 9px;
-        text-transform: uppercase;
-    }
-    .status-item { color: var(--sub-text); }
-    .status-value { color: var(--gold); opacity: 0.8; }
+        .f-part { display: flex; align-items: center; gap: 20px; }
+        .f-label { color: #444; font-size: 9px; font-family: 'JetBrains Mono'; text-transform: uppercase; }
+        .f-value { color: var(--gold); font-size: 11px; font-family: 'JetBrains Mono'; font-weight: bold; }
+        .f-center { justify-content: center; font-family: 'Cinzel', serif; letter-spacing: 5px; font-size: 14px; color: var(--gold); }
+        #footer-time { font-family: 'JetBrains Mono'; font-size: 14px; color: #fff; margin-left: 15px; }
 
-    /* Убеждаемся, что футер растягивается правильно */
-    body { display: flex; flex-direction: column; min-height: 100vh; }
-    footer { margin-top: auto; }
     </style>
 </head>
 <body>
-    <div class="grid-bg"></div>
 
-    <header>
-        <div class="logo">NEXUS_MECHANICA</div>
-        <div style="font-size: 9px; opacity: 0.5;">CORE_LOGIC: ACTIVE</div>
-    </header>
+<div class="vitruvian-overlay"></div>
 
-    <div id="cy"></div>
+<div class="side-panel left-panel">
+    <div class="header-title">System Metrics <span>v8.2</span></div>
 
-    <div class="nexus-controls">
-        <div class="control-panel">
-            <h3>NODE_INSPECTOR</h3>
-            <div id="node-name" style="font-size: 18px; margin-bottom: 10px;">AWAITING_SELECTION...</div>
-            <div id="inspect-out" style="font-family: 'JetBrains Mono'; font-size: 11px; color: var(--sub-text);">
-                Select a neural node to inspect internal parameters.
-            </div>
-        </div>
-        <div class="control-panel">
-            <h3>COMMAND_INTERFACE</h3>
-            <div id="node-actions">
-                <p style="opacity: 0.3; font-size: 10px;">NO_ACTIVE_COMMANDS</p>
-            </div>
+    <div class="stat-row">
+        <div class="stat-header"><span>Core Stability</span><span>99.1%</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width: 99.1%"></div></div>
+    </div>
+
+    <div class="stat-row">
+        <div class="stat-header"><span>Memory Load</span><span>24%</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width: 24%; opacity: 0.6;"></div></div>
+    </div>
+
+    <div class="chart-box">
+        <canvas id="loadChart"></canvas>
+    </div>
+
+    <div class="header-title" style="margin-top: 10px;">Forge Command</div>
+    <button class="btn-nexus" onclick="forgeNewBlueprint()">🔨 Forge New Blueprint</button>
+    <button class="btn-nexus" onclick="location.reload()">🔄 Re-Sync Spheres</button>
+
+    <button class="btn-nexus btn-danger" onclick="window.location.href='/admin/'">Return to Core</button>
+</div>
+
+<div class="side-panel right-panel">
+    <div id="node-inspector">
+        <div class="header-title">Nexus Inspector</div>
+        <div class="node-name-large" id="ins-label">Select Node</div>
+        <div style="font-family: 'JetBrains Mono'; font-size: 10px; color: var(--sub-text); margin-bottom: 20px;" id="ins-id">ID: NONE</div>
+
+        <div id="ins-actions" style="margin-bottom: 20px;"></div>
+
+        <div class="stat-header" style="margin-bottom: 5px;">Codex Stream:</div>
+        <div class="terminal" id="ins-terminal">
+            <span style="color: #444;">> Awaiting neural link...</span>
         </div>
     </div>
+</div>
+
+<div id="cy"></div>
 
 <footer>
-    <div class="footer-content">
-        <div class="footer-section engine-panel">
-            <h4>SYSTEM_CORE</h4>
-            <div style="font-family: 'JetBrains Mono'; font-size: 11px; letter-spacing: 1px;">
-                <span style="color: #fff;">GENESIS ENGINE</span>
-                <span style="color: var(--gold);">v3.0_RELEASE</span>
-            </div>
-            <p style="font-size: 10px; margin: 5px 0;">LOCATION: [ NEXUS_ORCHESTRATOR ]</p>
-
-            <div class="engine-status-grid">
-                <div class="status-item">Uptime:</div>
-                <div class="status-value">99.998%</div>
-                <div class="status-item">Logic:</div>
-                <div class="status-value">Neural_Flow</div>
-                <div class="status-item">Auth:</div>
-                <div class="status-value">AES-256_GCM</div>
-                <div class="status-item">Load:</div>
-                <div class="status-value">Optimal</div>
-            </div>
-        </div>
-
-        <div class="footer-section">
-            <h4>PROTOCOLS</h4>
-            <a href="#">Matrix Calculation</a>
-            <a href="#">Synastry Analysis</a>
-            <a href="#">Archetype Mapping</a>
-            <a href="#">Neural Biorhythms</a>
-        </div>
-
-        <div class="footer-section">
-            <h4>DATABASE</h4>
-            <p>Nodes: <span id="node-count">32,402</span></p>
-            <p>Registry: Decentralized</p>
-            <p>Sync: <span style="color: #00ff41;">In Progress</span></p>
-            <p>Region: Global_Nexus</p>
-        </div>
-
-        <div class="footer-section">
-            <h4>CONTACT_GATE</h4>
-            <p>Support: projectnumerology@gmail.com</p>
-            <p>Direct: 0xDEADBEEF</p>
-            <a href="#" style="margin-top: 10px; border: 1px solid var(--border); padding: 5px; text-align: center;">TERMINAL_HELP</a>
-        </div>
+    <div class="f-part">
+        <div><span class="f-label">System:</span> <span class="f-value" style="color: #2d5a27;">● NOMINAL</span></div>
+        <div><span class="f-label">Node:</span> <span class="f-value" id="f-active-node">ROOT</span></div>
     </div>
-
-    <div class="footer-bottom">
-        <div style="display: flex; gap: 20px; align-items: center;">
-            <span style="color: var(--gold); font-weight: bold;">2024-2026 © ARCHITECTURAL CORE</span>
-            <span style="opacity: 0.3;">|</span>
-            <span>GENESIS HR® INTELLIGENCE SYSTEMS</span>
-        </div>
-        <div id="footer-time" style="font-family: 'JetBrains Mono'; color: var(--gold);">00:00:00 UTC</div>
-        <div style="letter-spacing: 3px; font-size: 9px; opacity: 0.5;">STRICTLY_CONFIDENTIAL_ACCESS</div>
+    <div class="f-part f-center">
+        GENESIS <span style="opacity:0.2; margin: 0 15px;">|</span> NEXUS HUB
+    </div>
+    <div class="f-part" style="justify-content: flex-end;">
+        <div><span class="f-label">Path:</span> <span class="f-value">ADMIN/NEXUS_HUB</span></div>
+        <div id="footer-time">00:00:00</div>
     </div>
 </footer>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function(){
-        fetch('/admin/nexus/data')
+    // 1. Часы и График
+    function updateTime() {
+        const now = new Date();
+        document.getElementById('footer-time').innerText = now.toLocaleTimeString('ru-RU', { hour12: false });
+    }
+    setInterval(updateTime, 1000); updateTime();
+
+    const ctx = document.getElementById('loadChart').getContext('2d');
+    const loadChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['', '', '', '', '', '', ''],
+            datasets: [{
+                data: [10, 15, 12, 18, 14, 22, 19],
+                borderColor: '#b89b5e',
+                borderWidth: 1.5,
+                tension: 0.4,
+                pointRadius: 0,
+                fill: true,
+                backgroundColor: 'rgba(184, 155, 94, 0.05)'
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false } },
+            scales: { y: { display: false }, x: { display: false } },
+            responsive: true, maintainAspectRatio: false
+        }
+    });
+
+    // 2. Инициализация Cytoscape
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('/admin/nexus/nodes')
             .then(res => res.json())
             .then(data => {
                 const cy = cytoscape({
                     container: document.getElementById('cy'),
-                    elements: data,
+                    elements: [...data.nodes, ...data.edges],
                     style: [
                         { selector: 'node', style: {
-                            'background-color': '#000',
-                            'label': 'data(label)',
-                            'color': '#b89b5e', // Золотой текст узлов
-                            'font-family': 'JetBrains Mono',
-                            'font-size': '8px',
-                            'width': 30, 'height': 30,
-                            'border-width': 1, 'border-color': '#b89b5e' // Золотая рамка
+                            'background-color': '#000', 'border-width': 1, 'border-color': '#b89b5e',
+                            'label': 'data(label)', 'color': '#b89b5e', 'font-family': 'JetBrains Mono',
+                            'font-size': '11px', 'text-valign': 'bottom', 'text-margin-y': 8,
+                            'width': 55, 'height': 55, 'shape': 'diamond'
                         }},
+                        { selector: 'node[type="center"]', style: { 'width': 85, 'height': 85, 'shape': 'star', 'background-color': '#b89b5e', 'color': '#fff' }},
+                        { selector: 'node[type="database"]', style: { 'shape': 'hexagon', 'background-color': '#111' }},
                         { selector: 'edge', style: {
-                            'width': 1,
-                            'line-color': 'rgba(184, 155, 94, 0.2)', // Тусклое золото для связей
-                            'curve-style': 'bezier',
-                            'target-arrow-shape': 'chevron',
-                            'target-arrow-color': '#b89b5e'
+                            'width': 1, 'line-color': 'rgba(184, 155, 94, 0.15)',
+                            'curve-style': 'bezier', 'target-arrow-shape': 'chevron', 'target-arrow-color': '#b89b5e'
                         }},
-                        { selector: ':selected', style: {
-                            'border-width': 3, 'border-color': '#fff', 'line-color': '#fff'
-                        }}
+                        { selector: ':selected', style: { 'border-width': 3, 'border-color': '#fff' }}
                     ],
-                    layout: { name: 'cose', padding: 50 }
+                    layout: { name: 'cose', padding: 100, animate: true }
                 });
 
                 cy.on('tap', 'node', function(evt){
                     const node = evt.target.data();
-                    document.getElementById('node-name').innerText = node.label;
+
+                    // Обновление UI
+                    document.getElementById('ins-label').innerText = node.label;
+                    document.getElementById('ins-id').innerText = `ID: ${node.id.toUpperCase()}`;
+                    document.getElementById('f-active-node').innerText = node.id.toUpperCase();
+
+                    // Инспекция через HTMX
                     if(node.full_path) {
                         htmx.ajax('GET', `/admin/nexus/inspect?path=${encodeURIComponent(node.full_path)}`, {
-                            target: '#inspect-out'
+                            target: '#ins-terminal', swap: 'innerHTML'
                         });
+                    }
+
+                    // Генерация кнопок функций
+                    const actionsDiv = document.getElementById('ins-actions');
+                    actionsDiv.innerHTML = '';
+                    if(node.actions && node.actions.length > 0) {
+                        node.actions.forEach(a => {
+                            const b = document.createElement('button');
+                            b.className = 'btn-nexus';
+                            b.innerHTML = `⚡ EXEC: ${a.replace('nexus_', '').toUpperCase()}`;
+                            b.onclick = () => runNexusProtocol(node.id, a);
+                            actionsDiv.appendChild(b);
+                        });
+                    } else {
+                        actionsDiv.innerHTML = '<div style="font-size:10px; color:#444;">NO DIRECTIVE HOOKS FOUND</div>';
                     }
                 });
             });
-
-        function updateTime() {
-            const now = new Date();
-            document.getElementById('footer-time').innerText = now.toLocaleTimeString('ru-RU') + " UTC";
-        }
-        setInterval(updateTime, 1000);
-        updateTime();
     });
-    </script>
+
+    // 3. Функции управления
+    function runNexusProtocol(moduleId, action) {
+        const term = document.getElementById('ins-terminal');
+        term.innerHTML += `<br><b>> RUNNING:</b> ${action}...`;
+        term.scrollTop = term.scrollHeight;
+
+        fetch('/admin/nexus/execute', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ module: moduleId, command: action })
+        })
+        .then(res => res.json())
+        .then(data => {
+            const color = data.status === 'success' ? '#2d5a27' : '#8b0000';
+            term.innerHTML += `<br><span style="color:${color}">> [RESPONSE]: ${data.data || data.message}</span>`;
+            term.scrollTop = term.scrollHeight;
+        })
+        .catch(err => {
+            term.innerHTML += `<br><span style="color:var(--danger)">> CRITICAL: LINK INTERRUPTED</span>`;
+        });
+    }
+
+    function forgeNewBlueprint() {
+        const name = prompt("Enter Name for the New Archetype:");
+        if (!name) return;
+
+        const term = document.getElementById('ins-terminal');
+        term.innerHTML += `<br><span style="color:var(--gold)">> FORGING MODULE: ${name}...</span>`;
+
+        fetch('/admin/nexus/forge', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: name })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.status === 'success') {
+                alert("The forge has completed the task.");
+                location.reload();
+            } else {
+                alert("The forge failed: " + data.message);
+            }
+        });
+    }
+</script>
+
 </body>
 </html>

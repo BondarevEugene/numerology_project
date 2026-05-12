@@ -1,15 +1,116 @@
-from flask import Blueprint, render_template, session, redirect, url_for, request, jsonify
-from models import db, User, ArchetypeContent, ProfessionContent, Course
-from mind_logic import calculate_full_matrix_logic, sum_digits, SYNASTRY_TEXTS
-from data import ARCHETYPE_EXTRAS
+"""
+--------------------------------------------------------------------------------
+MODULE: profile.py (Mobile Sync Extension)
+PROJECT: Genesis HR® | Intelligence Systems
+VERSION: 2.6.0 (Mobile Integration)
+DATE: 2024-05-21
+DESCRIPTION: API endpoint for mobile application synchronization.
+             Implements intelligent advice logic based on Matrix sectors.
+--------------------------------------------------------------------------------
+"""
+
 import math
-import datetime  # <--- ОБЯЗАТЕЛЬНО ЭТА СТРОКА ИНАЧЕ ПАДАЕТ РЕГИСТРАЦИЯ
-from datetime import date
+from datetime import date, datetime
+from flask import Blueprint, render_template, session, redirect, url_for, request, jsonify
+from flask_login import login_required, current_user
+from models import db, User, ArchetypeContent, ProfessionContent, Course, SessionArchive
+from utils import calculate_full_matrix_logic, sum_digits, SYNASTRY_TEXTS
+from data import ARCHETYPE_EXTRAS
+from flask import jsonify
+from content import ARCHETYPES
+from data import ARCHETYPE_EXTRAS
+from mind_logic import sum_digits # или  функция расчета аркана
+from datetime import datetime
+from flask import render_template, redirect, url_for
+from flask_login import current_user
+# Импортируем словари с данными и логику
+from content import ARCHETYPES
+from data import ARCHETYPE_EXTRAS
+from utils import calculate_full_matrix_logic, sum_digits
+
 
 profile_bp = Blueprint('profile', __name__)
 
 
-def get_temporal_advice():
+# --- [ СЕКЦИЯ: ОСНОВНОЙ МАРШРУТ ПАНЕЛИ ] ---
+
+
+@profile_bp.route('/')
+def index():
+    # 1. Логика пользователя (Auth или Guest)
+    if current_user.is_authenticated:
+        user = current_user
+    else:
+        class GuestUser:
+            id = 777
+            username = "GUEST_PROTOCOL"
+            full_name = "Авторизация пропущена"
+            birth_date = datetime(1990, 5, 20)
+            email = "guest@genesis.ai"
+        user = GuestUser()
+
+    # 2. Расчеты
+    d, m, y = user.birth_date.day, user.birth_date.month, user.birth_date.year
+    matrix, *_ = calculate_full_matrix_logic(d, m, y)
+    arcane_number = d if d <= 22 else sum_digits(d)
+    arcane_key = str(arcane_number)
+
+    # 3. Данные из баз (content.py и data.py)
+    content_data = ARCHETYPES.get(arcane_key, {})
+    extra_data = ARCHETYPE_EXTRAS.get(arcane_key, {})
+
+    # 4. Биоритмы и сессии
+    bio_data = _calculate_biorhythms_internal(user.birth_date)
+    user_sessions = []
+    try:
+        user_sessions = SessionArchive.query.filter_by(user_id=user.id).order_by(SessionArchive.created_at.desc()).limit(8).all()
+    except: pass
+
+    return render_template('profile.html',
+                           user=user, matrix=matrix, bio=bio_data,
+                           content=content_data, extra=extra_data,
+                           user_sessions=user_sessions, arcane_key=arcane_key)
+
+
+    # 5. Статистика для Радара
+stats = {
+        'haracter': len(str(matrix.get('1', '')).replace('-', '')),
+        'energy': len(str(matrix.get('2', '')).replace('-', '')),
+        'interest': len(str(matrix.get('3', '')).replace('-', '')),
+        'health': len(str(matrix.get('4', '')).replace('-', '')),
+        'logic': len(str(matrix.get('5', '')).replace('-', '')),
+        'trud': len(str(matrix.get('6', '')).replace('-', ''))
+    }
+
+
+# --- [ СЕКЦИЯ: ВНУТРЕННЯЯ ЛОГИКА (HELPER FUNCTIONS) ] ---
+
+def _calculate_biorhythms_internal(birth_date):
+    """Внутренний расчет биоритмов для формирования контекста шаблона"""
+    if not birth_date:
+        return {"phys": 0, "emot": 0, "intel": 0}
+    b_date = birth_date.date() if isinstance(birth_date, datetime) else birth_date
+    days = (date.today() - b_date).days
+    calc = lambda p: round(math.sin(2 * math.pi * days / p) * 100)
+    return {"phys": calc(23), "emot": calc(28), "intel": calc(33)}
+
+
+def _calculate_moon_phase(dt):
+    """Расчет фазы Луны на основе даты рождения или текущей даты"""
+    d_obj = dt.date() if isinstance(dt, datetime) else dt
+    diff = d_obj - date(2000, 1, 6)  # Дата известного новолуния
+    days = diff.days % 29.53059
+    if days < 1.84:
+        return "Новолуние 🌑"
+    elif days < 9.22:
+        return "Растущая Луна 🌓"
+    elif days < 16.61:
+        return "Полнолуние 🌕"
+    return "Убывающая Луна 🌗"
+
+
+def _get_temporal_advice():
+    """Система временных советов Genesis на основе текущего часа"""
     hour = datetime.now().hour
     if 5 <= hour < 11:
         return {"status": "ИНИЦИАЦИЯ", "msg": "Время установки векторов. Энергия на пике созидания.",
@@ -19,282 +120,227 @@ def get_temporal_advice():
                 "color": "#d4af37"}
     elif 17 <= hour < 22:
         return {"status": "АНАЛИЗ", "msg": "Время подведения итогов и калибровки настроек.", "color": "#00d1ff"}
-    else:
-        return {"status": "СОН РАЗУМА", "msg": "Глубокая фаза обработки данных. Не принимайте решений.",
-                "color": "#ff4444"}
+    return {"status": "СОН РАЗУМА", "msg": "Глубокая фаза обработки данных. Не принимайте решений.", "color": "#ff4444"}
 
 
-@profile_bp.route('/profile')
-def nexus_dashboard():
-    if 'user_id' not in session:
-        return redirect(url_for('auth.login'))
+# --- [ СЕКЦИЯ: API ЭНДПОИНТЫ (NEXUS OPERATIONS) ] ---
 
-    user = db.session.get(User, session['user_id'])
-    # Генерируем динамические логи "на лету" (имитация работы Nexus)
-    system_status = []
-    if bio_data['phys'] < 30:
-        system_status.append({"msg": "LOW_PHYSICAL_RESERVE: Рекомендуется минимизировать нагрузки", "type": "warn"})
-    if int(matrix.get('1', '0').replace('-', '0')) > 111:
-        system_status.append({"msg": "LEADERSHIP_OVERFLOW: Высокое давление на окружение", "type": "info"})
-    # Nexus сам решит: считать биоритмы, луну или матрицу сегодня
-    # Мы просто передаем 'user', а получаем 'render_context'
-    context = nexus.execute_event('on_dashboard_load', {'user': user, 'stats': {}})
-    system_status.append({"msg": f"SYNC_COMPLETED: Node_{user.id} stable", "type": "success"})
-
-    return render_template('profile.html', **context)
-
-
-@profile_bp.route('/profile')
-def dashboard():
-    # 1. Проверка авторизации
-    if 'user_id' not in session:
-        return redirect(url_for('auth.login'))
-
-    # СНАЧАЛА получаем пользователя
-    user = db.session.get(User, session['user_id'])
-
-    if not user:
-        return redirect(url_for('auth.login'))
-
-    # ТЕПЕРЬ рассчитываем биоритмы, так как переменная 'user' уже существует
-    bio_data = get_biorhythms(user.birth_date)
-
-    # 2. Базовые расчеты даты
-    d, m, y = user.birth_date.day, user.birth_date.month, user.birth_date.year
-
-    # 3. Расчет Психоматрицы
-    matrix, *_ = calculate_full_matrix_logic(d, m, y)
-
-    # 4. Получение основного Архетипа (1-9) и контента из Neon
-    arc_num = str(sum_digits(d))
-    content = ArchetypeContent.query.filter_by(number=arc_num).first()
-
-    # 5. Сбор дополнительных данных "из всех углов"
-    # А) Астро-ключи из data.py
-    extra = ARCHETYPE_EXTRAS.get(arc_num, {})
-
-    # Б) Рекомендованные профессии из таблицы ProfessionContent
-    professions = ProfessionContent.query.filter_by(number=arc_num).first()
-    prof_list = professions.list_csv.split(',') if professions and professions.list_csv else []
-
-    # В) Рекомендованные курсы/обучение
-    courses = Course.query.filter_by(archetype_num=arc_num).all()
-
-    # 6. Расчет динамических показателей (stats) для графиков
-    # Считаем "мощность" каждого сектора матрицы
-    def nexus_get_power(key):
-        val = matrix.get(key, '')
-        return len(val)
-
-    stats = {
-        "haracter": get_power('1'),
-        "energy": get_power('2'),
-        "interest": get_power('3'),
-        "health": get_power('4'),
-        "logic": get_power('5'),
-        "trud": get_power('6'),
-        "luck": get_power('7'),
-        "duty": get_power('8'),
-        "memory": get_power('9')
-    }
-
-    # 7. Расчет "Вибрационного Числа Года" (текущий прогноз)
-    current_year = date.today().year
-    year_vibe = sum_digits(d + m + current_year)
-
-    system_status = []
-    if bio_data['phys'] < 30:
-        system_status.append({"msg": "LOW_PHYSICAL_RESERVE: Рекомендуется минимизировать нагрузки", "type": "warn"})
-    if int(matrix.get('1', '0').replace('-', '0')) > 111:
-        system_status.append({"msg": "LEADERSHIP_OVERFLOW: Высокое давление на окружение", "type": "info"})
-
-    # Добавляем "шум" для атмосферы
-    system_status.append({"msg": f"SYNC_COMPLETED: Node_{user.id} stable", "type": "success"})
-
-    # 8. Формируем итоговый объект для шаблона
-    return render_template('profile.html',
-                           user=user,
-                           matrix=matrix,
-                           content=content,
-                           stats=stats,  # ваши расчеты (haracter, energy и т.д.)
-                           bio=bio_data,  # <--- ВОТ ЭТОГО НЕ ХВАТАЛО
-                           extra=extra,
-                           professions=prof_list,
-                           courses=courses,
-                           year_vibe=year_vibe,
-                           spirit_level=min(100, (stats['haracter'] + stats['luck']) * 15),
-                           today=datetime.date.today(),
-                           current_year=datetime.date.today().year)
-
-
-def get_moon_phase(dt):
-    # Упрощенный расчет фазы Луны
-    diff = dt - date(2000, 1, 6)
-    days = diff.days % 29.53
-    if days < 1.84:
-        return "Новолуние 🌑"
-    elif days < 9.22:
-        return "Растущая Луна 🌓"
-    elif days < 16.61:
-        return "Полнолуние 🌕"
-    else:
-        return "Убывающая Луна 🌗"
-
-
-@profile_bp.route('/profile/compatibility', methods=['POST'])
-# moon = get_moon_phase(user.birth_date)
-# bio = get_biorhythms(user.birth_date)
-# return render_template(..., moon=moon, bio=bio)
-def nexus_compatibility():
-    """Максимально точный расчет совместимости"""
-    if 'user_id' not in session:
-        return jsonify({"status": "error", "message": "Unauthorized"}), 401
-
-    user = db.session.get(User, session['user_id'])
-    partner_date_str = request.form.get('partner_date')
-
+@profile_bp.route('/nexus/save_session', methods=['POST'])
+@login_required
+def save_current_session():
+    """[ OPERATION: STATE ANCHOR ] Фиксация состояния в Chrono-Vault"""
+    data = request.json
     try:
-        p_date = datetime.date.today().strptime(partner_date_str, '%Y-%m-%d')
+        new_session = SessionArchive(
+            user_id=current_user.id,
+            arcane_number=data.get('arcane'),
+            state_tag=data.get('tag', 'Standard'),
+            bio_physical=data.get('bio_p'),
+            bio_emotional=data.get('bio_e'),
+            bio_intellectual=data.get('bio_i'),
+            notes=data.get('notes')
+        )
+        db.session.add(new_session)
+        db.session.commit()
+        return jsonify({"status": "anchored", "session_id": new_session.id})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"status": "error", "message": str(e)}), 500
 
-        # Логика Арканов (до 22)
+
+@profile_bp.route('/nexus/archive')
+@login_required
+def get_archive_vault():
+    """[ OPERATION: CHRONO-VAULT ACCESS ] Получение истории сессий"""
+    sessions = SessionArchive.query.filter_by(user_id=current_user.id).order_by(SessionArchive.timestamp.desc()).all()
+    return jsonify({
+        "status": "accessed",
+        "vault": [s.to_dict() for s in sessions]
+    })
+
+
+@profile_bp.route('/nexus/biorhythms')
+@login_required
+def get_biorhythms_api():
+    """[ SYNAPSE: BIORHYTHM ENGINE ] API для динамического обновления биоритмов"""
+    if not current_user.birth_date:
+        return jsonify({"status": "warning", "message": "Birth date not set in core"}), 200
+
+    data = _calculate_biorhythms_internal(current_user.birth_date)
+    return jsonify({
+        "status": "synchronized",
+        "data": data
+    })
+
+
+@profile_bp.route('/compatibility', methods=['POST'])
+@login_required
+def nexus_compatibility():
+    """[ OPERATION: SYNASTRY ] Расчет совместимости арканов"""
+    partner_date_str = request.form.get('partner_date')
+    try:
+        p_date = datetime.strptime(partner_date_str, '%Y-%m-%d').date()
+
         def to_22(day):
             return day if day <= 22 else day - 22
 
-        a1 = to_22(user.birth_date.day)
+        a1 = to_22(current_user.birth_date.day)
         a2 = to_22(p_date.day)
 
         pair_num = a1 + a2
         if pair_num > 22: pair_num -= 22
 
         description = SYNASTRY_TEXTS.get(pair_num, "Ваш союз — это уникальный кармический узел.")
-
-        return jsonify({
-            "status": "success",
-            "pair_num": pair_num,
-            "description": description
-        })
+        return jsonify({"status": "success", "pair_num": pair_num, "description": description})
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 400
 
 
-@profile_bp.route('/profile')
+# --- [ СЕКЦИЯ: ГЛАВНЫЙ ДАШБОРД ] ---
+
+@profile_bp.route('/')
 @login_required
-def dashboard():
+def profile_home():
+    """[ SYNAPSE: MAIN DASHBOARD ] Сборка всех данных для профиля пользователя"""
     user = current_user
+    if not user.birth_date:
+        return "Критический сбой: Дата рождения не найдена в профиле.", 400
+
+    # 1. Расчеты Психоматрицы и Аркана
     d, m, y = user.birth_date.day, user.birth_date.month, user.birth_date.year
-
-    # 1. Психоматрица и Скиллы (из твоей mind_logic)
-    matrix, extra_nums, user_skills = calculate_full_matrix_logic(d, m, y)
-
-    # 2. Архетип и доп. данные из data.py
+    matrix, *_ = calculate_full_matrix_logic(d, m, y)
     arc_num = str(sum_digits(d))
-    extras = ARCHETYPE_EXTRAS.get(arc_num, {})
 
-    # 3. Биоритмы и Луна
-    bio_data = get_biorhythms(user.birth_date)
-    moon_phase = get_moon_phase(date.today())
+    # 2. Получение контента из базы данных
+    content = ArchetypeContent.query.filter_by(number=arc_num).first()
+    extra = ARCHETYPE_EXTRAS.get(arc_num, {})
+    professions = ProfessionContent.query.filter_by(number=arc_num).first()
+    prof_list = professions.list_csv.split(',') if professions and professions.list_csv else []
+    courses = Course.query.filter_by(archetype_num=arc_num).all()
 
-    # 4. Временной совет (Инициация/Экспансия и т.д.)
-    temp_advice = get_temporal_advice()
+    # 3. Динамические показатели (Биоритмы и Луна)
+    bio_data = _calculate_biorhythms_internal(user.birth_date)
+    moon_phase = _calculate_moon_phase(user.birth_date)
+    advice = _get_temporal_advice()
 
-    # 5. График энергии (7 чакр/дней)
-    # Здесь можно вставить реальную логику или оставить как в index.html
-    energy_data = [5, 7, 8, 4, 6, 9, 5]
+    # 4. Аналитика сил (Stats) для графиков
+    def get_power(key):
+        val = matrix.get(key, '')
+        return 0 if val == '-' else len(str(val))
+
+    stats = {k: get_power(v) for k, v in {
+        "haracter": "1", "energy": "2", "interest": "3",
+        "health": "4", "logic": "5", "trud": "6",
+        "luck": "7", "duty": "8", "memory": "9"
+    }.items()}
+
+    # 5. Прогнозы и статусы системы
+    current_year = date.today().year
+    year_vibe = sum_digits(d + m + current_year)
+
+    system_status = []
+    if bio_data['phys'] < 30:
+        system_status.append({"msg": "LOW_PHYSICAL_RESERVE: Требуется калибровка отдыха", "type": "warn"})
+    if get_power('1') > 3:
+        system_status.append({"msg": "LEADERSHIP_OVERFLOW: Высокое давление воли", "type": "info"})
+    system_status.append({"msg": f"SYNC_COMPLETED: Node_{user.id} stable", "type": "success"})
 
     return render_template('profile.html',
                            user=user,
                            matrix=matrix,
-                           extra_nums=extra_nums,
-                           user_skills=user_skills,
-                           arc_num=arc_num,
-                           extras=extras,
-                           bio_data=bio_data,
-                           moon_phase=moon_phase,
-                           temp_advice=temp_advice,
-                           energy_data=energy_data)
-
-def get_moon_phase(date):
-    """Примерный расчет фазы Луны (0 - новолуние, 14 - полнолуние)"""
-    diff = date - datetime.date.today()(2000, 1, 6)  # Дата известного новолуния
-    days = diff.days
-    phase = (days % 29.53059)
-    if phase < 1.84:
-        return "Новолуние 🌑"
-    elif phase < 5.53:
-        return "Молодая луна 🌒"
-    elif phase < 9.22:
-        return "Первая четверть 🌓"
-    elif phase < 12.91:
-        return "Растущая луна 🌔"
-    elif phase < 16.61:
-        return "Полнолуние 🌕"
-    elif phase < 20.30:
-        return "Убывающая луна 🌖"
-    elif phase < 23.99:
-        return "Последняя четверть 🌗"
-    else:
-        return "Старая луна 🌘"
+                           content=content,
+                           stats=stats,
+                           bio=bio_data,
+                           moon=moon_phase,
+                           extra=extra,
+                           professions=prof_list,
+                           courses=courses,
+                           year_vibe=year_vibe,
+                           today=date.today(),
+                           advice=advice,
+                           system_status=system_status)
 
 
-def get_biorhythms(birth_date):
-    """Расчет биоритмов на сегодня (в процентах)"""
-    today = datetime.date.today()
-    days = (today - birth_date).days
-    # Циклы: Физический (23 дня), Эмоциональный (28), Интеллектуальный (33)
-    p = math.sin(2 * math.pi * days / 23) * 100
-    e = math.sin(2 * math.pi * days / 28) * 100
-    i = math.sin(2 * math.pi * days / 33) * 100
-    return {"phys": round(p), "emot": round(e), "intel": round(i)}
+@profile_bp.route('/api/v1/mobile_sync')
+@login_required
+def mobile_sync_api():
+    """
+    Интеллектуальный эндпоинт: объединяет расчеты матрицы, биоритмов и
+    генерирует контекстные рекомендации по спорту, питанию и рискам.
+    """
+    user = current_user
+
+    # Расчет базовых структур Genesis
+    d, m, y = user.birth_date.day, user.birth_date.month, user.birth_date.year
+    matrix, *_ = calculate_full_matrix_logic(d, m, y)
+    bio_data = _calculate_biorhythms_internal(user.birth_date)
+
+    # Инициализация контейнера рекомендаций
+    recommendations = {
+        "food": "Сбалансированное питание. Поддержание энергетического плато.",
+        "sport": "Стандартная активность согласно текущему биоритму.",
+        "mind": "Анализ текущих задач и когнитивная настройка.",
+        "risk": "Система стабильна. Критических резонансов не обнаружено."
+    }
+
+    # --- ЛОГИКА ИНТЕРПРЕТАЦИИ МАТРИЦЫ ---
+
+    # Анализ Сектора 1 (Характер / Воля)
+    h_val = str(matrix.get('1', '')).replace('-', '')
+    if len(h_val) > 3:
+        recommendations["risk"] = "LEADERSHIP_OVERFLOW: Избыточное давление воли. Риск деструктивного доминирования."
+        recommendations["mind"] = "Практика 'Тихого Наблюдателя'. Снизьте ментальный контроль над окружением."
+
+    # Анализ Сектора 4 (Здоровье / Физический ресурс)
+    if matrix.get('4') == '-':
+        recommendations[
+            "sport"] = "HEALTH_LOW_RESERVE: Сектор здоровья не активен. Требуется принудительная активация тела (йога, плавание)."
+        recommendations["food"] = "Genesis Diet: Исключить стимуляторы и тяжелые жиры. Фокус на гидратации."
+
+    # Интеграция архетипического контента
+    arcane_num = sum_digits(d)
+    content = ArchetypeContent.query.filter_by(number=arcane_num).first()
+    if content:
+        recommendations["mind"] = f"Архетип {arcane_num}: {content.description[:150]}..."
+
+    return jsonify({
+        "status": "success",
+        "node_id": f"GEN_MOBILE_{user.id}",
+        "username": user.username,
+        "matrix": matrix,
+        "bio": bio_data,
+        "rec": recommendations,
+        "sync_time": datetime.now().isoformat()
+    })
 
 
-# Внутри @profile_bp.route('/profile') добавь:
-# moon = get_moon_phase(user.birth_date)
-# bio = get_biorhythms(user.birth_date)
-# return render_template(..., moon=moon, bio=bio)
+@profile_bp.route('/api/v1/evolution_sync')
+@login_required
+def evolution_sync():
+    user = current_user
+    d, m, y = user.birth_date.day, user.birth_date.month, user.birth_date.year
+    matrix, *_ = calculate_full_matrix_logic(d, m, y)
 
-# ==========================================
-# 2. NEXUS WRAPPERS (Обертки для админки)
-# ==========================================
-def nexus_get_biorhythms_data(user):
-    """Эта функция теперь видна в NEXUS-админке"""
-    return get_biorhythms(user.birth_date)
+    # Логіка вибору квестів із бази
+    active_quests = []
 
+    # Приклад: Реакція на пустий сектор 4 (Здоров'я)
+    if matrix.get('4') == '-':
+        quest = EvolutionProtocol.query.filter_by(sector_trigger=4, condition='empty').first()
+        if quest:
+            active_quests.append({"id": quest.id, "title": quest.title, "xp": quest.xp_reward})
 
-def nexus_calculate_moon_logic(user):
-    """И эта тоже"""
-    return get_moon_phase(user.birth_date)
+    # Приклад: Реакція на перевантажений сектор 1 (Воля)
+    if len(str(matrix.get('1', '')).replace('-', '')) > 3:
+        quest = EvolutionProtocol.query.filter_by(sector_trigger=1, condition='overflow').first()
+        if quest:
+            active_quests.append({"id": quest.id, "title": quest.title, "xp": quest.xp_reward})
 
-
-def nexus_biorhythms_check(context):
-    """[NODE] Проверка биоритмов пользователя для системы логов"""
-    # Вызываем твою основную функцию
-    user_birth = context['user'].birth_date
-    results = get_biorhythms(user_birth)
-    return results
-
-
-def nexus_moon_phase_info(context):
-    """[NODE] Получение фазы луны для дашборда"""
-    today = datetime.date.today()
-    return get_moon_phase(today)
-
-
-def nexus_matrix_power(context):
-    """[NODE] Анализ силы матрицы (111+)"""
-    matrix = context.get('matrix', {})
-    # Логика анализа...
-    return "High Energy" if len(matrix.get('1', '')) > 2 else "Stable"
-
-
-def get_temporal_advice():
-    from datetime import datetime
-    hour = datetime.now().hour
-
-    if 5 <= hour < 11:
-        return {"status": "Инициация", "msg": "Время для установки векторов дня. Энергия на пике созидания."}
-    elif 11 <= hour < 17:
-        return {"status": "Экспансия", "msg": "Активная фаза захвата ресурсов и реализации логических цепочек."}
-    elif 17 <= hour < 22:
-        return {"status": "Анализ", "msg": "Время подведения итогов и калибровки внутренних настроек."}
-    else:
-        return {"status": "Сон разума", "msg": "Глубокая фаза обработки данных подсознанием. Не принимать решений."}
+    return jsonify({
+        "status": "active",
+        "rank": "NEOPHYTE",  # Можна розрахувати на основі UserProgress
+        "xp_progress": 0.45,
+        "matrix": matrix,
+        "daily_quests": active_quests,
+        "detailed_analysis": ARCHETYPE_EXTRAS.get(sum_digits(d), {})
+    })
