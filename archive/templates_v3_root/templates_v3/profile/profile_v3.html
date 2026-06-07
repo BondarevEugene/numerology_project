@@ -1,0 +1,43 @@
+{% extends "templates_v3/layout/base.html" %}
+{% block content %}
+<div class="profile-container">
+    <div class="genesis-panel">
+        <div class="panel-header">
+            GENESIS ACCOUNT
+        </div>
+        <div class="account-grid">
+            <div>
+                <div class="label">NAME</div>
+                <div>{{ current_user.full_name }}</div>
+            </div>
+            <div>
+                <div class="label">EMAIL</div>
+                <div>{{ current_user.email }}</div>
+            </div>
+            <div>
+                <div class="label">PLAN</div>
+                <div>{{ profile.subscription }}</div>
+            </div>
+            <div>
+                <div class="label">REPORTS</div>
+                <div>{{ profile.reports_count }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="genesis-panel">
+        <div class="panel-header">
+            MY REPORTS
+        </div>
+        {% for item in profile.history %}
+        <div class="history-item">
+            <div>
+                {{ item.timestamp }}
+            </div>
+            <div>
+                {{ item.archetype_title }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

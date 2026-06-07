@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Genesis | Access Recovery</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        body { background: #050505; color: #b89b5e; font-family: 'JetBrains Mono'; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .box { width: 400px; border: 1px solid #b89b5e; padding: 30px; background: #0a0a0a; text-align: center; }
+        input { width: 100%; background: #000; border: 1px solid #333; color: #b89b5e; padding: 12px; margin: 20px 0; }
+        button { width: 100%; background: #b89b5e; color: #000; border: none; padding: 12px; font-family: 'Cinzel'; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2 style="font-family: 'Cinzel';">RECOVERY_PROTOCOL</h2>
+        <p style="font-size: 11px; color: #666;">Введите Email, привязанный к вашей матрице. Мы вышлем инструкции по восстановлению доступа.</p>
+        <form method="POST" action="{{ url_for('auth.reset_request') }}">
+            <input type="email" name="email" placeholder="ENTER_SECURE_EMAIL" required>
+            <button type="submit">INITIATE_RECOVERY</button>
+        </form>
+        <a href="{{ url_for('auth.login') }}" style="display:block; margin-top:20px; color:#444; font-size:10px; text-decoration:none;">// BACK_TO_LOGIN</a>
+    </div>
+</body>
+</html>

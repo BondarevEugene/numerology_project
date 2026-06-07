@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+
+<title>GENESIS PLATFORM</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+<link
+    rel="stylesheet"
+    href="{{ url_for(
+        'static',
+        filename='css_v3/nexus_ui.css'
+    ) }}">
+<style>
+
+    body{
+        margin:0;
+        background:#050608;
+        color:#b89b5e;
+        font-family:'JetBrains Mono',monospace;
+    }
+
+    .wrapper{
+        display:flex;
+        min-height:100vh;
+    }
+
+    .sidebar{
+        width:300px;
+        background:#0a0a0a;
+        border-right:1px solid rgba(184,155,94,.15);
+        padding:24px;
+        box-sizing:border-box;
+    }
+
+    .logo{
+        font-family:'Cinzel';
+        font-size:28px;
+        margin-bottom:30px;
+        color:#d4b97d;
+    }
+
+    .logo-sub{
+        margin-top:10px;
+        font-size:11px;
+        line-height:1.5;
+        color:#777;
+        font-family:'JetBrains Mono',monospace;
+    }
+
+    .sidebar-title{
+        margin-top:24px;
+        margin-bottom:10px;
+        font-size:11px;
+        letter-spacing:2px;
+        color:#666;
+        text-transform:uppercase;
+    }
+
+    .menu a{
+        display:block;
+        padding:10px 12px;
+        margin-bottom:8px;
+        text-decoration:none;
+        color:#b89b5e;
+        border:1px solid rgba(184,155,94,.10);
+        border-radius:8px;
+        transition:.25s;
+    }
+
+    .menu a:hover{
+        background:#1a1711;
+        border-color:rgba(184,155,94,.25);
+    }
+
+    .platform-status{
+        margin-top:35px;
+        padding-top:20px;
+        border-top:1px solid rgba(184,155,94,.10);
+    }
+
+    .status-line{
+        font-size:11px;
+        color:#777;
+        margin-bottom:8px;
+    }
+
+    .content{
+        flex:1;
+        padding:30px;
+        background:#050608;
+        overflow-x:auto;
+    }
+
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+<div class="sidebar">
+    <div class="logo">
+        GENESIS
+        <div class="logo-sub">
+            Human Intelligence Platform
+            <br>
+            Powered by Nexus Core
+        </div>
+    </div>
+    <div class="menu">
+        <div class="sidebar-title">
+            COMMAND CENTER
+        </div>
+        <a href="/admin">
+            Dashboard
+        </a>
+        <div class="sidebar-title">
+            CONTENT LAYER
+        </div>
+        <a href="/admin/content-hub">
+            Content Hub
+        </a>
+        <a href="/admin/archetypes">
+            Archetypes
+        </a>
+        <a href="/admin/articles">
+            Articles
+        </a>
+        <a href="/admin/tips">
+            Daily Coach
+        </a>
+        <a href="/admin/protocols">
+            Protocols
+        </a>
+        <div class="sidebar-title">
+            INTELLIGENCE LAYER
+        </div>
+        <a href="/admin/content-hub">
+        Content Hub
+        </a>
+        <a href="/admin/professions">
+            Professions
+        </a>
+        <a href="/admin/vocations">
+            Career Intelligence
+        </a>
+        <a href="/admin/career-center">
+            Career Center
+        </a>
+            <a href="/admin/competencies">
+            Competency Dictionary
+        </a>
+        <a href="/admin/vocations/matrix">
+            Career Matrix
+        </a>
+
+        <div class="sidebar-title">
+            USER LAYER
+        </div>
+
+        <a href="/admin/users">
+            Users
+        </a>
+
+        <div class="sidebar-title">
+            NEXUS CORE
+        </div>
+
+        <a href="/admin/nexus-hub">
+            Nexus Hub
+        </a>
+
+        <a href="#">
+            Graph
+        </a>
+
+        <a href="#">
+            Inspector
+        </a>
+
+        <a href="#">
+            Automation
+        </a>
+
+        <a href="/admin/nexus-hub">
+            Hub
+        </a>
+
+        <a href="#">
+            Graph
+        </a>
+
+        <a href="#">
+            Inspector
+        </a>
+
+        <div class="sidebar-title">
+            SYSTEM
+        </div>
+
+        <div class="sidebar-title">
+            CONTROL CENTER
+        </div>
+
+        <a href="/admin/audit-center">
+            Audit Center
+        </a>
+
+        <a href="#">
+            Settings
+        </a>
+
+        <a href="#">
+            Logs
+        </a>
+
+    </div>
+    <div class="platform-status">
+        <div class="status-line">
+            Core Status: ONLINE
+        </div>
+        <div class="status-line">
+            Build: V10
+        </div>
+        <div class="status-line">
+            Nexus Engine: ACTIVE
+        </div>
+    </div>
+</div>
+<div class="content">
+    {% block content %}
+    {% endblock %}
+
+</div>
+
+
+</div>
+
+</body>
+</html>

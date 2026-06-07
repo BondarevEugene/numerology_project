@@ -43,9 +43,11 @@ def register():
                 full_name=full_name,
                 phone=phone,
                 gender=gender,
-                birth_date=datetime.strptime(birth_date_str, '%Y-%m-%d').date(),
-                verification_token=token,
-                is_verified=False
+                birth_date=datetime.strptime(
+                    birth_date_str,
+                    '%Y-%m-%d'
+                ).date(),
+                is_verified=True
             )
             new_user.set_password(password)  # Используем метод из models.py
 
@@ -54,6 +56,7 @@ def register():
             print("✅ [SYSTEM]: Данные успешно синхронизированы.")
 
             # 4. Отправка почты (через try/except, чтобы не ломать регистрацию если почта упадет)
+            """
             try:
                 # Берем mail из current_app, если он там инициализирован
                 from app import mail
@@ -65,7 +68,7 @@ def register():
                 print("📧 [MAIL]: Инструкции отправлены.")
             except Exception as mail_err:
                 print(f"⚠️ [MAIL_WARN]: Сервер почты недоступен: {mail_err}")
-
+            """
             # 5. Авторизация и переход в профиль
             login_user(new_user, remember=True)
 
@@ -73,7 +76,7 @@ def register():
             flash(f'Протокол инициализирован. Добро пожаловать!')
 
             # ВАЖНО: убедись, что роут называется именно 'profile' в app.py
-            return redirect(url_for('profile'))
+            return redirect('/cabinet')
 
         except Exception as e:
             db.session.rollback()
@@ -132,7 +135,7 @@ def login():
             # db.session.commit()
 
             flash(f'Доступ разрешен. Добро пожаловать, {user.full_name}')
-            return redirect(url_for('profile.dashboard'))
+            return redirect('/cabinet')
 
         else:
             flash("Ошибка аутентификации: неверные данные.")

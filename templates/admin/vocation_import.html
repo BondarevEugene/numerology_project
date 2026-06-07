@@ -1,0 +1,32 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<h1>Импорт профессий</h1>
+<div class="card">
+   <h3>
+      Вставьте список профессий
+   </h3>
+   <form method="post">
+      <textarea
+         name="content"
+         style="
+         width:100%;
+         height:500px;
+         background:#0a0a0a;
+         color:#b89b5e;
+         border:1px solid rgba(184,155,94,.2);
+         padding:15px;
+         font-family:monospace;
+         "
+         placeholder="CEO
+         Founder
+         COO
+         Project Manager
+         Business Analyst">
+      </textarea>
+      <br><br>
+      <button type="submit">
+      Импортировать
+      </button>
+   </form>
+</div>
+{% endblock %}

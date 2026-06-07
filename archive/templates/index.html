@@ -1,0 +1,1562 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genesis HR® | Intelligence Systems v8.2 PRO</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&family=Inter:wght@300;400;600;700&family=Cinzel:wght@700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+
+    <style>
+        /* =========================================
+           ГЛОБАЛЬНЫЙ МАСШТАБ (УМЕНЬШАЕМ НА 30%)
+        ========================================= */
+        html {
+            zoom: 0.7;
+        }
+
+        :root {
+            --bg: #050505; --panel: #0a0a0a;
+            --gold: #b89b5e; --gold-dark: #8c7647; --border: rgba(184, 155, 94, 0.2);
+            --text: #dcdcdc; --sub-text: #666; --glow: rgba(184, 155, 94, 0.15);
+            --danger: #ff3333; --success: #00ff41;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            overflow-x: hidden;
+        }
+
+        /* =========================================
+           БОКОВОЕ МЕНЮ (ЖЕСТКАЯ ФИКСАЦИЯ)
+        ========================================= */
+        aside {
+            width: 340px;
+            position: fixed;
+            left: 0; top: 0; bottom: 0;
+            background: var(--panel);
+            border-right: 1px solid var(--border);
+            padding: 30px 25px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* =========================================
+           ЗАЩИТА ОТ НАЕЗДА НА МЕНЮ
+        ========================================= */
+        .top-header {
+            margin-left: 380px !important;
+            margin-top: 40px !important;
+            text-align: left !important;
+            width: calc(100% - 420px) !important;
+        }
+
+        body > *:not(aside):not(script):not(style):not(.top-header) {
+            margin-left: 380px !important;
+            margin-right: 40px !important;
+            max-width: calc(100% - 420px) !important;
+            display: block;
+        }
+
+        /* =========================================
+           СЕТКИ ОТЧЕТОВ И КОНТЕНТА (СТРОГО 1 СТОЛБЕЦ)
+        ========================================= */
+        .dashboard-grid, .analysis-grid, .results-grid {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 30px;
+            margin-bottom: 40px;
+            width: 100%;
+        }
+
+        /* =========================================
+           ОФОРМЛЕНИЕ БЛОКОВ
+        ========================================= */
+        .info-block, .vocation-card {
+            border: 1px solid var(--border);
+            background: rgba(184, 155, 94, 0.03);
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .vocation-card { transition: all 0.4s; overflow: hidden; }
+        .vocation-card::before { content: ""; position: absolute; left: 0; top: 0; width: 2px; height: 100%; background: var(--gold); opacity: 0.5; }
+        .vocation-card:hover { background: rgba(184, 155, 94, 0.07); transform: translateX(5px); border-color: var(--gold); }
+        .income-tag { position: absolute; right: 0; top: 0; background: var(--gold); color: #000; font-size: 11px !important; font-weight: bold; padding: 2px 8px; text-transform: uppercase; }
+
+        /* =========================================
+           ШРИФТЫ
+        ========================================= */
+        p, span, div, li, .almendra { font-size: 16px; line-height: 1.6; }
+        h1 { font-family: 'Cinzel', serif; font-size: 38px !important; color: #fff; margin: 10px 0 !important; }
+        h2 { font-size: 24px; }
+        h3 { font-family: 'Cinzel', serif; font-size: 20px !important; color: var(--gold); }
+
+        .btn-execute {
+            width: 100%; padding: 20px;
+            background: var(--gold); color: #000;
+            border: none; font-family: 'Cinzel', serif;
+            font-weight: bold; cursor: pointer;
+            transition: all 0.3s; letter-spacing: 2px;
+            margin-top: 20px;
+        }
+        .btn-execute:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* =========================================
+           МАТРИЦА
+        ========================================= */
+        .py-matrix { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; max-width: 320px; }
+        .py-cell { aspect-ratio: 1; border: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); }
+        .py-num { color: var(--gold); font-size: 26px; font-weight: bold; }
+        .py-lab { font-size: 10px !important; color: var(--sub-text); text-transform: uppercase; }
+
+        /* =========================================
+           АНИМАЦИЯ И СКРЫТЫЕ ЭЛЕМЕНТЫ
+        ========================================= */
+        .scanline { position: fixed; top: 0; left: 340px; right: 0; height: 2px; background: var(--gold); opacity: 0.05; z-index: 10000; animation: scan 10s linear infinite; pointer-events: none; }
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+
+        /* Скрываем верхние кнопки NODE */
+        .system-gateway-top { display: none !important; }
+
+        /* =========================================
+           СТИЛИ КРАСИВОГО ФУТЕРА
+        ========================================= */
+        footer {
+            margin-top: 60px; padding: 40px 0 30px; border-top: 1px solid var(--border);
+            display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 40px;
+            font-family: 'JetBrains Mono', monospace; font-size: 14px;
+            color: var(--sub-text);
+            width: 100%;
+        }
+        .footer-divider { grid-column: span 3; height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); margin: -20px 0 20px 0; opacity: 0.3; }
+        .footer-brand .f-title { font-family: 'Cinzel', serif; font-size: 24px; font-weight: bold; color: var(--gold); margin-bottom: 10px; }
+        .footer-col h4 { color: var(--gold); font-size: 16px; margin: 0 0 15px 0; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
+        .legal-text { font-size: 12px; line-height: 1.6; color: #444; text-align: justify; margin-top: 10px; }
+        .compliance-badges { display: flex; gap: 10px; margin-top: 15px; filter: grayscale(1) opacity(0.5); }
+        .badge { border: 1px solid #333; padding: 4px 8px; font-size: 11px; color: #666; }
+    </style>
+</head>
+<body>
+
+<aside style="width: 350px; border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 25px; background: var(--panel); position: fixed; height: 100vh; z-index: 1000; overflow-y: auto; scrollbar-width: thin;">
+    <div class="genesis-logo" onclick="location.href='/'" style="font-family: 'Cinzel'; color: var(--gold); font-size: 24px; margin-bottom: 30px; text-align: center; letter-spacing: 5px; cursor: pointer;">
+        GENESIS
+    </div>
+
+    <div class="genesis-frame" style="border: 1px solid var(--border); padding: 15px; position: relative; margin-bottom: 20px;">
+        <form action="{{ url_for('index') }}" method="POST">
+            <div style="font-size: 9px; color: #444; margin-bottom: 5px; letter-spacing: 1px;">SUBJECT_IDENTIFICATION:</div>
+            <input type="text" name="user_name" placeholder="ENTER NAME" required style="width:100%; background:rgba(255,255,255,0.02); border:1px solid var(--border); color:#fff; padding:12px; margin-bottom:10px; font-family:'JetBrains Mono'; outline:none;">
+
+            <div style="font-size: 9px; color: #444; margin-bottom: 5px; letter-spacing: 1px;">TEMPORAL_ORIGIN (DD / MM / YYYY):</div>
+            <div style="display: flex; gap: 5px; margin-bottom: 15px;">
+                <input type="text" name="day" placeholder="DD" maxlength="2" required style="width:25%; background:rgba(255,255,255,0.02); border:1px solid var(--border); color:#fff; padding:12px; text-align:center;">
+                <input type="text" name="month" placeholder="MM" maxlength="2" required style="width:25%; background:rgba(255,255,255,0.02); border:1px solid var(--border); color:#fff; padding:12px; text-align:center;">
+                <input type="text" name="year" placeholder="YYYY" maxlength="4" required style="width:50%; background:rgba(255,255,255,0.02); border:1px solid var(--border); color:#fff; padding:12px; text-align:center;">
+            </div>
+
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px dashed var(--border);">
+        <div class="info-block" style="margin-top: 30px;">
+    <div class="tl"></div><div class="tr"></div><div class="bl"></div><div class="br"></div>
+
+        <div style="font-family: 'Cinzel'; font-size: 13px; color: var(--gold); margin-bottom: 20px; letter-spacing: 2px; border-bottom: 1px solid rgba(184, 155, 94, 0.2); padding-bottom: 5px;">
+            PARTNER_INFO
+        </div>
+
+        <div class="input-group">
+            <label style="font-family: 'JetBrains Mono'; font-size: 10px; color: var(--gold); text-transform: uppercase;">Partner_Name</label>
+            <input type="text" id="partner-name" placeholder="ENTER_NAME..." style="background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: #fff; width: 100%; padding: 8px; font-family: 'JetBrains Mono'; outline: none;">
+        </div>
+
+        <div class="input-group" style="margin-top: 15px;">
+            <label style="font-family: 'JetBrains Mono'; font-size: 10px; color: var(--gold); text-transform: uppercase;">Birth_Date_B</label>
+            <input type="date" id="partner-dob" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: #fff; width: 100%; padding: 8px; font-family: 'JetBrains Mono'; outline: none; color-scheme: dark;">
+        </div>
+
+        <button class="btn-execute" onclick="analyzeCompatibility()" style="width: 100%; margin-top: 20px; cursor: pointer; position: relative; z-index: 10;">
+            RUN_COMPATIBILITY_SCAN
+        </button>
+    </div>
+
+            <button type="submit" class="cyber-btn" style="width:100%; font-weight: bold; background: rgba(184, 155, 94, 0.1); color: var(--gold); border: 1px solid var(--gold); padding: 12px; cursor:pointer; font-family: 'JetBrains Mono'; font-size: 10px;">
+                EXECUTE ANALYSIS
+            </button>
+        </form>
+    </div>
+
+    <div style="margin-top: 10px; border-top: 1px solid var(--border); padding-top: 20px;">
+        <div style="font-size:9px; color:#444; margin-bottom:12px; letter-spacing:2px;">SYSTEM_GATEWAY</div>
+        <div class="gateway-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+
+            <div class="nav-tile {% if request.path == '/' %}active{% endif %}" onclick="location.href='/'" style="border: 1px solid var(--border); padding: 10px 5px; cursor: pointer; text-align: center; background: rgba(184,155,94,0.05);">
+                <div style="font-size: 7px; color: var(--gold); opacity: 0.6;">NODE_01</div>
+                <div style="font-family: 'Cinzel'; font-size: 9px; color: #fff;">HR_INTEL</div>
+                <div style="font-size: 6px; color: #0f0;">ONLINE</div>
+            </div>
+
+            <div class="nav-tile {% if request.path == '/lila' %}active{% endif %}" onclick="location.href='/lila'" style="border: 1px solid var(--border); padding: 10px 5px; cursor: pointer; text-align: center;">
+                <div style="font-size: 7px; color: var(--gold); opacity: 0.6;">NODE_02</div>
+                <div style="font-family: 'Cinzel'; font-size: 9px; color: #fff;">LEELA_PATH</div>
+                <div style="font-size: 6px; color: #555;">ACTIVE</div>
+            </div>
+
+            <div class="nav-tile {% if request.path == '/profile_nexus' %}active{% endif %}" onclick="location.href='/profile_nexus'" style="border: 1px solid var(--border); padding: 10px 5px; cursor: pointer; text-align: center;">
+                <div style="font-size: 7px; color: var(--gold); opacity: 0.6;">NODE_03</div>
+                <div style="font-family: 'Cinzel'; font-size: 9px; color: #fff;">PROFILE</div>
+                <div style="font-size: 6px; color: #555;">DATA</div>
+            </div>
+
+            <div class="nav-tile" onclick="location.href='/admin_panel_secure_gate'" style="border: 1px solid var(--border); padding: 10px 5px; cursor: pointer; text-align: center;">
+                <div style="font-size: 7px; color: var(--gold); opacity: 0.6;">NODE_04</div>
+                <div style="font-family: 'Cinzel'; font-size: 9px; color: #fff;">ADMIN_PANEL</div>
+                <div style="font-size: 6px; color: #555;">ROOT</div>
+            </div>
+
+            <div class="nav-tile" onclick="openNexus()" style="border: 1px solid var(--border); padding: 10px 5px; cursor: pointer; text-align: center;">
+                <div style="font-size: 7px; color: var(--gold); opacity: 0.6;">NODE_05</div>
+                <div style="font-family: 'Cinzel'; font-size: 9px; color: #fff;">NEXUS_HUB</div>
+                <div style="font-size: 6px; color: var(--gold);">CORE</div>
+            </div>
+
+            <div class="nav-tile" onclick="location.href='/initiation'" style="border: 1px solid var(--border); padding: 10px 5px; cursor: pointer; text-align: center;">
+                <div style="font-size: 7px; color: var(--gold); opacity: 0.6;">NODE_06</div>
+                <div style="font-family: 'Cinzel'; font-size: 9px; color: #fff;">INITIATION</div>
+                <div style="font-size: 6px; color: #555;">SETUP</div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="report-controls" style="margin-top: 20px; padding: 15px; border: 1px solid rgba(184,155,94,0.1); background: rgba(0,0,0,0.2);">
+        <input type="email" id="user_email" placeholder="ENTER SECURE EMAIL" style="background: #000; border: 1px solid var(--border); color: var(--gold); padding: 8px; font-family: 'JetBrains Mono'; font-size: 10px; width: 100%; margin-bottom: 10px; outline: none;">
+        <button id="send-btn" onclick="prepareAndSend()" class="cyber-btn" style="width: 100%; background: var(--gold); color: #000; font-weight: bold; border: none; padding: 10px; cursor: pointer; font-family: 'Cinzel'; font-size: 9px;">
+            GENERATE & TRANSMIT PDF
+        </button>
+    </div>
+
+    <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border); font-family: 'JetBrains Mono';">
+        <div id="clock" style="font-size: 22px; color: var(--gold);">00:00:00</div>
+        <div style="font-size: 9px; color: #333; margin-top: 5px; line-height: 1.4; letter-spacing: 1px;">
+            KERNEL: GEN_CORE_v8.2.0_PRO<br>
+            STATUS: ENCRYPTED_UPLINK_ACTIVE
+        </div>
+    </div>
+</aside> {% if result %}
+<div style="padding: 30px; box-sizing: border-box; width: calc(100% - 350px); margin-left: 350px; position: relative;">
+
+    <div class="main-archetype-header" style="margin-bottom: 35px; border-bottom: 1px solid var(--border); padding-bottom: 20px;">
+        <h1 style="font-family: 'Cinzel', serif; color: var(--gold); margin: 0; font-size: 26px; letter-spacing: 2px; text-transform: uppercase;">
+            {{ result.number }}. {{ result.title | replace('᚛', '') | replace('᚜', '') }}
+        </h1>
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; margin-top: 10px; display: flex; gap: 20px;">
+            <div>ПЛАНЕТА-ПОКРОВИТЕЛЬ: <span style="color: #fff; font-weight: bold;">{{ result.planet }}</span></div>
+            <div>СТИХИЯ: <span style="color: #fff; font-weight: bold;">{{ result.element }}</span></div>
+            <div>ВЕДУЩИЙ ВЕКТОР: <span style="color: var(--gold); font-weight: bold;">{{ result.number }}</span></div>
+        </div>
+    </div>
+
+    <div class="dashboard-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 40px; align-items: start;">
+
+        <div class="info-block" style="margin: 0;">
+            <div class="tl"></div><div class="tr"></div><div class="bl"></div><div class="br"></div>
+            <h3>🧠 КВАДРАТ ПИФАГОРА [ИНСТРУМЕНТ АНАЛИЗА]</h3>
+
+            <div class="matrix-container" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0; background: rgba(0,0,0,0.2); padding: 15px; border: 1px solid rgba(184,155,94,0.1);">
+                <div class="cell" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 15px; text-align: center; font-family: 'JetBrains Mono'; font-size: 18px; color: var(--gold); min-height: 25px;">{{ result.m1 if result.m1 else '—' }}</div>
+                <div class="cell" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 15px; text-align: center; font-family: 'JetBrains Mono'; font-size: 18px; color: var(--gold); min-height: 25px;">{{ result.m4 if result.m4 else '—' }}</div>
+                <div class="cell" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 15px; text-align: center; font-family: 'JetBrains Mono'; font-size: 18px; color: var(--gold); min-height: 25px;">{{ result.m7 if result.m7 else '—' }}</div>
+
+                <div class="cell" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 15px; text-align: center; font-family: 'JetBrains Mono'; font-size: 18px; color: var(--gold); min-height: 25px;">{{ result.m2 if result.m2 else '—' }}</div>
+                <div class="cell" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 15px; text-align: center; font-family: 'JetBrains Mono'; font-size: 18px; color: var(--gold); min-height: 25px;">{{ result.m5 if result.m5 else '—' }}</div>
+                <div class="cell" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 15px; text-align: center; font-family: 'JetBrains Mono'; font-size: 18px; color: var(--gold); min-height: 25px;">{{ result.m8 if result.m8 else '—' }}</div>
+
+                <div class="cell" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 15px; text-align: center; font-family: 'JetBrains Mono'; font-size: 18px; color: var(--gold); min-height: 25px;">{{ result.m3 if result.m3 else '—' }}</div>
+                <div class="cell" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 15px; text-align: center; font-family: 'JetBrains Mono'; font-size: 18px; color: var(--gold); min-height: 25px;">{{ result.m6 if result.m6 else '—' }}</div>
+                <div class="cell" style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 15px; text-align: center; font-family: 'JetBrains Mono'; font-size: 18px; color: var(--gold); min-height: 25px;">{{ result.m9 if result.m9 else '—' }}</div>
+            </div>
+
+            <div id="matrix-text-details" style="font-family: 'JetBrains Mono'; font-size: 11px; line-height: 1.8; border-top: 1px solid var(--border); padding-top: 15px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px 15px;">
+                    <div>⚖️ {{ result.character_desc }}</div>
+                    <div>🩺 {{ result.health_desc }}</div>
+                    <div>🔮 {{ result.luck_desc }}</div>
+                    <div>⚡ {{ result.energy_desc }}</div>
+                    <div>🧠 {{ result.logic_desc }}</div>
+                    <div>🛡️ {{ result.duty_desc }}</div>
+                    <div>🎨 {{ result.interest_desc }}</div>
+                    <div>🛠️ {{ result.labor_desc }}</div>
+                    <div>💾 {{ result.memory_desc }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="core-decoder" class="info-block" style="margin: 0; min-height: 310px;">
+            <div class="tl"></div><div class="tr"></div><div class="bl"></div><div class="br"></div>
+            <h3>🔍 ДЕКОДЕР СИСТЕМНЫХ СВОЙСТВ ПСИХОМАТРИЦЫ</h3>
+            <div id="decoder-content" style="font-family: 'JetBrains Mono'; font-size: 12px; color: var(--sub-text); line-height: 1.6; margin-top: 15px;">
+                <p style="color: var(--gold); margin-bottom: 10px;">> СКАНИРОВАНИЕ ЯЧЕЕК И ВЕКТОРОВ УСПЕШНО ЗАВЕРШЕНО:</p>
+                <p>• Направленность характера и воли сбалансирована базовой логической цепочкой.</p>
+                <p>• Плотность внутренних биоэнергетических связей обеспечивает высокую стрессоустойчивость.</p>
+                <p style="margin-top: 15px; color: #666;">* Нажмите на любую ячейку таблицы для вызова детальной контекстной справки.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-grid" style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 30px; margin-bottom: 40px; align-items: start;">
+
+        <div class="info-block" style="margin: 0;">
+            <div class="tl"></div><div class="tr"></div><div class="bl"></div><div class="br"></div>
+            <h3>📈 БИОРИТМИЧЕСКИЙ СКАНЕР (ТЕКУЩЕЕ СОСТОЯНИЕ)</h3>
+            <div style="height: 220px; position: relative; margin-top: 15px;">
+                <canvas id="biorhythmChart"></canvas>
+            </div>
+            <div id="biorhythm-legend" style="display: flex; justify-content: space-around; margin-top: 15px; font-size: 11px; font-family: 'JetBrains Mono';"></div>
+        </div>
+
+        <div class="info-block">
+            <h3>🌙 АКТИВНОСТЬ ЛУННОЙ ФАЗЫ</h3>
+            <div class="lunar-box" style="margin-top: 10px;">
+                <div style="font-size: 45px; filter: drop-shadow(0 0 10px var(--gold)); opacity: 0.8;">🌑</div>
+                <div style="font-family: 'JetBrains Mono'; font-size: 11px; line-height: 1.7;">
+                    ФАЗА: <span style="color:#fff;">Убывающая Луна</span><br>
+                    ОСВЕЩЕННОСТЬ: <span style="color:var(--gold);">74.2%</span><br>
+                    ВЛИЯНИЕ: <span style="color:var(--gold); font-weight: bold;">Пик интуиции и анализа</span>
+                </div>
+            </div>
+
+        <div style="margin-top: 25px; border-top: 1px solid var(--border); padding-top: 15px;">
+                <h3 style="font-size: 11px;">💼 ВАКАНСИИ [RELEVANT_MATCHES]</h3>
+                <div style="font-family: 'JetBrains Mono'; font-size: 10px; color: #666; max-height: 100px; overflow-y: auto;">
+                    {% if result and result.jobs %}
+                        {% for job in result.jobs %}
+                            <div style="margin-bottom: 8px; color: #fff;">> <span style="color:var(--gold)">{{ job }}</span></div>
+                        {% endfor %}
+                    {% else %}
+                        > АНАЛИЗ РЫНКА ТРУДА В РЕЖИМЕ ОЖИДАНИЯ...
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    <script>
+                        // Функция для быстрого доступа к админ-панели (NODE_04)
+                            function adminAccess() {
+                                console.log("--- INITIATING ADMIN GATEWAY ---");
+                                const pass = prompt("IDENTIFICATION REQUIRED (GATEWAY_CODE):");
+                                if (pass === "0602") {
+                                    window.location.href = "/admin/";
+                                } else {
+                                    alert("ACCESS_DENIED: INVALID_ROOT_CREDENTIALS");
+                                }
+                            }
+
+                            // Функция-заглушка для генерации PDF (NODE_06)
+                            function generatePDF() {
+                                console.log("--- PREPARING CORE_DATA FOR TRANSMISSION ---");
+                                alert("INITIATING DATA EXPORT: Генерация отчета PDF запущена. Модуль сборки матриц активен.");
+                                // В будущем здесь будет твой вызов window.print() или интеграция с html2pdf
+                            }
+
+                    // Функция-заглушка для генерации PDF (NODE_06)
+                    function generatePDF() {
+                        console.log("--- PREPARING CORE_DATA FOR TRANSMISSION ---");
+                        alert("INITIATING DATA EXPORT: Генерация отчета PDF запущена. Модуль сборки матриц активен.");
+                        // В будущем здесь будет твой вызов window.print() или интеграция с html2pdf
+                    }
+
+                     const coreDecodings = {
+                1: { title: "EGO & CHARACTER", desc: "Сила воли, лидерство и самооценка. Определяет способность стоять на своем и вести за собой." },
+                2: { title: "ENERGY_RESERVE", desc: "Биоэнергетика и контактность. Ресурс для взаимодействия с миром и восстановления сил." },
+                3: { title: "KNOWLEDGE_INTEREST", desc: "Творческий потенциал и тяга к наукам. Умение усваивать информацию и креативность." },
+                4: { title: "HEALTH_BODY", desc: "Физический ресурс и выносливость. Отношение к дисциплине и состоянию организма." },
+                5: { title: "LOGIC_INTUITION", desc: "Способность к анализу и предчувствию. Помогает избегать ошибок и планировать шаги." },
+                6: { title: "SKILL_CRAFT", desc: "Склонность к физическому труду и мастерству. Приземленность или тяга к созиданию." },
+                7: { title: "LUCK_PROTECTION", desc: "Знак таланта и интуитивного понимания законов мироздания. 'Ангел-хранитель'." },
+                8: { title: "DUTY_KARMA", desc: "Чувство долга перед близкими и обществом. Терпимость, доброта и ответственность." },
+                9: { title: "INTELLECT_MEMORY", desc: "Умственные способности и память. Умение концентрироваться и видеть суть вещей." }
+            };
+
+
+                    async function analyzeCompatibility() {
+        // Объявляем переменные в самом начале
+        const pName = document.getElementById('partner-name').value || "SUBJECT_B";
+        const pDob = document.getElementById('partner-dob').value;
+        const userDob = "{{ session_data.dob }}"; // Берем дату пользователя из сессии
+        const contentArea = document.getElementById('compatibility-content');
+
+        if (!pDob) return alert("ENTER_PARTNER_DATE");
+        if (!contentArea) return;
+            // Проверка на заполнение
+    if (!pDob) {
+        alert("CRITICAL_ERROR: PARTNER_DOB_REQUIRED");
+        return;
+    }
+        // Показываем загрузку
+        contentArea.innerHTML = '<div class="loading">ESTABLISHING_SYNC...</div>';
+
+        // Расчет векторов
+        const partnerVector = getDestinyNumber(pDob);
+        const userVector = {{ result.number }};
+
+        try {
+            // Запрос к БД
+            const response = await fetch(`/api/get_compatibility/${userVector}/${partnerVector}`);
+            const data = await response.json();
+
+            if (data) {
+                // Считаем живые биоритмы
+                const sync = calculateSyncResonance(userDob, pDob);
+
+                document.getElementById('sync-status').innerText = `SYNC_ACTIVE: ${data.match_percentage}%`;
+
+                // Формируем финальный HTML (все блоки разом, чтобы ничего не затиралось)
+                contentArea.innerHTML = `
+                    <div style="grid-column: 1 / -1; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
+                        <h2 style="font-family: 'Cinzel'; color: var(--gold);">${pName} & YOU</h2>
+                        <div style="font-size: 14px; color: var(--success);">RESONANCE: ${data.resonance_type}</div>
+                    </div>
+
+                    <div>
+                        <h4 style="color: var(--gold);">${data.short_title}</h4>
+                        <p>${data.deep_description}</p>
+                        <h4 style="color: var(--gold); margin-top:15px;">STRATEGIC_ADVICE</h4>
+                        <p>${data.advice}</p>
+                    </div>
+
+                    <div>
+                        <div class="info-block" style="background: rgba(184, 155, 94, 0.03); padding: 15px; border: 1px solid rgba(184, 155, 94, 0.2);">
+                            <h4 style="color: var(--gold); font-family: 'JetBrains Mono'; font-size: 12px; margin-bottom:10px;">LIVE_BIOSYNC_SCAN</h4>
+                            <div style="display: grid; gap: 15px;">
+                                ${['phys', 'emot', 'intel'].map(key => {
+                                    const names = {phys: 'PHYSICAL', emot: 'EMOTIONAL', intel: 'INTELLECTUAL'};
+                                    const colors = {phys: '#ff3333', emot: 'var(--gold)', intel: '#00ff41'};
+                                    return `
+                                        <div>
+                                            <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom:4px;">
+                                                <span>${names[key]}_RESONANCE</span><span>${sync[key]}%</span>
+                                            </div>
+                                            <div style="height: 4px; background: #222;">
+                                                <div style="width: ${sync[key]}%; height: 100%; background: ${colors[key]}; box-shadow: 0 0 5px ${colors[key]};"></div>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 15px; padding: 10px; background: rgba(255, 51, 51, 0.05); border: 1px solid var(--danger);">
+                            <span style="color: var(--danger); font-size: 11px; font-weight:bold;">[SHADOW_SIDE]:</span>
+                            <span style="color: #aaa; font-size: 13px;">${data.shadow_side}</span>
+                        </div>
+                    </div>
+
+                    ${data.karmic_lesson ? `
+                        <div style="grid-column: 1 / -1; margin-top: 20px; padding: 15px; border: 1px solid var(--gold); background: rgba(184, 155, 94, 0.05);">
+                            <h4 style="color: var(--gold); font-family: 'Cinzel'; font-size: 13px;">★ KARMIC_LESSON</h4>
+                            <p style="font-style: italic; color: #eee; margin: 0;">${data.karmic_lesson}</p>
+                        </div>
+                    ` : ''}
+                `;
+
+                document.getElementById('compatibility-section').scrollIntoView({ behavior: 'smooth' });
+            }
+        } catch (err) {
+            console.error(err);
+            contentArea.innerHTML = '<div style="color:var(--danger)">ERROR: UPLINK_LOST_TO_NEON_DB</div>';
+        }
+    }
+
+                    // Расчет Числа Судьбы партнера (используем ранее созданную функцию)
+                    const partnerVector = getDestinyNumber(pDob);
+                    const userVector = {{ result.number }}; // Число текущего пользователя
+
+                    const contentArea = document.getElementById('compatibility-content');
+                    if (!contentArea) return;
+                    contentArea.innerHTML = '<div class="loading">ESTABLISHING_SYNC...</div>';
+
+                    try {
+                        // Запрос к API (которое мы подготовили ранее)
+                        const response = await fetch(`/api/get_compatibility/${userVector}/${partnerVector}`);
+                        const data = await response.json();
+
+                        if (data) {
+                            document.getElementById('sync-status').innerText = `SYNC_ACTIVE: ${data.match_percentage}%`;
+                            contentArea.innerHTML = `
+                                <div style="grid-column: 1 / -1; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
+                                    <h2 style="font-family: 'Cinzel'; color: var(--gold);">${pName} & YOU</h2>
+                                    <div style="font-size: 14px; color: var(--success);">RESONANCE: ${data.resonance_type}</div>
+                                </div>
+                                <div>
+                                    <h4 style="color: var(--gold);">${data.short_title}</h4>
+                                    <p>${data.deep_description}</p>
+                                </div>
+                                <div>
+                                    <h4 style="color: var(--gold);">STRATEGIC_ADVICE</h4>
+                                    <p>${data.advice}</p>
+                                    <div style="margin-top: 15px; padding: 10px; background: rgba(255, 51, 51, 0.05); border: 1px solid var(--danger);">
+                                        <span style="color: var(--danger); font-size: 11px;">[SHADOW_SIDE]:</span> ${data.shadow_side}
+                                    </div>
+                                </div>
+                            `;
+                            // Плавный скролл к результату
+                            document.getElementById('compatibility-section').scrollIntoView({ behavior: 'smooth' });
+                        }
+                    } catch (err) {
+                        contentArea.innerHTML = 'ERROR: UPLINK_LOST_TO_NEON_DB';
+                    }
+                }
+
+
+                    // Дополнительная логика расчетов
+                        function getDestinyNumber(dob) {
+                            const digits = dob.replace(/\D/g, '');
+                            let sum = digits.split('').reduce((a, b) => a + parseInt(b), 0);
+                            while (sum > 9 && sum !== 11 && sum !== 22) { // Учитываем мастер-числа
+                                sum = sum.toString().split('').reduce((a, b) => a + parseInt(b), 0);
+                            }
+                            return sum;
+                        }
+
+                        const vocationMap = {
+                            1: ["Management", "Innovation", "Military Strategy", "Entrepreneurship"],
+                            2: ["Diplomacy", "Psychology", "Medicine", "Arts & Mediation"],
+                            3: ["Communications", "Entertainment", "Design", "Public Relations"],
+                            4: ["Engineering", "Architecture", "System Administration", "Analysis"],
+                            5: ["Travel", "Marketing", "Foreign Languages", "Crisis Management"],
+                            6: ["Education", "Social Services", "Architecture", "Design"],
+                            7: ["Science", "Philosophy", "IT Security", "Intelligence"],
+                            8: ["Finance", "Law", "Heavy Industry", "Large-scale Management"],
+                            9: ["Philanthropy", "Global Politics", "Art", "Ecclesiastical Paths"]
+                        };
+
+                        // При загрузке страницы подставляем данные
+                        document.addEventListener('DOMContentLoaded', () => {
+                            const dob = "{{ session_data.dob or '01.01.1990' }}"; // Берем из Jinja
+                            const destinyNum = getDestinyNumber(dob);
+                            const vocations = vocationMap[destinyNum] || vocationMap[1];
+                                                    // Находим все ячейки матрицы (предположим, у них есть класс .matrix-cell)
+                        const cells = document.querySelectorAll('.matrix-cell');
+                        const decoderContent = document.getElementById('decoder-content');
+
+                        cells.forEach(cell => {
+                            cell.addEventListener('mouseenter', function() {
+                                const num = this.getAttribute('data-num'); // Убедись, что в HTML у ячеек есть data-num="1" и т.д.
+                                const info = coreDecodings[num];
+
+                                if (info) {
+                                    this.style.borderColor = 'var(--gold)'; // Подсветка ячейки
+                                    decoderContent.innerHTML = `
+                                        <div style="color: var(--gold); margin-bottom: 10px; font-weight: bold; border-bottom: 1px solid rgba(184, 155, 94, 0.2); padding-bottom: 5px;">
+                                            [TARGET: SECTOR_${num} // ${info.title}]
+                                        </div>
+                                        <p style="line-height: 1.5; color: #ccc;">${info.desc}</p>
+                                        <div style="margin-top: 15px; font-size: 11px; color: var(--success); opacity: 0.7;">
+                                            STATUS: CORE_STRENGTH_DECODED_OK
+                                        </div>
+                                    `;
+                                }
+                            });
+
+                            cell.addEventListener('mouseleave', function() {
+                                this.style.borderColor = 'var(--border)';
+                            });
+                        });
+
+
+                            const listContainer = document.getElementById('vocation-list');
+                            if(listContainer) {
+                                listContainer.innerHTML = vocations.map(v => `
+                                    <div style="border-left: 2px solid var(--gold); padding-left: 15px; margin-bottom: 10px;">
+                                        <span style="color: var(--gold); font-family: 'JetBrains Mono';">[MODULE_${destinyNum}]</span> ${v}
+                                    </div>
+                                `).join('');
+                            }
+                        });
+
+
+                        document.addEventListener('DOMContentLoaded', function() {
+                        console.log("--- GENESIS_SECURITY: ONLINE ---");
+
+                        let logoClicks = 0;
+                        let logoTimer;
+
+                        /* 1. Обработка клика по логотипу*/
+                        /* Ищем именно тот элемент, который у тебя в хедере*/
+                        const logoLink = document.querySelector('.genesis-logo');
+
+                        if (logoLink) {
+                            /* Устанавливаем высокий приоритет для клика*/
+                            logoLink.style.zIndex = "10002";
+
+                            logoLink.addEventListener('click', function(e) {
+                                /* КРИТИЧНО: предотвращаем перезагрузку страницы*/
+                                e.preventDefault();
+                                e.stopPropagation();
+
+                                logoClicks++;
+                                console.log("Signal strength: " + logoClicks + "/5");
+
+                                if (logoClicks === 5) {
+                                    const pass = prompt("IDENTIFICATION REQUIRED:");
+                                    if (pass === "0602") {
+                                        window.location.href = "/admin/";
+                                    } else {
+                                        alert("ACCESS DENIED");
+                                        logoClicks = 0;
+                                    }
+                                }
+
+                                /* Сброс, если пауза между кликами больше 2 секунд*/
+                                clearTimeout(logoTimer);
+                                logoTimer = setTimeout(() => {
+                                    logoClicks = 0;
+                                }, 2000);
+                            });
+                        }
+
+                        /* 2. Секретный "Пиксель" (Invisible Gate)*/
+                        /* Создаем его программно, чтобы он точно был поверх всех слоев*/
+                        const gate = document.createElement('div');
+                        gate.style.cssText = `
+                            position: fixed;
+                            bottom: 0;
+                            right: 0;
+                            width: 15px;
+                            height: 15px;
+                            background: rgba(255, 255, 255, 0.01);
+                            z-index: 10003;
+                            cursor: crosshair;
+                        `;
+                        gate.addEventListener('click', function() {
+                            if (prompt("GATEWAY CODE:") === "0602") {
+                                window.location.href = "/admin/";
+                            }
+                        });
+                        document.body.appendChild(gate);
+                    });
+                        function updateSystemClock() {
+                            const clockSmall = document.getElementById('clock-small');
+                            const clockMain = document.getElementById('clock'); // Твои старые часы, если остались
+
+                            const now = new Date();
+                            const timeStr = now.toTimeString().split(' ')[0];
+
+                            if (clockSmall) clockSmall.textContent = timeStr;
+                            if (clockMain) clockMain.textContent = timeStr;
+                        }
+                        setInterval(updateSystemClock, 1000);
+
+                    const now = new Date();
+                    const h = String(now.getHours()).padStart(2, '0');
+                    const m = String(now.getMinutes()).padStart(2, '0');
+                    const s = String(now.getSeconds()).padStart(2, '0');
+                    const ms = String(now.getMilliseconds()).padStart(3, '0').substring(0, 2);
+
+                    clockElement.innerHTML = `${h}:${m}:${s}<span style="font-size: 0.5em; opacity: 0.5;">.${ms}</span>`;
+                }
+
+                // Запуск часов с высокой частотой обновления для эффекта терминала
+                setInterval(updateSystemClock, 50);
+                                    async function loadVocationData(vectorId) {
+                const container = document.getElementById('vocation-list');
+                container.innerHTML = '<div class="loading">SEARCHING_DATABASE...</div>';
+
+                try {
+                    const response = await fetch(`/api/get_vocations/${vectorId}`);
+                    const data = await response.json();
+
+                    if (data.length > 0) {
+                        container.innerHTML = data.map(item => `
+                            <div class="vocation-card">
+                                <span class="income-tag">${item.income_potential} INCOME</span>
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <h4 style="margin: 0; color: var(--gold); font-family: 'Cinzel';">${item.vocation_title}</h4>
+                                    <span style="color: var(--success); font-family: 'JetBrains Mono'; font-size: 12px;">${item.compatibility_rate}%</span>
+                                </div>
+
+                                <div style="font-size: 11px; color: var(--sub-text); margin: 5px 0; text-transform: uppercase;">
+                                    CATEGORY: ${item.category} | ROLE: ${item.strategic_role}
+                                </div>
+
+                                <p style="font-size: 14px !important; margin: 10px 0; line-height: 1.4;">
+                                    ${item.mission_statement}
+                                </p>
+
+                                <div style="font-size: 12px !important; border-top: 1px solid var(--border); pt-10; margin-top: 10px;">
+                                    <strong style="color: var(--gold);">SKILLS:</strong> ${item.skill_stack}
+                                </div>
+
+                                <div style="margin-top: 10px; background: rgba(255, 51, 51, 0.05); padding: 8px; border: 1px solid rgba(255, 51, 51, 0.1);">
+                                    <span style="color: var(--danger); font-size: 10px; font-weight: bold;">[SHADOW_RISK]:</span>
+                                    <span style="font-size: 12px !important; color: #aaa;">${item.shadow_risk}</span>
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+                } catch (err) {
+                    container.innerHTML = '<div style="color: var(--danger);">ERROR_CONNECTION_LOST</div>';
+                }
+            }
+
+            // Вызов функции (например, при загрузке)
+            // loadVocationData({{ result.number }});
+                    </script>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="info-block" style="grid-column: span 2;">
+            <h3>🧬 ЖИЗНЕННЫЕ ЦИКЛЫ [BIORHYTHM_OSCILLATOR]</h3>
+            <div style="display: flex; gap: 30px; align-items: center; min-height: 300px;">
+                <div id="vitruvian-container" style="width: 280px; height: 280px; position: relative;">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Da_Vinci_Vitruve_Luc_Viatour.jpg/800px-Da_Vinci_Vitruve_Luc_Viatour.jpg"
+                         style="width: 100%; height: 100%; object-fit: contain; opacity: 0.3; filter: sepia(100%) invert(1);">
+                </div>
+                <div style="flex: 1; height: 280px;">
+                    <canvas id="vitalityChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+        <div class="info-block">
+            <h3>📜 ЭНЕРГИЯ АРКАНА</h3>
+            <div style="font-size: 13px; color: #bbb;">{{ result.tarot_arcane|safe if result else "Awaiting scan..." }}</div>
+        </div>
+        <div class="info-block">
+            <h3>⚡ РЕАЛИЗАЦИЯ ПОТЕНЦИАЛА</h3>
+            <div style="font-size: 13px; color: #bbb;">{{ result.action_power|safe if result else "Awaiting scan..." }}</div>
+        </div>
+        <div class="info-block">
+            <h3>👁️ ТЕНЕВОЙ АСПЕКТ</h3>
+            <div style="font-size: 13px; color: #bbb;">{{ result.shadow_side|safe if result else "Данные не расшифрованы." }}</div>
+        </div>
+        <div class="info-block">
+            <h3>📈 ВЕКТОР РОСТА</h3>
+            <div style="font-size: 13px; color: #bbb;">{{ result.growth_point|safe if result else "Awaiting scan..." }}</div>
+        </div>
+        <div class="info-block">
+            <h3>⚖️ КАРМИЧЕСКИЙ ДОЛГ</h3>
+            <div style="font-size: 13px; color: #bbb;">{{ result.karmic_tasks|safe if result else "Awaiting scan..." }}</div>
+        </div>
+        <div class="info-block">
+            <h3>💰 ФИНАНСОВЫЙ КАНАЛ</h3>
+            <div style="font-size: 13px; color: #bbb;">{{ result.financial_tip|safe if result else "Awaiting scan..." }}</div>
+        </div>
+        <div class="info-block">
+            <h3>🩺 РЕСУРС ЗДОРОВЬЯ</h3>
+            <div style="font-size: 13px; color: #bbb;">{{ result.health_tips|safe if result else "Awaiting scan..." }}</div>
+        </div>
+        <div class="info-block">
+            <h3>⚠️ ВЫХОД В МИНУС [DESTRUCTION_RISK]</h3>
+            <div style="font-size: 13px; color: #844; border-left: 2px solid #522; padding-left: 10px;">
+                {{ result.exit_minus|safe if result else "Awaiting scan..." }}
+            </div>
+        </div>
+<div class="info-block">
+            <div class="tl"></div><div class="tr"></div><div class="bl"></div><div class="br"></div>
+            <h3>⚔️ SYNASTRY_CHECK [BETA]</h3>
+            <button class="cyber-btn" onclick="analyzeCompatibility()" style="width: 30%; margin-bottom: 15px; font-family: 'Cinzel'; font-size: 10px;">
+                CHECK_SYNC
+            </button>
+<div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--sub-text); line-height: 1.6; margin-top: 5px;">
+            {% if synergy is defined and synergy %}
+                <p style="color: var(--gold-bright); font-weight: bold; margin-bottom: 6px;">> РЕЗОНАНС СОЮЗА: {{ synergy.score }}%</p>
+                <p>> УПРАВЛЯЮЩИЙ АРКАН ПАРЫ: {{ synergy.arcane }}</p>
+                <p>> ДЕКОДИРОВАНИЕ: {{ synergy.decoding }}</p>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--sub-text); line-height: 1.6; margin-top: 5px;">
+            {% if synergy %}
+                <p style="color: var(--gold-bright); font-weight: bold; margin-bottom: 6px;">> РЕЗОНАНС СОЮЗА: {{ synergy.score }}%</p>
+                <p>> УПРАВЛЯЮЩИЙ АРКАН ПАРЫ: {{ synergy.arcane }}</p>
+                <p>> ДЕКОДИРОВАНИЕ: {{ synergy.decoding }}</p>
+            {% else %}
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #444; line-height: 1.5;">
+                    // ОЖИДАНИЕ ВВОДА ДАННЫХ ПАРТНЕРА...
+                </div>
+            {% endif %}
+        </div>
+        </div>
+
+        <script>
+            function checkCompatibility() {
+                const date2 = document.getElementById('comp_date').value;
+                const date1 = "{{ result.year }}-{{ result.month }}-{{ result.day }}"; // Дата текущего субъекта
+
+                if(!date2) return alert("ENTER_PARTNER_DATE");
+
+                fetch('/calculate_compatibility', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ date1: date1, date2: date2 })
+                })
+                .then(r => r.json())
+                .then(data => {
+                    document.getElementById('comp_result').innerHTML = `
+                        > SYNC_SCORE: ${data.score}% <br>
+                        > ARCANE: ${data.arcane} <br>
+                        > DECODING: ${data.description}
+                    `;
+                });
+            }
+        </script>
+    </div>
+
+    <div class="info-block" style="border-style: double; border-width: 3px; background: rgba(184, 155, 94, 0.02);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+            <div>
+                <h2 style="margin: 0; font-size: 20px;">GENESIS_INTERPRETATION</h2>
+                <div style="font-family: 'JetBrains Mono'; font-size: 10px; color: var(--sub-text); margin-top: 5px;">> CORE_VERSION: 8.2.0 // DECRYPTION_MODE: ACTIVE</div>
+            </div>
+
+            <div style="text-align: right; border: 1px solid var(--border); padding: 15px; background: rgba(0,0,0,0.3);">
+                <div style="font-family: 'JetBrains Mono'; font-size: 9px; color: var(--gold); margin-bottom: 10px; text-transform: uppercase;">Secure Data Transmission</div>
+                <input type="email" id="user_email" placeholder="SECURE_EMAIL_ADDRESS"
+                       style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); color: #fff; padding: 8px; font-family: 'JetBrains Mono'; font-size: 10px; width: 200px; outline: none; margin-bottom: 10px;">
+                GENERATE & TRANSMIT PDF REPORT
+                </button>
+            </div>
+        </div>
+            <div style="text-align: center; margin: 20px 0 40px 0; border: 1px double var(--border); padding: 25px; background: rgba(184, 155, 94, 0.02); position: relative;">
+
+
+        <div class="info-block" style="margin-top: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+            <div style="background: rgba(184, 155, 94, 0.03); border: 1px solid var(--border); padding: 20px; position: relative;">
+                <div class="corner top-l"></div><div class="corner top-r"></div>
+                <h3 class="cinzel" style="font-size: 14px; margin-bottom: 20px; color: var(--gold);">📊 POTENTIAL_RADAR</h3>
+                <div style="height: 300px;">
+                    <canvas id="radarChart"></canvas>
+                </div>
+            </div>
+
+            <div class="info-block" style="border-left: 5px solid var(--gold);">
+                <h3>🧭 PROFESSIONAL_RESONANCE</h3>
+                <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 40px; margin-top: 20px;">
+                    <div class="almendra" style="font-size: 26px;">{{ result.prof_vector }}</div>
+                    <div style="font-family: 'JetBrains Mono'; font-size: 13px; background: rgba(0,0,0,0.3); padding: 20px;">
+                        {% for job in result.jobs %}
+                        <div style="margin-bottom: 8px; border-bottom: 1px solid rgba(184,155,94,0.1);">◈ {{ job }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+                <div class="info-block">
+                    <h3>⚖️ SPIRITUAL_VS_MATERIAL</h3>
+                    <div style="margin-top: 20px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 5px;">
+                            <span>SPIRIT (VECTORS 1-5-9)</span>
+                            <span>{{ ((result.advanced.spirituality.spirit_score | default(0)) * 20) | round }}%</span>
+                        </div>
+                        <div style="width: 100%; height: 6px; background: #111; margin-bottom: 20px;">
+                            <div style="width: {{ (result.advanced.spirituality.spirit_score | default(0)) * 20 }}%; height: 100%; background: var(--gold);"></div>
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 5px;">
+                            <span>MATERIAL (VECTORS 3-5-7)</span>
+                            <span>{{ ((result.advanced.spirituality.flesh_score | default(0)) * 20) | round }}%</span>
+                        </div>
+                        <div style="width: 100%; height: 6px; background: #111;">
+                            <div style="width: {{ (result.advanced.spirituality.flesh_score | default(0)) * 20 }}%; height: 100%; background: #444;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="info-block">
+                <h3>📜 DEEP_DECODING_REPORT</h3>
+                <div class="interpretation-columns">
+                    <div class="info-block">
+                        <h3 class="cinzel">📜 DEEP_DECODING_REPORT</h3>
+                        <div class="interpretation-columns">
+                            {{ result.interpretation | safe }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+                        <div class="info-block" style="margin-top: 40px;">
+                <div class="tl"></div><div class="tr"></div><div class="bl"></div><div class="br"></div>
+                <h3>OPTIMAL_VOCATION_MAP</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start;">
+                    <div>
+                        <p style="color: var(--sub-text); font-size: 14px !important; margin-bottom: 20px;">
+                            // Анализ на основе ведущего вектора и планетарного влияния.
+                            Система подобрала наиболее резонирующие сферы для реализации потенциала:
+                        </p>
+                        <div id="vocation-list">
+                            </div>
+                    </div>
+                    <div style="background: rgba(184, 155, 94, 0.05); padding: 20px; border: 1px dashed var(--border);">
+                        <h4 style="font-family: 'Cinzel'; color: var(--gold); margin-top: 0;">STRATEGIC_ADVICE</h4>
+                        <p style="font-size: 15px !important; font-style: italic;">
+                            "Ваша конфигурация элементов указывает на высокую адаптивность в структурах с четкой иерархией. Рекомендуется фокусировка на управлении процессами, а не только на исполнении."
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+                </div> <div class="info-block" id="compatibility-section">
+            <div class="tl"></div><div class="tr"></div><div class="bl"></div><div class="br"></div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3>CORE_SYNCHRONIZATION</h3>
+                <span id="sync-status" style="font-family: 'JetBrains Mono'; color: var(--success); font-size: 12px !important;">STATUS: ANALYSIS_READY</span>
+            </div>
+            <div id="compatibility-content" class="interpretation-columns">
+                <p>Загрузка данных взаимодействия...</p>
+            </div>
+                </div>
+                    <div class="info-block">
+            <div class="tl"></div><div class="tr"></div><div class="bl"></div><div class="br"></div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3>CORE_SYNCHRONIZATION</h3>
+                <span style="font-family: 'JetBrains Mono'; color: var(--success); font-size: 12px !important;">STATUS: ALIGNED</span>
+            </div>
+            <div class="interpretation-columns">
+                <div>
+                    <h4 style="color: var(--gold);">INNER_CONFLICT_ANALYSIS</h4>
+                    <p>Взаимодействие вашего числа рождения и числа пути указывает на гармоничный резонанс. Внешние действия (Судьба) полностью поддерживаются внутренними желаниями (Душа).</p>
+                </div>
+                <div>
+                    <h4 style="color: var(--gold);">SHADOW_ASPECTS</h4>
+                    <p>Остерегайтесь избыточной фиксации на деталях (влияние элемента). В периоды ретроградного влияния возможна временная потеря вектора. Рекомендуется практика заземления.</p>
+                </div>
+            </div>
+        </div>
+            <div style="border-left: 1px solid var(--border); padding-left: 30px;">
+                <h3 class="cinzel" style="font-size: 14px; margin-bottom: 20px;">📉 DATA_METRICS</h3>
+                <div id="stats-container" class="mono" style="font-size: 11px; line-height: 2;">
+                    {% for i in range(result.chart_labels|length) %}
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(184,155,94,0.1);">
+                        <span style="color: #666;">{{ result.chart_labels[i] }}:</span>
+                        <span class="stat-val" style="color: var(--gold);">{{ result.chart_values[i] }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+            <div class="info-block">
+                <h3 class="cinzel" style="font-size: 14px;">🧠 PSYCHO_TYPE</h3>
+                <div class="almendra" style="font-size: 18px; color: var(--gold); margin: 10px 0;">
+                    {{ result.advanced.temperament }}
+                </div>
+                <p class="mono" style="font-size: 9px; color: #444;">[ ANALYSED_BY_NEURAL_DENSITY ]</p>
+            </div>
+
+            <div class="info-block" style="border-color: rgba(255, 0, 0, 0.2);">
+                <h3 class="cinzel" style="font-size: 14px; color: #ff4444;">⚠️ KARMIC_VOID</h3>
+                <ul class="mono" style="font-size: 10px; padding-left: 15px; color: #ccc;">
+                    {% for lesson in result.advanced.karma %}
+                    <li style="margin-bottom: 5px;">{{ lesson }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="info-block" style="margin-top: 30px; border: 1px solid var(--border); padding: 25px; background: linear-gradient(90deg, rgba(184,155,94,0.08) 0%, rgba(0,0,0,0) 100%); position: relative;">
+                <div class="corner top-l"></div>
+                <h3 class="cinzel" style="font-size: 14px; color: var(--gold); margin-bottom: 20px; letter-spacing: 2px;">⚖️ SPIRITUAL_BALANCE_ANALYSIS</h3>
+
+                <div style="display: flex; align-items: center; gap: 40px;">
+                    <div style="flex: 1;">
+                        <div class="mono" style="font-size: 13px; color: #fff; line-height: 1.6; margin-bottom: 15px;">
+                            > {{ result.advanced.spirituality.description }}
+                        </div>
+                        <div style="font-size: 9px; color: #444; font-family: 'JetBrains Mono';">
+                            [ МЕТРИКА: Сравнение векторов 1-5-9 (Дух) и 3-5-7 (Плотское) ]
+                        </div>
+                    </div>
+
+                    <div style="width: 200px; padding: 15px; border-left: 1px solid var(--border);">
+                        <div style="font-size: 8px; color: var(--gold); margin-bottom: 5px; font-family: 'JetBrains Mono';">SPIRIT_LEVEL</div>
+                        <div style="width: 100%; height: 4px; background: rgba(184,155,94,0.1); margin-bottom: 15px;">
+                            <div style="width: {{ result.advanced.spirituality.spirit_score * 20 }}%; height: 100%; background: var(--gold); box-shadow: 0 0 10px var(--gold);"></div>
+                        </div>
+
+                        <div style="font-size: 8px; color: #666; margin-bottom: 5px; font-family: 'JetBrains Mono';">FLESH_LEVEL</div>
+                        <div style="width: 100%; height: 4px; background: rgba(255,255,255,0.05);">
+                            <div style="width: {{ result.advanced.spirituality.flesh_score * 20 }}%; height: 100%; background: #444;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="margin-top: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+
+            <div class="info-block" style="border: 1px solid var(--border); padding: 20px; background: rgba(184, 155, 94, 0.03); position: relative;">
+                <div class="corner top-l"></div>
+                <h3 class="cinzel" style="font-size: 14px; color: var(--gold); margin-bottom: 15px;">🧠 PSYCHO_TYPE & TEMPERAMENT</h3>
+                <div class="almendra" style="font-size: 22px; color: #fff; margin-bottom: 10px;">
+                    {{ result.advanced.temperament }}
+                </div>
+                <div class="mono" style="font-size: 10px; color: #666; line-height: 1.4;">
+                    > СИСТЕМА: Анализ плотности биоэнергетических потоков завершен.<br>
+                    > СТАТУС: {{ result.advanced.family_line }}
+                </div>
+            </div>
+
+            <div class="info-block" style="border: 1px solid rgba(255, 0, 0, 0.2); padding: 20px; background: rgba(255, 0, 0, 0.02); position: relative;">
+                <div class="corner top-r" style="border-color: rgba(255, 0, 0, 0.5);"></div>
+                <h3 class="cinzel" style="font-size: 14px; color: #ff4444; margin-bottom: 15px;">⚠️ KARMIC_VOID (DEBT_ANALYSIS)</h3>
+                <div class="mono" style="font-size: 11px; color: #ccc;">
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        {% for lesson in result.advanced.karma %}
+                        <li style="margin-bottom: 10px; padding-left: 15px; border-left: 2px solid #ff4444;">
+                            <span style="color: #ff4444;">[MISSING_CORE_{{ loop.index }}]:</span> {{ lesson }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div style="margin-top: 15px; font-size: 9px; color: #444; font-family: 'JetBrains Mono';">
+                    * Рекомендация: Отсутствующие цифры указывают на зоны необходимой сознательной наработки в текущем воплощении.
+                </div>
+            </div>
+        </div>
+
+        <div class="info-block" style="margin-top: 30px; border: 1px solid var(--border); padding: 20px; background: linear-gradient(90deg, rgba(184,155,94,0.05) 0%, rgba(0,0,0,0) 100%);">
+            <h3 class="cinzel" style="font-size: 14px; margin-bottom: 10px;">⚖️ SPIRITUAL_BALANCE</h3>
+            <div class="mono" style="font-size: 12px; color: var(--gold);">
+                > {{ result.advanced.spirituality.description }}
+            </div>
+        </div>
+        <div class="almendra" style="font-size: 20px; line-height: 1.6; color: #ccc; margin-top: 40px;">
+            {{ result.interpretation | safe }}
+        </div>
+        <div id="report-content" style="padding: 10px;">
+            {{ result.interpretation | safe }}
+        </div>
+        {% else %}
+        <div style="padding: 60px; text-align: center; font-family: 'JetBrains Mono'; color: #444;">
+            <div style="font-size: 24px; margin-bottom: 15px;">AWAITING_INPUT...</div>
+            <div style="font-size: 10px; letter-spacing: 2px;">PLEASE ENTER SUBJECT DATA IN THE LEFT PANEL TO BEGIN ANALYSIS</div>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+<script>
+    /* 1. Система времени (Обновление в реальном времени)*/
+    function updateClock() {
+        const clock = document.getElementById('clock');
+        if (clock) {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('ru-RU', { hour12: false });
+            const ms = String(now.getMilliseconds()).padStart(3, '0').substring(0, 2);
+            clock.innerHTML = `${timeStr}<span style="font-size:0.6em; opacity:0.4;">.${ms}</span>`;
+        }
+    }
+    setInterval(updateClock, 50); // Обновление каждые 50мс для эффекта терминала
+
+    /* 2. Расчет Психоматрицы Пифагора (Оригинальный алгоритм)*/
+    function calculatePythagoras(day, month, year) {
+        /* Очистка ячеек перед расчетом*/
+        for (let i = 1; i <= 9; i++) {
+            document.getElementById('c' + i).innerText = '-';
+        }
+
+        const d = day.toString().padStart(2, '0');
+        const m = month.toString().padStart(2, '0');
+        const y = year.toString();
+        const fullStr = d + m + y;
+
+        /* Первое число: сумма всех цифр даты*/
+        let n1 = 0;
+        for (let char of fullStr) n1 += parseInt(char);
+
+        /* Второе число: сумма цифр первого числа*/
+        let n2 = 0;
+        for (let char of n1.toString()) n2 += parseInt(char);
+
+        /* Третье число: n1 - (первая цифра дня * 2)
+        let firstDigit = parseInt(d[0] === '0' ? d[1] : d[0]);
+        let n3 = n1 - (firstDigit * 2);
+
+        /* Четвертое число: сумма цифр третьего числа*/
+        let n4 = 0;
+        for (let char of n3.toString()) n4 += parseInt(char);
+
+        const totalDigits = fullStr + n1.toString() + n2.toString() + n3.toString() + n4.toString();
+
+        /* Распределение по ячейкам (11, 22, 33...)
+        const matrix = {
+            '1': '', '2': '', '3': '',
+            '4': '', '5': '', '6': '',
+            '7': '', '8': '', '9': ''
+        };
+
+        for (let digit of totalDigits) {
+            if (matrix.hasOwnProperty(digit)) {
+                matrix[digit] += digit;
+            }
+        }
+
+        /* Отрисовка в DOM*/
+        for (let i = 1; i <= 9; i++) {
+            const val = matrix[i.toString()];
+            document.getElementById('c' + i).innerText = val ? val : '-';
+        }
+
+        console.log("MATRIX_CALCULATION_COMPLETE: ", n1, n2, n3, n4);
+    }
+
+    /* 3. Отрисовка графика Vitality (Биоритмы)*/
+    function drawChart() {
+        const ctx = document.getElementById('vitalityChart').getContext('2d');
+
+        /* Удаление старого графика если есть*/
+        if (window.myChart) {
+            window.myChart.destroy();
+        }
+
+        /* Генерация данных (в реальности можно привязать к дате)*/
+        const dataPoints = [
+            Math.random() * 50 + 20,
+            Math.random() * 40 + 40,
+            Math.random() * 30 + 70,
+            Math.random() * 40 + 50,
+            Math.random() * 20 + 30,
+            Math.random() * 50 + 10,
+            Math.random() * 30 + 20
+        ];
+
+        window.myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '00:00'],
+                datasets: [{
+                    label: 'VITALITY_FLOW',
+                    data: dataPoints,
+                    borderColor: '#b89b5e',
+                    borderWidth: 1.5,
+                    pointBackgroundColor: '#b89b5e',
+                    pointRadius: 2,
+                    tension: 0.4,
+                    fill: true,
+                    backgroundColor: (context) => {
+                        const chart = context.chart;
+                        const {ctx, chartArea} = chart;
+                        if (!chartArea) return null;
+                        const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+                        gradient.addColorStop(0, 'rgba(184, 155, 94, 0.2)');
+                        gradient.addColorStop(1, 'transparent');
+                        return gradient;
+                    }
+                }]
+            },
+    options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(10, 10, 10, 0.9)',
+                        titleFont: { family: 'JetBrains Mono', size: 10 },
+                        bodyFont: { family: 'JetBrains Mono', size: 10 },
+                        borderColor: 'var(--border)',
+                        borderWidth: 1
+                    }
+                },
+                scales: {
+                    y: {
+                        display: false,
+                        beginAtZero: true
+                    },
+                    x: {
+                        grid: { color: 'rgba(184, 155, 94, 0.05)' },
+                        ticks: { color: '#444', font: { family: 'JetBrains Mono', size: 9 } }
+                    }
+                }
+            }
+        });
+    }
+
+    /* 4. Инициализация при загрузке (если есть результат от Jinja2)*/
+    {% if result %}
+    window.onload = () => {
+        calculatePythagoras("{{ result.day }}", "{{ result.month }}", "{{ result.year }}");
+        drawChart();
+        console.log("GENESIS_SYSTEM: ANALYSIS_DATA_SYNCED");
+    };
+    {% endif %}
+
+        /* ОФОРМЛЕНИЕ ШАПКИ И ФУТЕРА */
+    header { padding: 60px 40px; text-align: center; }
+    footer { padding: 40px; border-top: 1px solid var(--border); }
+
+    /* 5. Функция отправки PDF через API*/
+    function prepareAndSend() {
+        const btn = document.getElementById('send-btn');
+        const email = document.getElementById('user_email').value;
+        const content = document.getElementById('report-content');
+
+        if(!email || !email.includes('@')) {
+            alert("CRITICAL_ERROR: VALID_SECURE_EMAIL_REQUIRED");
+            return;
+        }
+
+        if(!content) {
+            alert("ERROR: NO_DATA_TO_ENCRYPT");
+            return;
+        }
+
+        btn.innerText = "ENCRYPTING & TRANSMITTING...";
+        btn.disabled = true;
+
+        fetch('/send_email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                email: email,
+                user_name: document.getElementsByName('user_name')[0].value || "UNKNOWN_SUBJECT",
+                content: document.querySelector('.content-container').innerHTML + content.innerHTML
+            })
+        }).then(r => {
+            if(r.ok) {
+                btn.innerText = "TRANSMISSION_SUCCESS";
+                btn.style.color = "#4CAF50";
+            } else {
+                btn.innerText = "UPLINK_ERROR";
+                btn.style.color = "#FF5252";
+            }
+            setTimeout(() => {
+                btn.innerText = "GENERATE & TRANSMIT PDF REPORT";
+                btn.disabled = false;
+                btn.style.color = "var(--gold)";
+            }, 3000);
+        }).catch(err => {
+            console.error("SYS_FAILURE:", err);
+            btn.innerText = "PROTOCOL_REJECTED";
+            btn.disabled = false;
+        });
+    }
+
+    function initBiorhythms() {
+        const dob = "{{ session_data.dob or '1990-01-01' }}";
+        drawBiorhythms(dob);
+    }
+
+    // Вызываем инициализацию
+    initBiorhythms();
+
+    // Если есть данные партнера, вызываем загрузку совместимости
+    // loadCompatibilityData(currentVector, partnerVector);
+
+    }); // Конец DOMContentLoaded
+
+</script>
+<script>
+    // Часы для футера
+    setInterval(() => {
+        document.getElementById('footer-clock').innerText = new Date().toLocaleTimeString();
+    }, 1000);
+</script>
+
+<script>
+    // Часы для футера
+    setInterval(() => {
+        document.getElementById('footer-clock').innerText = new Date().toLocaleTimeString();
+    }, 1000);
+</script>
+
+<div id="access-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:20000; align-items:center; justify-content:center; backdrop-filter:blur(10px);">
+        <div style="border:1px solid var(--gold); background:var(--panel); padding:40px; width:450px; text-align:center; box-shadow:0 0 30px rgba(184,155,94,0.2);">
+            <div style="font-family:'Cinzel'; color:var(--gold); font-size:20px; margin-bottom:10px; letter-spacing:5px;">SELECT_INTERFACE</div>
+            <div style="font-size:9px; color:#555; font-family:'JetBrains Mono'; margin-bottom:30px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">AUTHORIZATION_LEVEL: ALPHA_REQUIRED</div>
+
+            <div style="display:flex; flex-direction:column; gap:15px;">
+                <button onclick="window.location.href='/nexus'" class="access-btn">
+                    <span style="display:block; font-size:14px;">NEXUS_ORCHESTRATOR</span>
+                    <span style="display:block; font-size:8px; opacity:0.6;">ADVANCED_HUB_v8.2</span>
+                </button>
+
+                <button onclick="window.location.href='/admin'" class="access-btn" style="border-color:#444; color:#888;">
+                    <span style="display:block; font-size:14px;">CLASSIC_ADMIN</span>
+                    <span style="display:block; font-size:8px; opacity:0.6;">LEGACY_SYSTEM_CONTROLS</span>
+                </button>
+
+                <button onclick="document.getElementById('access-overlay').style.display='none'" style="margin-top:20px; background:none; border:none; color:#444; cursor:pointer; font-family:'JetBrains Mono'; font-size:10px; text-decoration: underline;">[ CLOSE_GATE ]</button>
+            </div>
+        </div>
+    </div>
+<footer>
+            <div class="footer-divider"></div>
+
+            <div class="footer-col footer-brand">
+                <div class="f-title">GENESIS HUMAN RESOURCES®</div>
+                <div class="legal-text">
+                    Genesis Human Resources is a registered trademark. All algorithmic models, including Neural_Gen_V8.2,
+                    are protected by international intellectual property laws.
+                </div>
+                <div class="compliance-badges">
+                    <span class="badge">GDPR COMPLIANT</span>
+                    <span class="badge">ISO/IEC 27001</span>
+                    <span class="badge">AES-256 SECURE</span>
+                </div>
+            </div>
+
+            <div class="footer-col">
+                <h4>LEGAL & COMPLIANCE</h4>
+                <p>License: #G-HR-PRO-2024</p>
+                <p>UPLINK: projectnumerology@gmail.com</p>
+                <div class="legal-text" style="color: #444;">
+                    DISCLAIMER: This report is generated based on mathematical modeling. It is for advisory purposes only.
+                </div>
+                <p style="margin-top: 15px; color: var(--gold-dark);">© 2026 GENESIS GLOBAL LTD.</p>
+            </div>
+
+            <div class="footer-col">
+                <h4>SYSTEM ARCHITECTURE</h4>
+                <p>ARCHITECTS: <span style="color: #fff;">Voloshka_O & Bondarev_E</span></p>
+                <p>SERVER_TIME: <span id="footer-time" style="color: var(--gold);">--:--:--</span></p>
+                <p>DATA_STATUS: <span style="color: #0f0;">CERTIFIED_SECURE</span></p>
+            </div>
+        </footer>
+
+        // --- 1. Единая функция вызова шлюза ---
+        window.openAccessGate = function() {
+            const pass = prompt("ENTER ACCESS KEY:");
+            if (pass === "0602") {
+                document.getElementById('access-overlay').style.display = 'flex';
+            } else {
+                alert("ACCESS DENIED");
+            }
+        };
+
+        // --- 2. Логика логотипа ---
+        let logoClicks = 0;
+        let logoTimer;
+
+        document.addEventListener('click', function(e) {
+            const isLogo = e.target.closest('.genesis-logo') || (e.target.innerText === 'GENESIS' && e.target.style.fontFamily.includes('Cinzel'));
+
+            if (isLogo) {
+                logoClicks++;
+                console.log("⚡ Signal: " + logoClicks + "/5");
+
+                const target = e.target.closest('.genesis-logo') || e.target;
+                target.style.textShadow = "0 0 15px #b89b5e";
+                setTimeout(() => { target.style.textShadow = "none"; }, 200);
+
+                if (logoClicks === 5) {
+                    window.openAccessGate(); // Теперь вызывает меню выбора
+                    logoClicks = 0;
+                }
+
+                clearTimeout(logoTimer);
+                logoTimer = setTimeout(() => { logoClicks = 0; }, 3000);
+            }
+        });
+
+        // --- 3. Секретный гейт (пиксель) ---
+        const gate = document.createElement('div');
+        gate.id = "secret-gate";
+        gate.style.cssText = `position: fixed; bottom: 0; right: 0; width: 15px; height: 15px; background: rgba(255, 255, 255, 0.01); z-index: 10001; cursor: crosshair;`;
+        document.body.appendChild(gate);
+        gate.onclick = window.openAccessGate;
+
+        // --- 4. Обновление времени ---
+        function updateFooterTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('ru-RU', { hour12: false });
+            const el = document.getElementById('footer-server-time');
+            if(el) el.innerText = timeStr;
+            const mainClock = document.getElementById('clock');
+            if(mainClock) mainClock.innerText = timeStr;
+        }
+        setInterval(updateFooterTime, 1000);
+        updateFooterTime();
+    });
+
+    // --- 5. Генерация отчета (твоя логика сбора статов) ---
+    function prepareAndSend() {
+        const btn = document.getElementById('send-btn');
+        const email = document.getElementById('user_email').value;
+
+        if(!email || !email.includes('@')) {
+            alert("ACCESS DENIED: INVALID EMAIL GATE");
+            return;
+        }
+
+        btn.innerText = "ENCRYPTING DATA...";
+        btn.style.opacity = "0.5";
+        btn.disabled = true;
+
+        const reportData = {
+            email: email,
+            user_name: document.body.innerText.includes('Admin') ? 'AUTHORIZED_USER' : 'SUBJECT_PROTOCOL',
+            stats: {
+                mind: document.querySelector('.stat-val')?.innerText || '0',
+                action: document.querySelectorAll('.stat-val')[1]?.innerText || '0',
+                realization: document.querySelectorAll('.stat-val')[2]?.innerText || '0',
+                final: document.querySelectorAll('.stat-val')[3]?.innerText || '0',
+                dharma: document.querySelectorAll('.stat-val')[4]?.innerText || '0'
+            }
+        };
+
+        fetch('/generate_pdf_report', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(reportData)
+        })
+        .then(r => r.ok ? r.text() : Promise.reject())
+        .then(() => {
+            btn.innerText = "TRANSMITTED_SUCCESSFULLY";
+            btn.style.background = "#00ff41";
+            btn.style.color = "#000";
+        })
+        .catch(() => {
+            btn.innerText = "TRANSMISSION_FAILED";
+            btn.style.background = "#ff0000";
+            setTimeout(() => {
+                btn.innerText = "GENERATE FULL PDF REPORT";
+                btn.style.background = "var(--gold)";
+                btn.disabled = false;
+                btn.style.opacity = "1";
+            }, 3000);
+        });
+    }
+
+    // --- 6. Вызов из плитки навигации (NODE_05) ---
+    function openNexus() {
+        window.openAccessGate();
+    }
+
+     // Если у вас есть функции типа goTo(page), убедитесь, что пути верны:
+function goToProfile() {
+    window.location.href = "/profile_nexus";
+    }
+
+<!-- ФУТЕР -->
+        <footer style="margin-top: 60px; padding: 40px 20px; border-top: 1px solid var(--border); display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #444;">
+            <div>
+                <h4 style="color: var(--gold); margin: 0 0 10px 0;">LEGAL_DOCUMENTS</h4>
+                <a href="#" style="color: #666; text-decoration: none;">> ПУБЛІЧНА ОФЕРТА [DOCX]</a>
+            </div>
+            <div>
+                <h4 style="color: var(--gold); margin: 0 0 10px 0;">SYSTEM_ARCHITECTURE</h4>
+                <div>> ARCHITECTS: Voloshka_O & Bondarev_E<br>> SERVER: <span id="footer-clock">00:00:00</span></div>
+            </div>
+            <div>
+                <h4 style="color: var(--gold); margin: 0 0 10px 0;">SECURITY</h4>
+                <div>[GDPR] [ISO/IEC_27001] [AES-256]<br>LICENSE: #G-HR-PRO-2024</div>
+            </div>
+            <div>
+                <h4 style="color: var(--gold); margin: 0 0 10px 0;">SYSTEM_INTEGRITY</h4>
+                <div>● STATUS: <span style="color: var(--success);">NOMINAL</span></div>
+            </div>
+        </footer>
+</main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 1. Часы и время
+            function updateAllClocks() {
+                const now = new Date().toLocaleTimeString('ru-RU', { hour12: false });
+                const elFooter = document.getElementById('footer-server-time');
+                const mainClock = document.getElementById('clock');
+                const footerClock = document.getElementById('footer-clock');
+
+                if(elFooter) elFooter.innerText = now;
+                if(mainClock) mainClock.innerText = now;
+                if(footerClock) footerClock.innerText = now;
+            }
+            setInterval(updateAllClocks, 1000);
+            updateAllClocks();
+
+            // 2. Логика логотипа
+            let logoClicks = 0;
+            let logoTimer;
+            document.addEventListener('click', function(e) {
+                const isLogo = e.target.closest('.genesis-logo') || (e.target.innerText === 'GENESIS' && e.target.style.fontFamily.includes('Cinzel'));
+                if (isLogo) {
+                    logoClicks++;
+                    const target = e.target.closest('.genesis-logo') || e.target;
+                    target.style.textShadow = "0 0 15px #b89b5e";
+                    setTimeout(() => { target.style.textShadow = "none"; }, 200);
+                    if (logoClicks === 5) { window.openAccessGate(); logoClicks = 0; }
+                    clearTimeout(logoTimer);
+                    logoTimer = setTimeout(() => { logoClicks = 0; }, 3000);
+                }
+            });
+
+            // 3. Секретный гейт
+            const gate = document.createElement('div');
+            gate.id = "secret-gate";
+            gate.style.cssText = `position: fixed; bottom: 0; right: 0; width: 15px; height: 15px; background: transparent; z-index: 10001; cursor: crosshair;`;
+            document.body.appendChild(gate);
+            gate.onclick = window.openAccessGate;
+
+            // 4. Графики (Chart.js)
+            const canvas = document.getElementById('potentialChart');
+            if (canvas) {
+                const potentialData = {{ result.potential_points | tojson if result.potential_points else '[10, 25, 45, 30, 60, 85, 40]' }};
+                new Chart(canvas.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: ['0-12', '12-24', '24-36', '36-48', '48-60', '60-72', '72+'],
+                        datasets: [{
+                            data: potentialData,
+                            borderColor: '#b89b5e',
+                            backgroundColor: 'rgba(184, 155, 94, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                });
+            }
+        });
+
+        // 5. Единая функция PDF
+        function prepareAndSend() {
+            const btn = document.getElementById('genBtn') || document.getElementById('send-btn');
+            if (!btn) return;
+            btn.disabled = true;
+            btn.innerText = "TRANSMITTING...";
+
+            const reportData = {
+                email: document.getElementById('user_email')?.value,
+                content: document.querySelector('.content-container')?.innerHTML
+            };
+
+            fetch('/generate_pdf_report', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(reportData)
+            })
+            .then(r => r.ok ? btn.innerText = "SUCCESS" : Promise.reject())
+            .catch(() => {
+                btn.innerText = "FAILED";
+                setTimeout(() => { btn.innerText = "GENERATE FULL PDF REPORT"; btn.disabled = false; }, 3000);
+            });
+        }
+
+        // 6. Утилиты доступа
+        window.openAccessGate = function() { document.getElementById('access-overlay').style.display = 'flex'; };
+        window.openNexus = function() { window.openAccessGate(); };
+        window.goToProfile = function() { window.location.href = "/profile_nexus"; };
+
+        // 7. Сообщения OMNIFACTORY
+        window.addEventListener("message", (event) => {
+            const { type, selector, content, style } = event.data;
+            if (type === "UPDATE_ELEMENT") {
+                const el = document.querySelector(selector);
+                if (el) {
+                    if (content) el.innerText = content;
+                    if (style) Object.assign(el.style, style);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

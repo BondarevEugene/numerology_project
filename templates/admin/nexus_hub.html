@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+
+    <meta charset="UTF-8">
+    <title>GENESIS | SUPREME NEXUS</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.21.1/cytoscape.min.js"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=JetBrains+Mono:wght@300;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --gold: #b89b5e; /* Античная латунь */
+            --gold-glow: rgba(184, 155, 94, 0.4);
+            --bg: #050608;
+            --panel: rgba(10, 11, 14, 0.98);
+        }
+
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background-color: var(--bg); color: var(--gold);
+            font-family: 'JetBrains Mono', monospace; overflow: hidden;
+        }
+
+        /* Атмосферный фон Витрувия */
+        .master-bg {
+            position: fixed; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, transparent 0%, var(--bg) 90%),
+                        url('https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Da_Vinci_Vitruve_Luc_Viatour.jpg/800px-Da_Vinci_Vitruve_Luc_Viatour.jpg') no-repeat center;
+            background-size: auto 80vh; opacity: 0.05; filter: sepia(1); pointer-events: none;
+        }
+
+        /* Сетка чертежа */
+        .blueprint-grid {
+            position: fixed; width: 100%; height: 100%;
+            background-image: linear-gradient(var(--gold-glow) 0.5px, transparent 0.5px),
+                              linear-gradient(90deg, var(--gold-glow) 0.5px, transparent 0.5px);
+            background-size: 50px 50px; opacity: 0.1; pointer-events: none;
+        }
+
+        #cy { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; }
+
+        /* HUD Панели */
+        .hud-panel {
+            position: fixed; background: var(--panel); backdrop-filter: blur(20px);
+            border: 1px solid var(--gold-glow); z-index: 100; padding: 25px;
+            box-shadow: 0 0 50px rgba(0,0,0,0.9);
+        }
+
+        .left-panel { top: 20px; left: 20px; bottom: 20px; width: 320px; border-radius: 0 40px 40px 0; border-left: 5px solid var(--gold); }
+        .right-panel { top: 20px; right: 20px; bottom: 20px; width: 380px; border-radius: 40px 0 0 40px; border-right: 5px solid var(--gold); }
+
+        h1, h2 { font-family: 'Cinzel', serif; letter-spacing: 3px; margin: 0; text-transform: uppercase; }
+
+        /* Анимированные индикаторы */
+        .status-bar { height: 2px; background: rgba(184,155,94,0.1); margin: 15px 0; overflow: hidden; }
+        .status-fill { height: 100%; background: var(--gold); width: 0%; transition: 2s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 10px var(--gold); }
+
+        /* Терминал */
+        .terminal {
+            background: rgba(0,0,0,0.4); border: 1px solid var(--gold-glow);
+            padding: 15px; font-size: 11px; color: #8a8a8a; height: 300px;
+            overflow-y: auto; margin-top: 20px; line-height: 1.6;
+        }
+
+        .action-btn {
+            width: 100%; padding: 12px; background: transparent; border: 1px solid var(--gold);
+            color: var(--gold); font-family: 'Cinzel'; cursor: pointer; transition: 0.3s;
+            margin-top: 10px; text-transform: uppercase;
+        }
+        .action-btn:hover { background: var(--gold); color: #000; box-shadow: 0 0 20px var(--gold-glow); }
+
+        /* Линия сканирования */
+        .scanline {
+            width: 100%; height: 2px; background: var(--gold); position: fixed;
+            opacity: 0.05; animation: scan 8s linear infinite; z-index: 101;
+        }
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+    </style>
+
+<body>
+
+<div class="master-bg"></div>
+<div class="blueprint-grid"></div>
+<div class="scanline"></div>
+
+<div class="hud-panel left-panel">
+    <h1>Genesis</h1>
+    <p style="font-size: 9px; opacity: 0.5;">ARCHITECTURAL_NEXUS_V3</p>
+
+    <div style="margin-top: 40px;">
+        <div style="font-size: 10px;">CONTENT_COVERAGE</div>
+        <div class="status-bar"><div id="bar1" class="status-fill"></div></div>
+
+        <div style="font-size: 10px;">PLATFORM_READINESS</div>
+        <div class="status-bar"><div id="bar2" class="status-fill"></div></div>
+    </div>
+
+    <div id="module-log" style="font-size: 11px; color: #555; margin-top: 30px;">
+        > Ожидание инициализации потока данных...
+    </div>
+
+    <button class="action-btn" style="margin-top: auto;" onclick="window.location.href='/admin/'">Return to Core</button>
+</div>
+
+<div class="hud-panel right-panel">
+    <h2 id="inspect-name">Idle_Mode</h2>
+    <div id="nexus-actions"></div>
+
+    <div class="terminal" id="terminal-out">
+        > Инициализация системы...<br>
+        > Сканирование сакральной геометрии...<br>
+        > Genesis Nexus Core initialized. Waiting for node inspection...
+    </div>
+</div>
+
+<div id="cy"></div>
+
+<script>
+    // Анимация интерфейса при входе
+    setTimeout(() => {
+        document.getElementById('bar1').style.width = '92%';
+        document.getElementById('bar2').style.width = '78%';
+    }, 500);
+
+    // Основная логика графа
+    console.log("Запуск Nexus Orchestrator...");
+
+    fetch('/admin/nexus/nodes')
+        .then(res => {
+            if (!res.ok) throw new Error("Ошибка сервера: " + res.status);
+            return res.json();
+        })
+        .then(data => {
+            console.log("Данные получены:", data);
+
+            if (!data.nodes || data.nodes.length === 0) {
+                document.getElementById('terminal-out').innerHTML += "<br><span style='color:red;'>! ВНИМАНИЕ: Узлы не обнаружены. Проверьте admin.py</span>";
+                return;
+            }
+
+            const cy = cytoscape({
+                container: document.getElementById('cy'),
+                elements: [...data.nodes, ...data.edges],
+              style: [
+            {
+                selector: 'node',
+
+                style: {
+                    'background-color': '#000',
+                    'border-width': 1,
+                    'border-color': '#b89b5e',
+                    'label': 'data(label)',
+                    'color': '#b89b5e',
+                    'font-family': 'Cinzel',
+                    'font-size': '12px',
+                    'text-valign': 'center',
+                    'text-outline-width': 2,
+                    'text-outline-color': '#050608'
+                }
+            },
+
+            {
+                selector: 'node[type="root"]',
+                style: {
+                    'shape': 'hexagon',
+                    'width': 180,
+                    'height': 180,
+                    'font-size': '26px',
+                    'border-width': 4,
+                    'background-color': '#1c1608',
+                    'border-color': '#d8b56a',
+                    'color': '#f3d48a',
+                    'text-outline-color': '#1c1608'
+                }
+            },
+
+            {
+                selector: 'node[type="layer"]',
+                style: {
+                    'shape': 'round-rectangle',
+                    'width': 150,
+                    'height': 70,
+                    'font-size': '18px',
+                    'border-width': 3,
+                    'background-color': '#111'
+                }
+            },
+
+            {
+                selector: 'node[type="module"]',
+
+                style: {
+                    'shape': 'diamond',
+                    'width': 80,
+                    'height': 80,
+                    'font-size': '11px',
+                    'border-width': 1,
+                    'background-color': '#000'
+                }
+                },
+
+                {
+                    selector: 'node[status="active"]',
+                    style: {
+                        'border-color': '#3ddc84',
+                        'border-width': 3,
+                        'shadow-blur': 15,
+                        'shadow-color': '#3ddc84',
+                        'shadow-opacity': 0.3
+                    }
+                },
+
+                {
+                    selector: 'node[status="planned"]',
+                    style: {
+                        'border-color': '#ff9f43',
+                        'border-width': 3,
+                        'shadow-blur': 15,
+                        'shadow-color': '#ff9f43',
+                        'shadow-opacity': 0.3
+                    }
+                },
+            },
+            {
+                selector: 'edge',
+                style: {
+                    'width': 2,
+                    'line-color': '#b89b5e',
+                    'target-arrow-color': '#b89b5e',
+                    'target-arrow-shape': 'triangle',
+                    'curve-style': 'bezier',
+                    'opacity': 0.8
+                }
+            }
+            ],
+                layout: {
+                    name: 'breadthfirst',
+                    directed: true,
+                    spacingFactor: 1.8,
+                    padding: 80,
+                    animate: true,
+                    roots: '#GENESIS'
+                    }
+            });
+            document.getElementById('module-log').innerHTML = `> ОБНАРУЖЕНО УЗЛОВ: ${data.nodes.length}`;
+
+            cy.on('tap', 'node', function(evt){
+                const node = evt.target.data();
+                document.getElementById('inspect-name').innerText = node.label;
+                document.getElementById(
+                    'module-log'
+                ).innerHTML +=
+                    `<br>> SELECTED: ${node.label}`;
+
+                // Запуск HTMX инспекции
+                htmx.ajax('GET', `/admin/nexus/inspect?path=${encodeURIComponent(node.id)}`, {
+                    target:'#terminal-out',
+                    swap:'innerHTML'
+                });
+
+                // Вывод функций
+                let btnHtml = '';
+                if(node.actions) {
+                    node.actions.forEach(a => {
+                        btnHtml += `<button class="action-btn" style="font-size:10px;">⚡ EXECUTE: ${a}</button>`;
+                    });
+                }
+                document.getElementById('nexus-actions').innerHTML = btnHtml;
+            });
+        })
+        .catch(err => {
+            console.error(err);
+            document.getElementById('terminal-out').innerHTML = `<span style='color:red;'>ОШИБКА ПОДКЛЮЧЕНИЯ:<br>${err.message}</span>`;
+        });
+</script>
+</body>
+</html>

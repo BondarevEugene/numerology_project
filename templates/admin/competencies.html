@@ -1,0 +1,44 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<div class="page-header">
+   <div class="page-title">
+      Competency Dictionary
+   </div>
+   <div class="page-subtitle">
+      Genesis Human Capability Framework
+   </div>
+</div>
+<div class="section-card">
+   <div class="section-title">
+      CORE COMPETENCIES
+   </div>
+   <table class="admin-table">
+      <thead>
+         <tr>
+            <th>ID</th>
+            <th>Code</th>
+            <th>Title</th>
+            <th>Category</th>
+         </tr>
+      </thead>
+      <tbody>
+         {% for item in content %}
+         <tr>
+            <td>
+               {{ item.id }}
+            </td>
+            <td>
+               {{ item.code }}
+            </td>
+            <td>
+               {{ item.title }}
+            </td>
+            <td>
+               {{ item.category }}
+            </td>
+         </tr>
+         {% endfor %}
+      </tbody>
+   </table>
+</div>
+{% endblock %}

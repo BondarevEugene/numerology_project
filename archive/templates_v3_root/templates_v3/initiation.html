@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Genesis | Initiation Protocol</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root { --gold: #b89b5e; --bg: #050505; }
+        body {
+            background: var(--bg); color: var(--gold);
+            font-family: 'JetBrains Mono', monospace;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; margin: 0; overflow: hidden;
+        }
+        .init-container { text-align: center; position: relative; }
+
+        /* Анимированный сакральный круг */
+        .sacred-circle {
+            width: 300px; height: 300px;
+            border: 1px double var(--gold);
+            border-radius: 50%;
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            animation: rotate 20s linear infinite;
+            opacity: 0.3;
+        }
+        .sacred-circle::before {
+            content: ''; position: absolute; inset: 20px;
+            border: 1px solid var(--gold); border-radius: 50%;
+            border-style: dashed;
+        }
+
+        @keyframes rotate { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+        .status-text {
+            font-family: 'Cinzel'; font-size: 24px; letter-spacing: 10px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.98); } }
+
+        .glitch-code { font-size: 10px; opacity: 0.5; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="sacred-circle"></div>
+    <div class="init-container">
+        <div class="status-text">INITIATION_STAGE</div>
+        <div class="glitch-code">> ACCESS_RESTRICTED: MODULE_UNDER_CONSTRUCTION...</div>
+        <div class="glitch-code" id="timer">ESTABLISHING_LINK: 0.00%</div>
+        <button onclick="window.history.back()" style="margin-top: 40px; background: none; border: 1px solid var(--gold); color: var(--gold); padding: 10px 20px; cursor: pointer; font-family: 'Cinzel';">RETURN_TO_CORE</button>
+    </div>
+
+    <script>
+        let progress = 0;
+        setInterval(() => {
+            progress += Math.random() * 0.1;
+            if (progress > 99) progress = 99;
+            document.getElementById('timer').innerText = `ESTABLISHING_LINK: ${progress.toFixed(2)}%`;
+        }, 100);
+    </script>
+</body>
+</html>

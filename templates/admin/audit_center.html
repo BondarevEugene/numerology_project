@@ -1,0 +1,80 @@
+{% extends "admin/base.html" %}
+{% block content %}
+
+<div class="page-header">
+
+    <div class="page-title">
+        🔎 Genesis Audit Center
+    </div>
+
+    <div class="page-subtitle">
+        Platform Health Monitoring
+    </div>
+
+</div>
+
+<div class="kpi-grid">
+
+    <div class="kpi-card">
+        <div class="kpi-label">
+            Missing RU
+        </div>
+
+        <div class="kpi-number">
+            {{ audit_data.missing_ru }}
+        </div>
+    </div>
+
+    <div class="kpi-card">
+        <div class="kpi-label">
+            Missing UA
+        </div>
+
+        <div class="kpi-number">
+            {{ audit_data.missing_ua }}
+        </div>
+    </div>
+
+    <div class="kpi-card">
+        <div class="kpi-label">
+            Missing Keywords
+        </div>
+
+        <div class="kpi-number">
+            {{ audit_data.missing_keywords }}
+        </div>
+    </div>
+
+    <div class="kpi-card">
+        <div class="kpi-label">
+            Missing Category
+        </div>
+
+        <div class="kpi-number">
+            {{ audit_data.missing_category }}
+        </div>
+    </div>
+
+</div>
+
+<div class="section-card">
+
+    <div class="section-title">
+        RECOMMENDED ACTIONS
+    </div>
+
+    <div class="badge badge-warning">
+        Fill Missing Translations
+    </div>
+
+    <div class="badge badge-warning">
+        Complete Career Metadata
+    </div>
+
+    <div class="badge badge-warning">
+        Improve Search Keywords
+    </div>
+
+</div>
+
+{% endblock %}

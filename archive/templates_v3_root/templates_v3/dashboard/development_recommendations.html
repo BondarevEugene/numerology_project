@@ -1,0 +1,56 @@
+{% if result.advanced %}
+<section class="genesis-panel">
+<div class="panel-header">
+YOUR NEXT EVOLUTION STEP
+</div>
+<div class="report-content">
+
+{% if result.advanced.imbalances %}
+<h3>MAIN LIMITING FACTOR</h3>
+<p>
+<strong>
+{{ result.advanced.imbalances[0].status }}
+</strong>
+</p>
+<p>
+{{ result.advanced.imbalances[0].recommendation }}
+</p>
+<hr>
+{% endif %}
+
+<h3>YOUR DEVELOPMENT VECTOR</h3>
+
+{% if result.advanced.social_role %}
+<p>
+{{ result.advanced.social_role }}
+</p>
+{% endif %}
+
+<hr>
+
+<h3>NEXT 30 DAYS FOCUS</h3>
+
+{% if result.advanced.karma %}
+<ul>
+{% for lesson in result.advanced.karma %}
+<li>{{ lesson }}</li>
+{% endfor %}
+</ul>
+{% else %}
+<p>
+Углубление уже сформированных качеств и системное развитие сильных сторон.
+</p>
+{% endif %}
+
+<hr>
+
+<h3>FIRST PRACTICAL STEP</h3>
+
+<p>
+Выберите одну сферу жизни, где сейчас есть максимальное напряжение,
+и ежедневно уделяйте ей минимум 20 минут осознанного внимания.
+</p>
+
+</div>
+</section>
+{% endif %}

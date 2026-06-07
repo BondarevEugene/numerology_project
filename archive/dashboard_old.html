@@ -1,0 +1,80 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<h1>NEXUS CMS</h1>
+<div style="
+   display:grid;
+   grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+   gap:20px;
+   margin-bottom:30px;
+   ">
+   <div class="card">
+      <h2>{{ stats.archetypes }}</h2>
+      <div>Архетипов</div>
+   </div>
+   <div class="card">
+      <h2>{{ stats.vocations }}</h2>
+      <div>Профессий</div>
+   </div>
+   <div class="card">
+      <h2>{{ stats.tips }}</h2>
+      <div>Советов</div>
+   </div>
+   <div class="card">
+      <h2>{{ stats.articles }}</h2>
+      <div>Статей</div>
+   </div>
+   <div class="card">
+      <h2>{{ stats.users }}</h2>
+      <div>Пользователей</div>
+   </div>
+   <div class="card">
+      <h2>{{ stats.reports }}</h2>
+      <div>Отчетов</div>
+   </div>
+   <div class="card">
+      <h2>{{ stats.protocols }}</h2>
+      <div>Протоколов</div>
+   </div>
+</div>
+<div class="card">
+   <h2>Контент аудит</h2>
+   {% if audit %}
+   {% for item in audit %}
+   <div style="margin-bottom:8px;">
+      ⚠ {{ item }}
+   </div>
+   {% endfor %}
+   {% else %}
+   <div>
+      ✅ Критических проблем не обнаружено
+   </div>
+   {% endif %}
+</div>
+<div class="card">
+   <h2>Быстрый доступ</h2>
+   <div style="
+      display:flex;
+      gap:15px;
+      flex-wrap:wrap;
+      ">
+      <a href="/admin/archetypes">
+      Архетипы
+      </a>
+      <a href="/admin/vocations">
+      Профессии
+      </a>
+      <a href="/admin/tips">
+      Daily Coach
+      </a>
+      <a href="/admin/articles">
+      Статьи
+      </a>
+      <a href="/admin/protocols">
+      Протоколы
+      </a>
+      <a href="/admin/users">
+      Пользователи
+      </a>
+   </div>
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+.profile-container{
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+}
+
+.account-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:20px;
+}
+
+.history-item{
+    padding:12px;
+    border-bottom:1px solid rgba(255,255,255,.1);
+}

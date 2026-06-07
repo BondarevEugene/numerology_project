@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Genesis HR® // Intelligence Systems v2.9.8</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&family=Inter:wght@300;400;600;700&family=Cinzel:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+
+    <style>
+        :root {
+            --bg: #050505;
+            --panel: rgba(10, 10, 10, 0.98);
+            --gold: #b89b5e;
+            --gold-bright: #f3e5ab;
+            --gold-glow: rgba(184, 155, 94, 0.3);
+            --border: rgba(184, 155, 94, 0.2);
+            --text: #e2e2e2;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            background-image: radial-gradient(circle at 50% -20%, #1a1a1a 0%, #050505 80%);
+            background-attachment: fixed;
+        }
+
+        .cinzel { font-family: 'Cinzel', serif; }
+        .almendra { font-family: 'Almendra', serif; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* Контейнеры и панели */
+        .nexus-panel {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            position: relative;
+            backdrop-filter: blur(10px);
+            transition: all 0.5s ease;
+        }
+        .nexus-panel:hover {
+            border-color: var(--gold);
+            box-shadow: 0 0 40px rgba(0,0,0,0.5), inset 0 0 20px var(--gold-glow);
+        }
+
+        /* Таблица Пифагора (Legacy Gold Edition) */
+        .matrix-table {
+            border-collapse: separate;
+            border-spacing: 8px;
+            width: 100%;
+        }
+        .matrix-cell {
+            background: rgba(184, 155, 94, 0.03);
+            border: 1px solid var(--border);
+            height: 100px;
+            text-align: center;
+            transition: 0.3s;
+            position: relative;
+        }
+        .matrix-cell:hover { background: rgba(184, 155, 94, 0.1); border-color: var(--gold); }
+        .matrix-num { font-family: 'Cinzel'; font-size: 1.6rem; color: var(--gold-bright); display: block; }
+        .matrix-label { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; color: #666; font-weight: bold; }
+
+        /* Ввод данных */
+        .gold-input {
+            background: #000;
+            border: 1px solid var(--border);
+            color: var(--gold-bright);
+            padding: 12px;
+            text-align: center;
+            outline: none;
+            transition: 0.3s;
+        }
+        .gold-input:focus { border-color: var(--gold); box-shadow: 0 0 10px var(--gold-glow); }
+
+        .btn-genesis {
+            background: linear-gradient(135deg, #8c7647 0%, #b89b5e 50%, #8c7647 100%);
+            color: #000;
+            font-family: 'Cinzel';
+            font-weight: 900;
+            letter-spacing: 2px;
+            transition: 0.4s;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-genesis:hover { transform: translateY(-2px); filter: brightness(1.2); box-shadow: 0 5px 20px var(--gold-glow); }
+
+        /* Анимация сканирования */
+        .scan-line {
+            width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            position: absolute; top: 0; left: 0;
+            animation: scan 4s linear infinite;
+            z-index: 10; opacity: 0.3; pointer-events: none;
+        }
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+
+        /* Кастомный Scrollbar */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; color: black; }
+            .nexus-panel { border: 1px solid #000; box-shadow: none; }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-7xl mx-auto">
+
+        <header class="flex flex-col md:flex-row justify-between items-end mb-16 border-b border-gold/20 pb-8">
+            <div class="relative group">
+                <h1 onclick="location.href='/nexus'" class="cinzel text-4xl md:text-5xl text-gold tracking-[0.2em] cursor-pointer select-none">
+                    GENESIS<span class="opacity-50">HR</span>
+                </h1>
+                <div class="mono text-[9px] tracking-[0.4em] text-gold/40 mt-2 uppercase">Neural Intelligence Interface // v2.9.8</div>
+            </div>
+
+            <div class="no-print mt-6 md:mt-0 flex gap-6 items-center">
+                <div class="text-right">
+                    <div class="mono text-[9px] text-gold/60 uppercase">System Status</div>
+                    <div class="text-[9px] text-emerald-500 animate-pulse uppercase tracking-widest">● Online / Encrypted</div>
+                </div>
+                <button onclick="window.print()" class="btn-genesis px-6 py-2 text-[10px] uppercase">Экспорт PDF</button>
+            </div>
+        </header>
+
+        <section class="no-print grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
+            <div class="nexus-panel p-8 rounded-tr-3xl lg:col-span-2">
+                <div class="scan-line"></div>
+                <h3 class="cinzel text-gold text-[10px] mb-6 tracking-widest uppercase">// Инициализация субъекта</h3>
+                <form method="POST" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <input type="number" name="day" placeholder="ДЕНЬ" required class="gold-input rounded-sm">
+                    <input type="number" name="month" placeholder="МЕСЯЦ" required class="gold-input rounded-sm">
+                    <input type="number" name="year" placeholder="ГОД" required class="gold-input rounded-sm">
+                    <button type="submit" class="btn-genesis rounded-sm py-3 px-4 text-xs">АНАЛИЗ</button>
+                </form>
+            </div>
+
+            <div class="nexus-panel p-8 border-dashed opacity-50 hover:opacity-100 transition-opacity flex flex-col justify-center">
+                <h3 class="cinzel text-gold/60 text-[10px] mb-4 tracking-widest uppercase">// Синастрия (Beta)</h3>
+                <div class="flex gap-2">
+                    <input type="text" placeholder="Дата партнера" onfocus="(this.type='date')" class="gold-input w-full text-[10px]">
+                    <button class="border border-gold/30 px-4 hover:bg-gold/10 transition">
+                        <svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        {% if result %}
+        <main class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+            <div class="lg:col-span-8 space-y-8">
+                <div class="nexus-panel p-10 overflow-hidden min-h-[500px]">
+                    <div class="absolute -right-10 -top-10 cinzel text-[20rem] text-gold opacity-[0.03] italic select-none pointer-events-none">{{ result.number }}</div>
+
+                    <header class="relative z-10 mb-10">
+                        <div class="text-gold mono text-[10px] uppercase mb-2 tracking-[0.5em]">Dominant Archetype Code</div>
+                        <h2 class="cinzel text-4xl md:text-6xl text-white font-black mb-8 tracking-tighter leading-tight">{{ result.title }}</h2>
+
+                        <div class="flex flex-wrap gap-8 border-y border-gold/10 py-6">
+                            <div class="flex items-center gap-3">
+                                <span class="text-gold/40 mono text-[10px]">PLANET:</span>
+                                <span class="cinzel text-gold text-lg tracking-widest">{{ result.planet }}</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="text-gold/40 mono text-[10px]">ELEMENT:</span>
+                                <span class="cinzel text-gold text-lg tracking-widest">{{ result.element }}</span>
+                            </div>
+                        </div>
+                    </header>
+
+                    <div class="relative z-10 almendra text-xl leading-relaxed text-slate-300 drop-shadow-md">
+                        {{ result.prof_vector | safe }}
+                    </div>
+                </div>
+
+                <div class="nexus-panel p-8 rounded-bl-3xl">
+                    <h3 class="cinzel text-gold text-[10px] mb-10 tracking-[0.4em] uppercase">// Векторы реализации личности</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                        {% for item in result.advanced.imbalances %}
+                        <div class="group border-l border-gold/10 pl-6 py-2 hover:border-gold transition-colors">
+                            <div class="flex justify-between items-start mb-3">
+                                <span class="mono text-[10px] text-gold/40 uppercase">{{ item.aspect }}</span>
+                                <span class="text-[9px] bg-gold/10 text-gold px-2 py-0.5 rounded italic border border-gold/20">{{ item.status }}</span>
+                            </div>
+                            <p class="text-[12px] text-slate-400 leading-relaxed group-hover:text-slate-200 transition-colors almendra">
+                                {{ item.recommendation }}
+                            </p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-4 space-y-8">
+                <div class="nexus-panel p-8">
+                    <h3 class="cinzel text-gold text-center text-[10px] mb-8 tracking-[0.4em] uppercase">Digital Matrix 3x3</h3>
+                    <table class="matrix-table">
+                        <tr>
+                            <td class="matrix-cell"><span class="matrix-num">{{ result.cells['1'] or '-' }}</span><span class="matrix-label">Характер</span></td>
+                            <td class="matrix-cell"><span class="matrix-num">{{ result.cells['4'] or '-' }}</span><span class="matrix-label">Здоровье</span></td>
+                            <td class="matrix-cell"><span class="matrix-num">{{ result.cells['7'] or '-' }}</span><span class="matrix-label">Удача</span></td>
+                        </tr>
+                        <tr>
+                            <td class="matrix-cell"><span class="matrix-num">{{ result.cells['2'] or '-' }}</span><span class="matrix-label">Энергия</span></td>
+                            <td class="matrix-cell"><span class="matrix-num">{{ result.cells['5'] or '-' }}</span><span class="matrix-label">Логика</span></td>
+                            <td class="matrix-cell"><span class="matrix-num">{{ result.cells['8'] or '-' }}</span><span class="matrix-label">Долг</span></td>
+                        </tr>
+                        <tr>
+                            <td class="matrix-cell"><span class="matrix-num">{{ result.cells['3'] or '-' }}</span><span class="matrix-label">Интерес</span></td>
+                            <td class="matrix-cell"><span class="matrix-num">{{ result.cells['6'] or '-' }}</span><span class="matrix-label">Труд</span></td>
+                            <td class="matrix-cell"><span class="matrix-num">{{ result.cells['9'] or '-' }}</span><span class="matrix-label">Память</span></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="nexus-panel p-8">
+                    <h3 class="cinzel text-gold text-center text-[10px] mb-8 tracking-[0.3em] uppercase">Spirit vs Flesh Balance</h3>
+                    <div class="relative w-full h-2 bg-black border border-gold/20 rounded-full overflow-hidden mb-6">
+                        <div class="absolute h-full bg-gradient-to-r from-blue-900 to-sky-500 shadow-[0_0_10px_#0ea5e9]"
+                             style="width: {{ result.advanced.spirituality.spirit_score * 10 }}%"></div>
+                    </div>
+                    <div class="flex justify-between w-full mono text-[9px] uppercase tracking-tighter mb-6">
+                        <span class="text-sky-400">Spirit: {{ result.advanced.spirituality.spirit_score }}</span>
+                        <span class="text-gold">Flesh: {{ result.advanced.spirituality.flesh_score }}</span>
+                    </div>
+                    <p class="text-center text-[11px] italic text-slate-500 leading-relaxed almendra">
+                        {{ result.advanced.spirituality.description }}
+                    </p>
+                </div>
+
+                <div class="nexus-panel p-6 h-80">
+                    <canvas id="miniRadar"></canvas>
+                </div>
+            </div>
+        </main>
+
+        <section class="mt-12">
+            <div class="nexus-panel p-[1px] bg-gradient-to-r from-transparent via-gold/30 to-transparent border-none">
+                <div class="bg-[#050505] p-10">
+                    <h3 class="cinzel text-gold text-center text-xs mb-12 tracking-[0.5em] uppercase">Протокол кармических задач</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {% for lesson in result.advanced.karma %}
+                        <div class="nexus-panel p-6 text-[11px] leading-relaxed border-gold/10 hover:border-gold/40 transition-all group">
+                            <div class="text-gold mb-4 opacity-30 group-hover:opacity-100 transition-opacity text-lg">◈</div>
+                            <span class="text-slate-400 italic almendra text-sm">{{ lesson }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        <footer class="mt-32 pb-20 border-t border-gold/10 pt-20 no-print">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 mb-20">
+                <div class="col-span-1">
+                    <div class="cinzel text-2xl text-gold mb-8 tracking-[0.2em] font-bold">GENESIS®</div>
+                    <p class="mono text-[10px] text-slate-500 leading-relaxed uppercase tracking-widest">
+                        Система Genesis Intelligence является интеллектуальной собственностью.
+                        Алгоритмы дешифровки защищены протоколами квантового шифрования.
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="cinzel text-gold text-[11px] mb-8 tracking-[0.3em] font-bold">МЕТОДОЛОГИЯ</h4>
+                    <ul class="mono text-[10px] space-y-4 text-slate-400 uppercase tracking-widest">
+                        <li><a href="#" class="hover:text-gold transition-colors inline-block">Pythagoras Matrix</a></li>
+                        <li><a href="#" class="hover:text-gold transition-colors inline-block">Archetypal Codes</a></li>
+                        <li><a href="#" class="hover:text-gold transition-colors inline-block">Neural Analysis</a></li>
+                        <li><a href="#" class="hover:text-gold transition-colors inline-block">Fate Decoding</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h4 class="cinzel text-gold text-[11px] mb-8 tracking-[0.3em] font-bold">ДОКУМЕНТЫ</h4>
+                    <ul class="mono text-[10px] space-y-4 text-slate-400 uppercase tracking-widest">
+                        <li><a href="#" class="hover:text-gold transition-colors inline-block">User Agreement</a></li>
+                        <li><a href="#" class="hover:text-gold transition-colors inline-block">Privacy Policy</a></li>
+                        <li><a href="#" class="hover:text-gold transition-colors inline-block">Secure License v2.9</a></li>
+                    </ul>
+                </div>
+
+                <div class="lg:text-right">
+                    <h4 class="cinzel text-gold text-[11px] mb-8 tracking-[0.3em] font-bold uppercase">Engineered By</h4>
+                    <p class="mono text-[11px] text-slate-300 mb-2 tracking-[0.2em]">GENESIS_CORE_SYSTEMS</p>
+                    <p class="mono text-[10px] text-slate-600 italic">"Beyond human intelligence"</p>
+                    <div class="flex lg:justify-end gap-3 mt-6">
+                        <div class="w-12 h-[1px] bg-gold/30 mt-2"></div>
+                        <span class="cinzel text-gold text-sm tracking-widest">2024-2026</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row justify-between items-center border-t border-white/5 pt-10">
+                <div class="mono text-[9px

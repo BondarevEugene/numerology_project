@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+   <head>
+      <meta charset="UTF-8">
+      <title>NEXUS CMS</title>
+      <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+      <style>
+         body{
+         margin:0;
+         background:#050608;
+         color:#b89b5e;
+         font-family:'JetBrains Mono',monospace;
+         }
+         .wrapper{
+         display:flex;
+         min-height:100vh;
+         }
+         .sidebar{
+         width:280px;
+         background:#0a0a0a;
+         border-right:1px solid rgba(184,155,94,.2);
+         padding:30px;
+         }
+         .logo{
+         font-family:'Cinzel';
+         font-size:26px;
+         margin-bottom:40px;
+         }
+         .menu a{
+         display:block;
+         padding:12px;
+         margin-bottom:10px;
+         color:#b89b5e;
+         text-decoration:none;
+         border:1px solid rgba(184,155,94,.15);
+         }
+         .menu a:hover{
+         background:#b89b5e;
+         color:#000;
+         }
+         .content{
+         flex:1;
+         padding:40px;
+         }
+         .card{
+         border:1px solid rgba(184,155,94,.2);
+         background:#0a0a0a;
+         padding:20px;
+         margin-bottom:20px;
+         }
+      </style>
+   </head>
+   <body>
+      <div class="wrapper">
+         <div class="sidebar">
+            <div class="logo">
+               NEXUS CMS
+            </div>
+            <div class="menu">
+               <a href="/admin">
+               Dashboard</a>
+               <a href="/admin/archetypes">
+               Архетипы
+               </a>
+               <a href="/admin/professions">
+               Профессии
+               </a>
+               <a href="/admin/tips">
+               Daily Coach
+               </a>
+               <a href="/admin/articles">
+               Статьи
+              </a>
+ <!--               <a href="/admin/courses">
+               Программы
+               </a>-->
+               <a href="/admin/protocols">
+               Протоколы
+               </a>
+               <a href="/admin/vocations">
+               Карьерный интеллект
+               </a>
+                <a href="/admin/vocations/matrix">
+                Матрица профессий
+                </a>
+               <a href="/admin/users">
+               Пользователи
+               </a>
+            </div>
+         </div>
+         <div class="content">
+            {% block content %}
+            {% endblock %}
+         </div>
+      </div>
+   </body>
+</html>

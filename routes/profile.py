@@ -28,6 +28,7 @@ from content import ARCHETYPES
 from data import ARCHETYPE_EXTRAS
 from utils import calculate_full_matrix_logic, sum_digits
 
+from core.profile_service import ProfileService
 
 profile_bp = Blueprint('profile', __name__)
 
@@ -71,7 +72,7 @@ def index():
                            content=content_data, extra=extra_data,
                            user_sessions=user_sessions, arcane_key=arcane_key)
 
-
+"""
     # 5. Статистика для Радара
 stats = {
         'haracter': len(str(matrix.get('1', '')).replace('-', '')),
@@ -81,7 +82,7 @@ stats = {
         'logic': len(str(matrix.get('5', '')).replace('-', '')),
         'trud': len(str(matrix.get('6', '')).replace('-', ''))
     }
-
+"""
 
 # --- [ СЕКЦИЯ: ВНУТРЕННЯЯ ЛОГИКА (HELPER FUNCTIONS) ] ---
 
@@ -344,3 +345,17 @@ def evolution_sync():
         "daily_quests": active_quests,
         "detailed_analysis": ARCHETYPE_EXTRAS.get(sum_digits(d), {})
     })
+
+@profile_bp.route("/cabinet")
+@login_required
+def cabinet():
+
+    profile_data = ProfileService.build(
+        current_user
+    )
+
+    return render_template(
+        "templates_v3/profile/profile_v3.html",
+        profile=profile_data
+    )
+

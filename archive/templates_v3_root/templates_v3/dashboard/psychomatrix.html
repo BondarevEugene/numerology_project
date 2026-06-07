@@ -1,0 +1,66 @@
+{% if result %}
+
+<section class="genesis-panel">
+    <div class="panel-header">
+        КВАДРАТ ПИФАГОРА
+    </div>
+    <div class="matrix-grid">
+        <div class="matrix-cell">
+            {{ result.m1 if result.m1 else '—' }}
+        </div>
+        <div class="matrix-cell">
+            {{ result.m4 if result.m4 else '—' }}
+        </div>
+        <div class="matrix-cell">
+            {{ result.m7 if result.m7 else '—' }}
+        </div>
+        <div class="matrix-cell">
+            {{ result.m2 if result.m2 else '—' }}
+        </div>
+        <div class="matrix-cell">
+            {{ result.m5 if result.m5 else '—' }}
+        </div>
+        <div class="matrix-cell">
+            {{ result.m8 if result.m8 else '—' }}
+        </div>
+        <div class="matrix-cell">
+            {{ result.m3 if result.m3 else '—' }}
+        </div>
+        <div class="matrix-cell">
+            {{ result.m6 if result.m6 else '—' }}
+        </div>
+        <div class="matrix-cell">
+            {{ result.m9 if result.m9 else '—' }}
+        </div>
+    </div>
+    <div class="matrix-properties">
+        <div>
+            ⚖️ {{ result.character_desc }}
+        </div>
+        <div>
+            🩺 {{ result.health_desc }}
+        </div>
+        <div>
+            🔮 {{ result.luck_desc }}
+        </div>
+        <div>
+            ⚡ {{ result.energy_desc }}
+        </div>
+        <div>
+            🧠 {{ result.logic_desc }}
+        </div>
+        <div>
+            🛡️ {{ result.duty_desc }}
+        </div>
+        <div>
+            🎨 {{ result.interest_desc }}
+        </div>
+        <div>
+            🛠️ {{ result.labor_desc }}
+        </div>
+        <div>
+            💾 {{ result.memory_desc }}
+        </div>
+    </div>
+</section>
+{% endif %}

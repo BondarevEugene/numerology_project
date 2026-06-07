@@ -1,0 +1,300 @@
+{% extends "admin/base.html" %}
+{% block content %}
+
+<div class="page-header">
+    <div class="page-title">
+        🚀 Genesis Command Center
+    </div>
+    <div class="page-subtitle">
+        Human Intelligence Platform • Build V10
+    </div>
+</div>
+<div class="kpi-grid">
+    <div class="kpi-card">
+        <div class="kpi-label">
+            Users
+        </div>
+        <div class="kpi-number">
+            {{ stats.users if stats and stats.users else 0 }}
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">
+            Archetypes
+        </div>
+        <div class="kpi-number">
+            {{ stats.archetypes if stats and stats.archetypes else 0 }}
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">
+            Professions
+        </div>
+        <div class="kpi-number">
+            {{ stats.professions if stats and stats.professions else 0 }}
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-label">
+            Articles
+        </div>
+        <div class="kpi-number">
+            {{ stats.articles if stats and stats.articles else 0 }}
+        </div>
+    </div>
+</div>
+<div class="section-card">
+    <div class="section-title">
+        SYSTEM AUDIT
+    </div>
+    {% if audit %}
+        {% for item in audit %}
+            <div class="badge badge-warning">
+                {{ item }}
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="badge badge-success">
+            SYSTEM HEALTHY
+        </div>
+    {% endif %}
+</div>
+<div class="section-card">
+    <div class="section-title">
+        QUICK ACTIONS
+    </div>
+    <a
+        href="/admin/archetypes"
+        class="btn btn-gold">
+        Archetypes
+    </a>
+    <a
+        href="/admin/professions"
+        class="btn btn-gold">
+        Professions
+    </a>
+    <a
+        href="/admin/vocations"
+        class="btn btn-gold">
+        Career Intelligence
+    </a>
+    <a
+        href="/admin/vocations/matrix"
+        class="btn btn-gold">
+        Career Matrix
+    </a>
+</div>
+<div class="section-card">
+    <div class="section-title">
+        NEXUS CORE STATUS
+    </div>
+
+    <div class="badge badge-success">
+        ONLINE
+    </div>
+    <div class="badge badge-success">
+        DATABASE CONNECTED
+    </div>
+    <div class="badge badge-success">
+        CAREER ENGINE READY
+    </div>
+</div>
+<div class="section-card">
+
+    <div class="section-title">
+        PLATFORM HEALTH
+    </div>
+
+    <div class="kpi-grid">
+
+        <div class="kpi-card">
+            <div class="kpi-label">
+                Sessions
+            </div>
+            <div class="kpi-number">
+                {{ platform_stats.sessions }}
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-label">
+                Protocols
+            </div>
+            <div class="kpi-number">
+                {{ platform_stats.protocols }}
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-label">
+                Articles
+            </div>
+            <div class="kpi-number">
+                {{ platform_stats.articles }}
+            </div>
+        </div>
+
+    </div>
+
+</div>
+<div class="section-card">
+
+    <div class="section-title">
+        KNOWLEDGE BASE
+    </div>
+
+    <div class="kpi-grid">
+
+        <div class="kpi-card">
+            <div class="kpi-label">
+                Archetypes
+            </div>
+
+            <div class="kpi-number">
+                {{ knowledge_stats.archetypes }}
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-label">
+                Professions
+            </div>
+
+            <div class="kpi-number">
+                {{ knowledge_stats.professions }}
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-label">
+                Daily Coach
+            </div>
+
+            <div class="kpi-number">
+                {{ knowledge_stats.daily_coach }}
+            </div>
+        </div>
+
+    </div>
+
+</div>
+<div class="section-card">
+
+    <div class="section-title">
+        CAREER INTELLIGENCE HEALTH
+    </div>
+
+    <div class="kpi-grid">
+
+        <div class="kpi-card">
+            <div class="kpi-label">
+                Career Records
+            </div>
+
+            <div class="kpi-number">
+                {{ career_stats.records }}
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-label">
+                Missing RU
+            </div>
+
+            <div class="kpi-number">
+                {{ career_stats.missing_ru }}
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-label">
+                Missing UA
+            </div>
+
+            <div class="kpi-number">
+                {{ career_stats.missing_ua }}
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-label">
+                Missing Keywords
+            </div>
+
+            <div class="kpi-number">
+                {{ career_stats.missing_keywords }}
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-label">
+                Missing Category
+            </div>
+
+            <div class="kpi-number">
+                {{ career_stats.missing_category }}
+            </div>
+        </div>
+
+    </div>
+
+</div>
+<div class="section-card">
+
+    <div class="section-title">
+        AI CENTER
+    </div>
+
+    <div class="badge badge-warning">
+        AI AUDIT - PLANNED
+    </div>
+
+    <div class="badge badge-warning">
+        AI CONTENT REVIEW - PLANNED
+    </div>
+
+    <div class="badge badge-warning">
+        AI CAREER REVIEW - PLANNED
+    </div>
+
+</div>
+<div class="section-card">
+
+    <div class="section-title">
+        DEVELOPMENT ROADMAP
+    </div>
+
+    <div class="badge badge-success">
+        Career Matrix
+    </div>
+
+    <div class="badge badge-success">
+        Archetype Engine
+    </div>
+
+    <div class="badge badge-success">
+        Daily Coach
+    </div>
+
+    <div class="badge badge-success">
+        PDF Reports
+    </div>
+
+    <div class="badge badge-warning">
+        AI Audit
+    </div>
+
+    <div class="badge badge-warning">
+        Subscription System
+    </div>
+
+    <div class="badge badge-warning">
+        Corporate Portal
+    </div>
+
+    <div class="badge badge-warning">
+        Mobile App
+    </div>
+
+</div>
+{% endblock %}

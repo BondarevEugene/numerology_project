@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: 'Arial', Arial, sans-serif; background: #fff; color: #111; margin: 0; padding: 40px; }
+        .header { text-align: center; border-bottom: 2px solid #c5a059; padding-bottom: 20px; margin-bottom: 30px; }
+        .title { font-size: 32px; color: #c5a059; text-transform: uppercase; }
+        .user-info { font-size: 14px; color: #666; margin-top: 10px; }
+
+        /* Вместо Grid используем таблицы для 100% совместимости */
+        .stats-table { width: 100%; border-spacing: 10px; margin-bottom: 30px; }
+        .stat-box { border: 1px solid #ddd; padding: 15px; text-align: center; width: 20%; background: #fcfcfc; }
+        .stat-val { font-size: 24px; font-weight: bold; color: #c5a059; }
+        .stat-label { font-size: 10px; text-transform: uppercase; color: #888; }
+
+        .box { border: 1px solid #eee; padding: 20px; margin-bottom: 20px; page-break-inside: avoid; }
+        .box h3 { color: #c5a059; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-top: 0; }
+
+        .matrix-container { position: relative; width: 400px; height: 400px; margin: 0 auto; border: 1px solid #eee; }
+        /* В PDF лучше использовать статичную картинку матрицы */
+
+        .footer { text-align: center; font-size: 10px; color: #aaa; margin-top: 50px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="title">Genesis Analysis: {{ result.title }}</div>
+        <div class="user-info">Объект: {{ user_name }} | Дата рождения: {{ day }}.{{ month }}.{{ year }}</div>
+    </div>
+
+    <table class="stats-table">
+        <tr>
+            <td class="stat-box"><div class="stat-val">{{ calc.mind }}</div><div class="stat-label">УМ</div></td>
+            <td class="stat-box"><div class="stat-val">{{ calc.action }}</div><div class="stat-label">ДЕЙСТВИЕ</div></td>
+            <td class="stat-box"><div class="stat-val">{{ calc.realization }}</div><div class="stat-label">РЕАЛИЗАЦИЯ</div></td>
+            <td class="stat-box"><div class="stat-val">{{ calc.final }}</div><div class="stat-label">ИТОГ</div></td>
+            <td class="stat-box"><div class="stat-val">{{ calc.dharma }}</div><div class="stat-label">ДХАРМА</div></td>
+        </tr>
+    </table>
+
+    <div class="box">
+        <h3>⚡ Вектор Силы</h3>
+        {{ result.action_power|safe }}
+    </div>
+
+    <div class="box">
+        <h3>🌑 Теневая Ловушка</h3>
+        {{ result.shadow_side|safe }}
+    </div>
+
+    <div class="box">
+        <h3>🎯 Точка Роста</h3>
+        {{ result.growth_point|safe }}
+    </div>
+
+    <div style="page-break-after: always;"></div> <div class="box">
+        <h3>⚖️ Кармические задачи</h3>
+        {{ result.karmic_tasks|safe }}
+    </div>
+
+    <div class="footer">Genesis Psychology Digital Report © 2026</div>
+</body>
+</html>
+</html>

@@ -1,0 +1,40 @@
+{% if result and result.jobs %}
+<section class="genesis-panel">
+   <div class="panel-header">
+      PROFESSIONAL RESONANCE
+   </div>
+   <div class="career-subtitle">
+      Ваши наиболее естественные направления реализации
+   </div>
+   <div class="career-grid">
+      {% for job in result.jobs %}
+      <div class="career-card">
+         <div class="career-icon">
+            ⬢
+         </div>
+         <div class="career-title">
+            {{ job }}
+         </div>
+         <div class="career-description">
+            Это направление соответствует вашему природному способу мышления и реализации.
+         </div>
+      </div>
+      {% endfor %}
+   </div>
+   <hr>
+   <h3>КАК ВЫ СОЗДАЕТЕ ЦЕННОСТЬ</h3>
+   <p>
+      {{ result.short_desc }}
+   </p>
+   <hr>
+   <h3>СРЕДА МАКСИМАЛЬНОЙ РЕАЛИЗАЦИИ</h3>
+   <p>
+      {{ result.description }}
+   </p>
+   <hr>
+   <h3>КЛЮЧЕВЫЕ НАВЫКИ</h3>
+   <p>
+      {{ result.keywords }}
+   </p>
+</section>
+{% endif %}
