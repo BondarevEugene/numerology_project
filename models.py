@@ -497,19 +497,21 @@ class ArchetypeCompetency(db.Model):
 
 
 class ProfessionCompetency(db.Model):
-    # TEMP V1
-    # Будет заменено на professions.id
-    # после создания новой таблицы профессий
     """
     Связь профессии и компетенции.
+
     Показывает насколько данная компетенция
     важна для конкретной профессии.
+
     Пример:
+
     Project Manager
+
     Leadership = 90
     Strategy = 85
     Communication = 95
     """
+
     __tablename__ = "profession_competencies"
 
     id = db.Column(
@@ -566,22 +568,15 @@ class ProfessionCompetency(db.Model):
         'Competency'
     )
 
-    def __repr__(self):
-        return (
-            f"<ProfessionCompetency "
-            f"{self.profession_id}:"
-            f"{self.competency_id}>"
-        )
-
 
 class Profession(db.Model):
+    __tablename__ = "professions"
+
     """
     Единый справочник профессий Genesis.
     Источники:- Manual;- Excel;- ESCO;- O*NET;- AI;
     Статусы:raw,curated, published,archived
     """
-
-    __tablename__ = "professions"
 
     id = db.Column(
         db.Integer,
@@ -673,6 +668,24 @@ class Profession(db.Model):
         default=datetime.utcnow,
         onupdate=datetime.utcnow
     )
+    category_group = db.Column(
+        db.String(100)
+    )
+
+    complexity_level = db.Column(
+        db.Integer,
+        default=1
+    )
+
+    automation_risk = db.Column(
+        db.Integer,
+        default=0
+    )
+
+    future_demand = db.Column(
+        db.Integer,
+        default=50
+    )
 
     def __repr__(self):
         return (
@@ -680,10 +693,79 @@ class Profession(db.Model):
         )
 
 
-profession_id = db.Column(
-    db.Integer,
-    db.ForeignKey(
-        'professions.id'
-    ),
-    nullable=False
-)
+# ======================== ИМПОРТЫ ======================
+
+class ImportJob(db.Model):
+    __tablename__ = "import_jobs"
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    filename = db.Column(
+        db.String(255)
+    )
+
+    import_type = db.Column(
+        db.String(50)
+    )
+
+    status = db.Column(
+        db.String(50),
+        default="uploaded"
+    )
+
+    total_rows = db.Column(
+        db.Integer,
+        default=0
+    )
+
+    imported_rows = db.Column(
+        db.Integer,
+        default=0
+    )
+
+    failed_rows = db.Column(
+        db.Integer,
+        default=0
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow
+    )
+
+
+class ImportLog(db.Model):
+    __tablename__ = "import_logs"
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    job_id = db.Column(
+        db.Integer,
+        db.ForeignKey(
+            'import_jobs.id'
+        )
+    )
+
+    row_number = db.Column(
+        db.Integer
+    )
+
+    status = db.Column(
+        db.String(50)
+    )
+
+    message = db.Column(
+        db.Text
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow
+    )
+

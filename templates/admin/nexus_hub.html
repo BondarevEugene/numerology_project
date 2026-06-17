@@ -140,62 +140,60 @@
             const cy = cytoscape({
                 container: document.getElementById('cy'),
                 elements: [...data.nodes, ...data.edges],
-              style: [
-            {
-                selector: 'node',
+                style: [
+                      {
+                    selector: 'node',
+                    style: {
+                        'background-color': '#000',
+                        'border-width': 1,
+                        'border-color': '#b89b5e',
+                        'label': 'data(label)',
+                        'color': '#b89b5e',
+                        'font-family': 'Cinzel',
+                        'font-size': '12px',
+                        'text-valign': 'center',
+                        'text-outline-width': 2,
+                        'text-outline-color': '#050608'
+                    }
+                },
 
-                style: {
-                    'background-color': '#000',
-                    'border-width': 1,
-                    'border-color': '#b89b5e',
-                    'label': 'data(label)',
-                    'color': '#b89b5e',
-                    'font-family': 'Cinzel',
-                    'font-size': '12px',
-                    'text-valign': 'center',
-                    'text-outline-width': 2,
-                    'text-outline-color': '#050608'
-                }
-            },
+                {
+                    selector: 'node[type="root"]',
+                    style: {
+                        'shape': 'hexagon',
+                        'width': 180,
+                        'height': 180,
+                        'font-size': '26px',
+                        'border-width': 4,
+                        'background-color': '#1c1608',
+                        'border-color': '#d8b56a',
+                        'color': '#f3d48a',
+                        'text-outline-color': '#1c1608'
+                    }
+                },
 
-            {
-                selector: 'node[type="root"]',
-                style: {
-                    'shape': 'hexagon',
-                    'width': 180,
-                    'height': 180,
-                    'font-size': '26px',
-                    'border-width': 4,
-                    'background-color': '#1c1608',
-                    'border-color': '#d8b56a',
-                    'color': '#f3d48a',
-                    'text-outline-color': '#1c1608'
-                }
-            },
+                {
+                    selector: 'node[type="layer"]',
+                    style: {
+                        'shape': 'round-rectangle',
+                        'width': 150,
+                        'height': 70,
+                        'font-size': '18px',
+                        'border-width': 3,
+                        'background-color': '#111'
+                    }
+                },
 
-            {
-                selector: 'node[type="layer"]',
-                style: {
-                    'shape': 'round-rectangle',
-                    'width': 150,
-                    'height': 70,
-                    'font-size': '18px',
-                    'border-width': 3,
-                    'background-color': '#111'
-                }
-            },
-
-            {
-                selector: 'node[type="module"]',
-
-                style: {
-                    'shape': 'diamond',
-                    'width': 80,
-                    'height': 80,
-                    'font-size': '11px',
-                    'border-width': 1,
-                    'background-color': '#000'
-                }
+                {
+                    selector: 'node[type="module"]',
+                    style: {
+                        'shape': 'diamond',
+                        'width': 80,
+                        'height': 80,
+                        'font-size': '11px',
+                        'border-width': 1,
+                        'background-color': '#000'
+                    }
                 },
 
                 {
@@ -219,28 +217,29 @@
                         'shadow-opacity': 0.3
                     }
                 },
-            },
-            {
-                selector: 'edge',
-                style: {
-                    'width': 2,
-                    'line-color': '#b89b5e',
-                    'target-arrow-color': '#b89b5e',
-                    'target-arrow-shape': 'triangle',
-                    'curve-style': 'bezier',
-                    'opacity': 0.8
-                }
-            }
-            ],
-                layout: {
-                    name: 'breadthfirst',
-                    directed: true,
-                    spacingFactor: 1.8,
-                    padding: 80,
-                    animate: true,
-                    roots: '#GENESIS'
+
+                {
+                    selector: 'edge',
+                    style: {
+                        'width': 2,
+                        'line-color': '#b89b5e',
+                        'target-arrow-color': '#b89b5e',
+                        'target-arrow-shape': 'triangle',
+                        'curve-style': 'bezier',
+                        'opacity': 0.8
                     }
-            });
+                }
+
+                ],
+                        layout: {
+                            name: 'cose',
+                            animate: true,
+                            fit: true,
+                            padding: 120,
+                            nodeRepulsion: 120000,
+                            idealEdgeLength: 180
+                        }
+                });
             document.getElementById('module-log').innerHTML = `> ОБНАРУЖЕНО УЗЛОВ: ${data.nodes.length}`;
 
             cy.on('tap', 'node', function(evt){

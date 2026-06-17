@@ -1,0 +1,264 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<div class="page-header">
+   <div class="page-title">
+      💼 Professional Resonance Lab
+   </div>
+   <div class="page-subtitle">
+      Career Intelligence Mapping System
+   </div>
+</div>
+<div class="kpi-grid">
+   <div class="kpi-card">
+      <div class="kpi-label">
+         Professions
+      </div>
+      <div class="kpi-number">
+         {{ professions|length }}
+      </div>
+   </div>
+   <div class="kpi-card">
+      <div class="kpi-label">
+         Competencies
+      </div>
+      <div class="kpi-number">
+         {{ competencies|length }}
+      </div>
+   </div>
+   <div class="kpi-card">
+      <div class="kpi-label">
+         Links
+      </div>
+      <div class="kpi-number">
+         0
+      </div>
+   </div>
+   <div class="kpi-card">
+      <div class="kpi-label">
+         Coverage
+      </div>
+      <div class="kpi-number">
+         0%
+      </div>
+   </div>
+   <div class="action-toolbar">
+    <a
+        href="/admin/import-center"
+        class="btn btn-gold">
+        Import Dataset
+    </a>
+    <button
+        class="btn btn-gold">
+        Create Profession
+    </button>
+    <button
+        class="btn btn-gold">
+        Auto Mapping
+    </button>
+    <button
+        class="btn btn-gold">
+        Validate
+    </button>
+    <button
+        class="btn btn-gold">
+        Export
+    </button>
+</div>
+</div>
+<div class="mapping-layout">
+   <!-- LEFT -->
+   <div class="mapping-sidebar">
+      <div class="section-card">
+         <div class="section-title">
+            SEARCH
+         </div>
+         <input
+            id="profession-search"
+            class="form-control"
+            placeholder="Search profession..."
+            >
+      </div>
+      <div class="section-card">
+         <div class="section-title">
+            CATEGORIES
+         </div>
+         <div class="badge badge-success">
+            ALL
+         </div>
+         <div class="badge badge-warning">
+            MANAGEMENT
+         </div>
+         <div class="badge badge-warning">
+            ENGINEERING
+         </div>
+         <div class="badge badge-warning">
+            ANALYTICAL
+         </div>
+         <div class="badge badge-warning">
+            CREATIVE
+         </div>
+         <div class="badge badge-warning">
+            ENTREPRENEURSHIP
+         </div>
+      </div>
+      <div class="section-card">
+         <div class="section-title">
+            PROFESSIONS
+         </div>
+         <div class="profession-list">
+            {% for p in professions %}
+            <div
+               class="profession-card"
+               data-id="{{ p.id }}">
+               <div class="profession-title">
+                  {{ p.title }}
+               </div>
+               <div class="profession-meta">
+                  {{ p.category or "UNDEFINED" }}
+               </div>
+            </div>
+            {% endfor %}
+         </div>
+      </div>
+   </div>
+   <!-- CENTER -->
+   <div class="mapping-center">
+      <div class="section-card">
+         <div class="section-title">
+            PROFESSION PROFILE
+         </div>
+         <div id="profession-profile">
+            <div class="empty-state">
+               Select profession
+            </div>
+         </div>
+      </div>
+        <div class="section-card">
+          <div class="section-title">
+           CAREER INTELLIGENCE
+       </div>
+          <div id="career-insights">
+              No profession selected
+          </div>
+      </div>
+   </div>
+   <!-- RIGHT -->
+   <div class="mapping-right">
+      <div class="section-card">
+         <div class="section-title">
+            COMPETENCY PROFILE
+         </div>
+         <div id="competency-panel">
+            <div class="empty-state">
+               Select profession
+            </div>
+         </div>
+      </div>
+   </div>
+
+</div>
+<style>
+   .mapping-layout{
+   display:grid;
+   grid-template-columns:320px 1fr 420px;
+   gap:20px;
+   margin-top:20px;
+   }
+   .profession-list{
+   max-height:700px;
+   overflow-y:auto;
+   }
+   .profession-card{
+   padding:12px;
+   margin-bottom:10px;
+   border:1px solid rgba(184,155,94,.3);
+   border-radius:10px;
+   cursor:pointer;
+   transition:.2s;
+   }
+   .profession-card:hover{
+   transform:translateY(-2px);
+   }
+   .profession-title{
+   font-weight:600;
+   }
+   .profession-meta{
+   opacity:.6;
+   font-size:12px;
+   }
+   .competency-row{
+   display:flex;
+   justify-content:space-between;
+   align-items:center;
+   margin-bottom:12px;
+   }
+   .competency-bar{
+   height:8px;
+   border-radius:10px;
+   background:#222;
+   overflow:hidden;
+   margin-top:4px;
+   }
+   .competency-fill{
+   height:100%;
+   background:#b89b5e;
+   }
+   .empty-state{
+   opacity:.6;
+   padding:30px;
+   text-align:center;
+   }
+</style>
+<script>
+   function renderCompetencies(data){
+       let html = '';
+       data.forEach(item => {
+           html += `
+           <div class="competency-row">
+               <div style="width:100%;">
+                   <div>
+                       ${item.title}
+                   </div>
+                   <div class="competency-bar">
+                       <div
+                           class="competency-fill"
+                           style="width:${item.weight}%">
+                       </div>
+                   </div>
+               </div>
+               <div style="margin-left:10px;">
+                   ${item.weight}
+               </div>
+           </div>
+           `;
+       });
+       document
+           .getElementById(
+               'competency-panel'
+           )
+           .innerHTML = html;
+   }
+   document
+   .querySelectorAll(
+       '.profession-card'
+   )
+   .forEach(card => {
+       card.addEventListener(
+           'click',
+           async () => {
+               const id =
+                   card.dataset.id;
+               const response =
+                   await fetch(
+                       `/admin/api/profession/${id}/competencies`
+                   );
+               const data =
+                   await response.json();
+               renderCompetencies(
+                   data
+               );
+           }
+       );
+   });
+</script>
+{% endblock %}

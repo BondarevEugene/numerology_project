@@ -5,7 +5,6 @@ class CareerService:
 
     @staticmethod
     def get_recommendations(result_data):
-
         jobs = result_data.get("jobs", [])
 
         return jobs

@@ -535,4 +535,6 @@ def get_vocations(vector_id):
         return jsonify({"error": str(e)}), 500
 
 
+
+
 app.run(debug=True, port=5000)

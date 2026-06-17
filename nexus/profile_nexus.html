@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genesis | Nexus Terminal v8.5 PRO</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Almendra:wght@400;700&family=Cinzel:wght@400;700&family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --gold: #b89b5e; --gold-bright: #f4cf6d; --bg: #050505;
+            --panel: rgba(12, 12, 12, 0.98); --border: rgba(184, 155, 94, 0.25);
+            --text: #dcdcdc; --side-width: 280px; --accent-red: #ff4d4d;
+            --terminal-green: #00ff41; --glow: rgba(184, 155, 94, 0.15);
+        }
+
+        * { box-sizing: border-box; outline: none; }
+        html, body { margin: 0; padding: 0; width: 100%; height: 100vh; overflow: hidden; background: var(--bg); }
+        body { color: var(--text); font-family: 'Inter', sans-serif; display: flex; }
+
+        #matrix-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; opacity: 0.12; pointer-events: none; }
+
+        .sidebar {
+            width: var(--side-width); min-width: var(--side-width); border-right: 1px solid var(--border);
+            background: rgba(0,0,0,0.9); display: flex; flex-direction: column; z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+        .sidebar-header { padding: 30px 20px; border-bottom: 1px solid var(--border); }
+        .nav-link {
+            padding: 15px 25px; color: #666; text-decoration: none;
+            font-family: 'JetBrains Mono'; font-size: 0.7rem; cursor: pointer;
+            transition: 0.4s; border-bottom: 1px solid rgba(184,155,94,0.05);
+            display: flex; align-items: center; gap: 12px;
+        }
+        .nav-link:hover, .nav-link.active { color: var(--gold); background: rgba(184,155,94,0.05); border-right: 3px solid var(--gold); }
+
+        .main-container { flex: 1; display: flex; flex-direction: column; min-width: 0; position: relative; z-index: 1; }
+        .scroll-area {
+            flex: 1; overflow-y: auto; padding: 30px;
+            display: grid; grid-template-columns: 1fr 350px; gap: 25px;
+        }
+
+        .panel {
+            background: var(--panel); border: 1px solid var(--border);
+            padding: 25px; margin-bottom: 25px; position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .label-mono { font-family: 'JetBrains Mono'; font-size: 0.6rem; color: var(--gold); letter-spacing: 2px; display: block; margin-bottom: 15px; opacity: 0.8; }
+
+        /* ФИКС ПУНКТА 1: Чтобы Soul/Destiny не создавали полосы прокрутки */
+        .stat-row { display: flex; gap: 10px; width: 100%; overflow: hidden; }
+        .stat-card {
+            flex: 1; min-width: 0; text-align: center; border: 1px solid var(--border);
+            padding: 15px 5px; background: rgba(255,255,255,0.02);
+        }
+
+        .vitruvian-container {
+            width: 100%; height: 260px; position: relative; overflow: hidden;
+            background: radial-gradient(circle, rgba(184,155,94,0.08) 0%, transparent 70%);
+            margin: 20px 0; border: 1px solid rgba(184,155,94,0.15);
+        }
+        .scan-line { position: absolute; width: 100%; height: 2px; background: var(--gold); top: 0; animation: scan 4s linear infinite; box-shadow: 0 0 15px var(--gold); }
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .btn-nexus {
+            width: 100%; background: transparent; border: 1px solid var(--border);
+            color: var(--gold); padding: 12px; font-family: 'JetBrains Mono';
+            font-size: 0.7rem; cursor: pointer; transition: 0.3s; margin-top: 10px;
+        }
+        .btn-nexus:hover { background: var(--gold); color: #000; }
+
+        .matrix-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .matrix-table td {
+            border: 1px solid var(--border); width: 33.3%; aspect-ratio: 1;
+            text-align: center; vertical-align: middle; padding: 10px;
+        }
+
+        @media (max-width: 1100px) {
+            .scroll-area { grid-template-columns: 1fr; }
+            .sidebar { width: 70px; min-width: 70px; }
+            .nav-link span { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix-bg"></canvas>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div style="font-family: 'Cinzel'; color: var(--gold); font-size: 1.5rem; letter-spacing: 4px; font-weight: 700;">GENESIS</div>
+            <div style="font-size: 0.5rem; color: #444; margin-top: 5px; letter-spacing: 2px;">NEURAL_INTERFACE_v8.5</div>
+        </div>
+        <nav>
+            <div class="nav-link active" onclick="switchTab('main', this)">
+                <i class="fas fa-microchip"></i> <span>01_CORE_ENGINE</span>
+            </div>
+            <div class="nav-link" onclick="switchTab('dossier', this)">
+                <i class="fas fa-folder-open"></i> <span>02_DOSSIER_DATA</span>
+            </div>
+            <div class="nav-link" onclick="switchTab('resonance', this)">
+                <i class="fas fa-project-diagram"></i> <span>03_RESONANCE</span>
+            </div>
+            <div class="nav-link" onclick="switchTab('security', this)">
+                <i class="fas fa-key"></i> <span>04_SECURITY</span>
+            </div>
+        </nav>
+
+        <div style="margin-top: auto; padding: 25px;">
+            <div class="label-mono" style="margin-bottom: 10px; font-size: 0.5rem;">SYSTEM_STATUS</div>
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 0.6rem; color: var(--terminal-green);">
+                <div style="width: 5px; height: 5px; background: var(--terminal-green); border-radius: 50%;"></div>
+                ENCRYPTED_NODE_ACTIVE
+            </div>
+        </div>
+    </aside>
+
+    <main class="main-container">
+        <div class="scroll-area">
+            <section>
+
+                <div id="tab-main" class="tab-content active">
+                    <div class="panel">
+                        <span class="label-mono">> SUBJECT_BIOMETRICS</span>
+                        <h2 style="font-family: 'Cinzel'; color: var(--gold); margin: 0; font-size: 2rem;">{{ user.username }}</h2>
+
+                        <div class="vitruvian-container">
+                            <div class="scan-line"></div>
+                            <img src="/static/images/vitruvian.png" style="width:100%; height:100%; object-fit:contain; opacity:0.4;" onerror="this.style.display='none'">
+                        </div>
+
+                        <div style="border-left: 2px solid var(--gold); padding-left: 20px; margin-top: 20px;">
+                            <span class="label-mono">ARCHETYPAL_ANALYSIS</span>
+                            <p style="font-size: 0.85rem; line-height: 1.6; color: #aaa; margin-bottom: 0;">
+                                {{ rec.archetype_data.description if rec else "Инициализация нейронного профиля..." }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="panel">
+                        <span class="label-mono">> PSYCHOSOMATIC_CHART</span>
+                        <div style="height: 180px;">
+                            <canvas id="energyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+            <div class="content-area">
+
+                <div id="tab-01" class="pane active">
+                    </div>
+                <div id="tab-dossier" class="pane">
+        <div class="panel-genesis">
+            <span class="label-da-vinci">Pythagorean_Matrix_Core</span>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; max-width: 300px;">
+                {% for i in ['1','2','3','4','5','6','7','8','9'] %}
+                <div style="border: 1px solid var(--border); padding: 15px; text-align: center; background: rgba(184,155,94,0.05);">
+                    <div style="font-size: 0.6rem; color: var(--gold-dark);">{{ i }}</div>
+                    <div style="font-family: 'JetBrains Mono'; color: var(--gold); font-size: 1.2rem;">
+                        {{ matrix.get(i, '-') }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-resonance" class="pane">
+        <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 30px;">
+            <div>
+                <span class="label-da-vinci" style="display:block; margin-bottom:10px;">{{ content.title }}</span>
+                <div style="font-size: 0.9rem; line-height: 1.7; color: #ccc; text-align: justify; max-height: 400px; overflow-y: auto;">
+                    {{ content.full_text | safe }}
+                </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <div class="panel-genesis" style="border: 1px dashed var(--gold);">
+                    <span class="label-da-vinci">SYNERGY_SYNC_MODULE</span>
+                    <p style="font-size: 0.7rem; color: var(--sub-text);">Введите дату партнера для проверки резонанса:</p>
+                    <input type="date" id="partner-date" class="terminal-input" style="width:100%; background:transparent; border:1px solid var(--border); color:var(--gold); padding:5px;">
+                    <button onclick="runSynergy()" class="nav-item" style="width:100%; margin-top:10px; justify-content:center;">INITIATE_SYNC</button>
+                    <div id="sync-result" style="display:none; margin-top:15px; text-align:center; border-top: 1px solid var(--border); padding-top:10px;">
+                        <div id="sync-percent" style="font-size: 2rem; color: var(--gold-bright); font-family: 'Cinzel';">0%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-security" class="pane">
+        <div class="panel-genesis">
+            <span class="label-da-vinci">SESSION_LOG_ARCHIVE</span>
+            <div style="margin-top:15px; max-height: 300px; overflow-y: auto;">
+                <table style="width: 100%; font-family: 'JetBrains Mono'; font-size: 0.7rem; border-collapse: collapse;">
+                    <tr style="color: var(--gold); border-bottom: 1px solid var(--border); text-align: left;">
+                        <th style="padding: 10px;">TIMESTAMP</th>
+                        <th>ACTION_NODE</th>
+                        <th>STATUS</th>
+                    </tr>
+                    {% for log in user_sessions %}
+                    <tr style="border-bottom: 1px solid rgba(184,155,94,0.1);">
+                        <td style="padding: 10px;">{{ log.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>{{ log.session_type }}</td>
+                        <td style="color: var(--terminal-green);">[ COMPLETE ]</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="3" style="padding: 20px; text-align: center; color: var(--sub-text);">История пуста...</td></tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+                <div id="tab-dossier" class="tab-content">
+                    <div class="panel">
+                        <span class="label-mono">> BEHAVIORAL_PATTERNS</span>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div style="background: rgba(255,255,255,0.02); padding: 15px; border: 1px solid var(--border);">
+                                <h4 style="color: var(--gold); font-family: 'Cinzel'; margin-top:0; font-size: 0.8rem;">СЛАБЫЕ СТОРОНЫ</h4>
+                                <p style="font-size: 0.75rem; color: #888; line-height: 1.5;">{{ rec.shadow_side if rec else "Данные отсутствуют" }}</p>
+                            </div>
+                            <div style="background: rgba(255,255,255,0.02); padding: 15px; border: 1px solid var(--border);">
+                                <h4 style="color: var(--gold); font-family: 'Cinzel'; margin-top:0; font-size: 0.8rem;">ТОЧКИ РОСТА</h4>
+                                <p style="font-size: 0.75rem; color: #888; line-height: 1.5;">{{ rec.growth_path if rec else "Данные отсутствуют" }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel">
+                        <span class="label-mono">> IKIGAI_VECTORS</span>
+                        <table class="matrix-table" style="text-align: left; font-size: 0.8rem;">
+                            <tbody id="ikigai-table-body">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="tab-resonance" class="tab-content">
+                    <div class="panel">
+                        <span class="label-mono">> SYNASTRY_SCANNER</span>
+                        <div style="display: flex; gap: 20px; align-items: center;">
+                            <div style="flex: 1;">
+                                <p style="font-size: 0.7rem; color: #666; margin-bottom: 15px;">Введите дату рождения партнера для анализа частотного резонанса:</p>
+                                <input type="date" id="partner-date" class="btn-nexus" style="text-align: left; margin-bottom: 10px; background: rgba(255,255,255,0.02);">
+                                <button class="btn-nexus" onclick="calculateResonance()">ЗАПУСТИТЬ СКАНИРОВАНИЕ</button>
+                            </div>
+                            <div id="resonance-results" style="opacity: 0; transition: 1.5s; text-align: center; flex: 1; border-left: 1px solid var(--border);">
+                                <div id="total-percent" style="font-size: 3.5rem; color: var(--gold); font-family: 'Cinzel'; text-shadow: 0 0 20px var(--glow);">0%</div>
+                                <div class="label-mono" style="font-size: 0.5rem; margin-top: 5px;">RESONANCE_INDEX</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-security" class="tab-content">
+                    <div class="panel">
+                        <span class="label-mono">> ACCESS_CONTROL_PROTOCOL</span>
+                        <div style="max-width: 400px;">
+                            <p style="font-size: 0.8rem; color: #888; margin-bottom: 20px;">Запуск протокола восстановления сбросит текущие сессионные ключи и отправит новый вектор доступа на ваш Email.</p>
+                            <button class="btn-nexus" onclick="triggerRecovery()" style="border-color: var(--accent-red); color: var(--accent-red); font-weight: bold;">
+                                <i class="fas fa-exclamation-triangle"></i> EMERGENCY_RECOVERY
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <aside>
+                <div class="panel" style="padding: 15px;">
+                    <div class="stat-row">
+                        <div class="stat-card">
+                            <span class="label-mono" style="margin-bottom:5px; font-size: 0.5rem;">SOUL</span>
+                            <div style="font-family: 'Cinzel'; font-size: 1.8rem; color: var(--gold-bright); line-height: 1;">
+                                {{ rec.soul_number if rec else '0' }}
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <span class="label-mono" style="margin-bottom:5px; font-size: 0.5rem;">DESTINY</span>
+                            <div style="font-family: 'Cinzel'; font-size: 1.8rem; color: var(--gold-bright); line-height: 1;">
+                                {{ rec.destiny_number if rec else '0' }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <span class="label-mono">> NUMERICAL_MATRIX</span>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
+                        {% for key, val in matrix.items() %}
+                        <div style="border: 1px solid var(--border); aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,0.03); position: relative;">
+                            <span style="font-size: 0.5rem; color: #444; font-family: 'JetBrains Mono'; position: absolute; top: 4px; left: 4px;">{{ key }}</span>
+                            <span style="color: var(--gold); font-size: 1.2rem; font-family: 'Cinzel'; font-weight: bold;">{{ val if val != '-' else '' }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <span class="label-mono">> EVOLUTION_WHEEL</span>
+                    <div style="height: 220px; position: relative;">
+                        <canvas id="radarChart"></canvas>
+                    </div>
+                </div>
+            </aside>
+        </div> ```
+        <footer style="padding: 15px 30px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; font-size: 0.6rem; color: #444; font-family: 'JetBrains Mono'; background: #000; z-index: 100;">
+            <div>NODE_ID: {{ user.id if user else '000' }}X-85</div>
+            <div id="footer-clock">00:00:00</div>
+            <div>GENESIS_STABLE_v8.5_PRO</div>
+        </footer>
+    </main>
+
+    <script>
+        // 1. ЛОГИКА ПЕРЕКЛЮЧЕНИЯ ВКЛАДОК (Исправление Пункта 2)
+        function switchTab(tabId, element) {
+            // Скрываем все вкладки
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            // Убираем активный класс у всех ссылок
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+
+            // Показываем целевую вкладку
+            const target = document.getElementById('tab-' + tabId);
+            if(target) {
+                target.classList.add('active');
+                element.classList.add('active');
+            }
+        }
+
+        // 2. ЭФФЕКТ МАТРИЦЫ (ФОН)
+        const canvas = document.getElementById('matrix-bg');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        const letters = "010101"; const fontSize = 12;
+        const columns = canvas.width / fontSize;
+        const drops = Array(Math.floor(columns)).fill(1);
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#b89b5e'; ctx.font = fontSize + 'px monospace';
+            drops.forEach((y, i) => {
+                const text = letters[Math.floor(Math.random() * letters.length)];
+                ctx.fillText(text, i * fontSize, y * fontSize);
+                if (y * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            });
+        }
+        setInterval(drawMatrix, 50);
+
+        // 3. ГРАФИК RADAR (Данные из profile_templ)
+        const ctxRadar = document.getElementById('radarChart');
+        if(ctxRadar) {
+            new Chart(ctxRadar, {
+                type: 'radar',
+                data: {
+                    labels: ['ХАР', 'ЭНЕР', 'ИНТ', 'ЗДОР', 'ЛОГ', 'ТРУД'],
+                    datasets: [{
+                        data: [
+                            {{ stats.haracter if stats else 0 }},
+                            {{ stats.energy if stats else 0 }},
+                            {{ stats.interest if stats else 0 }},
+                            {{ stats.health if stats else 0 }},
+                            {{ stats.logic if stats else 0 }},
+                            {{ stats.trud if stats else 0 }}
+                        ],
+                        backgroundColor: 'rgba(184, 155, 94, 0.1)',
+                        borderColor: '#b89b5e',
+                        borderWidth: 1,
+                        pointRadius: 2,
+                        pointBackgroundColor: '#b89b5e'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            grid: { color: 'rgba(184,155,94,0.1)' },
+                            angleLines: { color: 'rgba(184,155,94,0.1)' },
+                            ticks: { display: false, max: 9 },
+                            pointLabels: { color: '#555', font: { size: 9, family: 'JetBrains Mono' } }
+                        }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        // 4. ЭНЕРГО-ГРАФИК (Дополнительный визуал)
+        const ctxEnergy = document.getElementById('energyChart');
+        if(ctxEnergy) {
+            new Chart(ctxEnergy, {
+                type: 'line',
+                data: {
+                    labels: ['00', '04', '08', '12', '16', '20', '24'],
+                    datasets: [{
+                        data: [30, 45, 85, 70, 90, 65, 40],
+                        borderColor: '#b89b5e',
+                        borderWidth: 2,
+                        fill: true,
+                        backgroundColor: 'rgba(184, 155, 94, 0.05)',
+                        tension: 0.4,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { display: false }, y: { display: false } }
+                }
+            });
+        }
+
+        // 5. ФУНКЦИИ ВЗАИМОДЕЙСТВИЯ
+        function calculateResonance() {
+            const results = document.getElementById('resonance-results');
+            results.style.opacity = '1';
+            let val = Math.floor(Math.random() * 40 + 55);
+            document.getElementById('total-percent').innerText = val + '%';
+        }
+
+        function triggerRecovery() {
+            alert("ПРОТОКОЛ ЗАПУЩЕН: Ссылка для сброса отправлена на {{ user.email if user else 'email' }}");
+        }
+
+        // Обновление часов
+        setInterval(() => {
+            document.getElementById('footer-clock').innerText = new Date().toLocaleTimeString();
+        }, 1000);
+
+        // Инициализация таблицы Икигай (пример данных)
+        (function initIkigai() {
+            const tableBody = document.getElementById('ikigai-table-body');
+            if(tableBody) {
+                const data = ["Квантовая аналитика", "Психоархитектура", "Нейродизайн"];
+                tableBody.innerHTML = data.map(item => `
+                    <tr style="border-bottom: 1px solid rgba(184,155,94,0.05);">
+                        <td style="padding: 10px 0; color: #888;">${item.toUpperCase()}</td>
+                        <td style="text-align: right; color: var(--terminal-green); font-family: 'JetBrains Mono';">MATCH_95%</td>
+                    </tr>
+                `).join('');
+            }
+        })();
+    </script>
+</body>
+</html>

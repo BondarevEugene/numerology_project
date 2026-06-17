@@ -7,6 +7,7 @@ from flask import (
     redirect,
     flash
 )
+from werkzeug.utils import secure_filename
 
 from sqlalchemy import or_
 
@@ -28,7 +29,9 @@ from models import (
     DailyCoachTip,
     EvolutionProtocol,
     SessionArchive,
+    Profession,
     ProfessionContent,
+    ProfessionCompetency,
     VocationIntelligence,
     VocationCompatibility,
     User
@@ -36,10 +39,11 @@ from models import (
 
 import time
 
+from flask import jsonify
+
 from core.archetype_profiles import (
     ARCHETYPE_PROFILES
 )
-
 
 admin_bp = Blueprint(
     'admin',
@@ -47,7 +51,16 @@ admin_bp = Blueprint(
     url_prefix='/admin'
 )
 
+from core.import_engine import (
+    ImportEngine
+)
 
+from models import (
+    ImportJob
+)
+
+
+# ================================ CODE ROUTES ==========================
 @admin_bp.route('/')
 @login_required
 def dashboard():
@@ -1148,54 +1161,6 @@ def content_hub():
     )
 
 
-@admin_bp.route('/career-center')
-@login_required
-def career_center():
-    matrix_stats = {
-
-        "records":
-            VocationIntelligence.query.count(),
-
-        "missing_ru":
-            VocationIntelligence.query.filter(
-                or_(
-                    VocationIntelligence.title_ru == None,
-                    VocationIntelligence.title_ru == ''
-                )
-            ).count(),
-
-        "missing_ua":
-            VocationIntelligence.query.filter(
-                or_(
-                    VocationIntelligence.title_ua == None,
-                    VocationIntelligence.title_ua == ''
-                )
-            ).count(),
-
-        "missing_keywords":
-            VocationIntelligence.query.filter(
-                or_(
-                    VocationIntelligence.keywords == None,
-                    VocationIntelligence.keywords == ''
-                )
-            ).count(),
-
-        "missing_category":
-            VocationIntelligence.query.filter(
-                or_(
-                    VocationIntelligence.category == None,
-                    VocationIntelligence.category == ''
-                )
-            ).count()
-
-    }
-
-    return render_template(
-        'admin/career_center.html',
-        matrix_stats=matrix_stats
-    )
-
-
 @admin_bp.route('/audit-center')
 @login_required
 def audit_center():
@@ -1250,6 +1215,7 @@ def nexus_hub():
     )
 
 
+# ================== БЛОК УПРАВЛЕНИЯ ГРАФАМИ НА ==============
 @admin_bp.route('/nexus/nodes')
 @login_required
 def nexus_nodes():
@@ -1424,6 +1390,42 @@ def nexus_nodes():
                 "label": "Inspector",
                 "type": "module"
             }
+        },
+
+        {
+            "data": {
+                "id": "COMPETENCIES",
+                "label": "Competencies",
+                "type": "module",
+                "status": "active"
+            }
+        },
+
+        {
+            "data": {
+                "id": "ARCHETYPE_MAPPING",
+                "label": "Archetype Mapping",
+                "type": "module",
+                "status": "active"
+            }
+        },
+
+        {
+            "data": {
+                "id": "PROFESSION_MAPPING",
+                "label": "Profession Mapping",
+                "type": "module",
+                "status": "planned"
+            }
+        },
+
+        {
+            "data": {
+                "id": "RECOMMENDATION_LAB",
+                "label": "Recommendation Lab",
+                "type": "module",
+                "status": "planned"
+            }
         }
 
     ]
@@ -1456,7 +1458,13 @@ def nexus_nodes():
         {"data": {"source": "ADMIN", "target": "USER_CENTER"}},
 
         {"data": {"source": "NEXUS", "target": "GRAPH"}},
-        {"data": {"source": "NEXUS", "target": "INSPECTOR"}}
+        {"data": {"source": "NEXUS", "target": "INSPECTOR"}},
+
+        {"data": {"source": "CAREER", "target": "COMPETENCIES"}},
+        {"data": {"source": "CAREER", "target": "ARCHETYPE_MAPPING"}},
+        {"data": {"source": "CAREER", "target": "PROFESSION_MAPPING"}},
+        {"data": {"source": "CAREER", "target": "RECOMMENDATION_LAB"}},
+
     ]
 
     return {
@@ -1721,24 +1729,54 @@ def nexus_inspect():
 @admin_bp.route('/career-center')
 @login_required
 def career_center():
-    stats = {
-        "competencies": 0,
-        "profession_links": 0,
-        "archetype_links": 0,
-        "recommendations": 0
+    matrix_stats = {
+
+        "records":
+            VocationIntelligence.query.count(),
+
+        "missing_ru":
+            VocationIntelligence.query.filter(
+                or_(
+                    VocationIntelligence.title_ru == None,
+                    VocationIntelligence.title_ru == ''
+                )
+            ).count(),
+
+        "missing_ua":
+            VocationIntelligence.query.filter(
+                or_(
+                    VocationIntelligence.title_ua == None,
+                    VocationIntelligence.title_ua == ''
+                )
+            ).count(),
+
+        "missing_keywords":
+            VocationIntelligence.query.filter(
+                or_(
+                    VocationIntelligence.keywords == None,
+                    VocationIntelligence.keywords == ''
+                )
+            ).count(),
+
+        "missing_category":
+            VocationIntelligence.query.filter(
+                or_(
+                    VocationIntelligence.category == None,
+                    VocationIntelligence.category == ''
+                )
+            ).count()
+
     }
 
     return render_template(
         'admin/career_center.html',
-        stats=stats
+        matrix_stats=matrix_stats
     )
-
 
 
 @admin_bp.route('/competencies')
 @login_required
 def competencies():
-
     content = (
         Competency
         .query
@@ -1754,10 +1792,10 @@ def competencies():
         content=content
     )
 
+
 @admin_bp.route('/archetype-mapping')
 @login_required
 def archetype_mapping():
-
     competencies = (
         Competency
         .query
@@ -1780,3 +1818,271 @@ def archetype_mapping():
         competencies=competencies,
         mappings=mappings
     )
+
+
+@admin_bp.route(
+    '/api/archetype/<number>'
+)
+@login_required
+def archetype_profile_api(number):
+    mappings = (
+        ArchetypeCompetency.query
+        .filter_by(
+            archetype_number=number
+        )
+        .all()
+    )
+    result = []
+    for item in mappings:
+        result.append({
+            "id":
+                item.competency.id,
+            "title":
+                item.competency.title,
+            "category":
+                item.competency.category,
+            "weight":
+                item.weight
+        })
+    return jsonify(result)
+
+
+@admin_bp.route(
+    '/api/archetype/save',
+    methods=['POST']
+)
+@login_required
+def save_archetype_mapping():
+    data = request.json
+
+    archetype = data["archetype"]
+
+    competency_id = data["competency_id"]
+
+    weight = data["weight"]
+
+    mapping = (
+        ArchetypeCompetency.query
+        .filter_by(
+            archetype_number=archetype,
+            competency_id=competency_id
+        )
+        .first()
+    )
+
+    if not mapping:
+        mapping = ArchetypeCompetency(
+
+            archetype_number=archetype,
+
+            competency_id=competency_id
+        )
+
+        db.session.add(mapping)
+
+    mapping.weight = weight
+
+    db.session.commit()
+
+    return jsonify({
+        "success": True
+    })
+
+
+#======== Роут-заготовка на будущее =======
+@admin_bp.route('/career-lab')
+@login_required
+def career_lab():
+    stats = {
+        "competencies": 0,
+        "profession_links": 0,
+        "archetype_links": 0,
+        "recommendations": 0
+    }
+
+    return render_template(
+        'admin/career_lab.html',
+        stats=stats
+    )
+
+
+# ==================== Импорты ===========================
+@admin_bp.route('/import-center')
+@login_required
+def import_center():
+    jobs = (
+        ImportJob
+        .query
+        .order_by(
+            ImportJob.id.desc()
+        )
+        .all()
+    )
+
+    return render_template(
+        'admin/import_center.html',
+        jobs=jobs
+    )
+
+
+@admin_bp.route(
+    '/import-center/upload', methods=['POST'])
+@login_required
+def import_upload():
+    file = request.files['file']
+
+    path = os.path.join(
+        'uploads/imports',
+        file.filename
+    )
+    file.save(path)
+    job = ImportJob(
+        filename=file.filename,
+        import_type="profession"
+    )
+    db.session.add(job)
+    db.session.commit()
+    result = (
+        ImportEngine.run(
+            "profession",
+            path
+        )
+    )
+    job.status = "completed"
+    job.imported_rows = (
+        result["imported"]
+    )
+    job.failed_rows = (
+        result["failed"]
+    )
+    db.session.commit()
+    return redirect(
+        url_for(
+            'admin.import_center'
+        )
+    )
+
+
+@admin_bp.route('/profession-mapping')
+@login_required
+def profession_mapping():
+    professions = (
+        Profession
+        .query
+        .order_by(
+            Profession.title
+        )
+        .all()
+    )
+
+    competencies = (
+        Competency
+        .query
+        .order_by(
+            Competency.category,
+            Competency.title
+        )
+        .all()
+    )
+
+    return render_template(
+        'admin/profession_mapping.html',
+
+        professions=professions,
+
+        competencies=competencies
+    )
+
+
+@admin_bp.route(
+    '/api/profession/<int:profession_id>/competencies'
+)
+@login_required
+def profession_competencies_api(
+        profession_id
+):
+    links = (
+
+        ProfessionCompetency
+
+        .query
+
+        .filter_by(
+            profession_id=profession_id
+        )
+
+        .all()
+
+    )
+
+    result = []
+
+    for link in links:
+        result.append({
+
+            "id":
+                link.competency.id,
+
+            "title":
+                link.competency.title,
+
+            "weight":
+                link.weight
+
+        })
+    return jsonify(
+        result
+    )
+
+
+# ==========================
+# PROFESSION API
+# ==========================
+
+@admin_bp.route('/api/profession/<int:profession_id>')
+@login_required
+def profession_profile_api(profession_id):
+    profession = (
+        Profession
+        .query
+        .get_or_404(
+            profession_id
+        )
+    )
+    return jsonify({
+        "id":
+            profession.id,
+        "title":
+            profession.title,
+        "category":
+            profession.category,
+        "source":
+            profession.source,
+        "status":
+            profession.status,
+        "business_potential":
+            profession.business_potential,
+        "future_demand":
+            profession.future_demand,
+        "automation_risk":
+            profession.automation_risk
+    })
+
+
+from core.seed_competencies import (
+    seed_competencies
+)
+
+
+@admin_bp.route(
+    '/seed-competencies'
+)
+@login_required
+def seed_competencies_route():
+    created = (
+        seed_competencies()
+    )
+
+    return f"""
+    Created: {created}
+    """

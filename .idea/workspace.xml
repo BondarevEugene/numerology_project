@@ -4,134 +4,24 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6eb95a8b-e607-44a0-8ef5-a6183af34a1e" name="Changes" comment="Genesys .4.0-PRO 12\05\2026&#10;full working">
-      <change afterPath="$PROJECT_DIR$/archive/base_legacy.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/archive/check_db.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/archive/core_unused/dashboard_service.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/archive/core_unused/profile_dashboard_service.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/archive/core_unused/report_sections_service.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/archive/dashboard_old.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/archive/frontend_experimental/src/components/BotBuilder.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/archive/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/archive/index_back_up with frame 290426.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/archive/templates/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/archive/templates_v3_root/templates_v3/admin.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/archive/templates_v3_root/templates_v3/dashboard/advanced_analytics.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/archive/templates_v3_root/templates_v3/dashboard/archetype_header.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/archive/templates_v3_root/templates_v3/dashboard/archetype_overview.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/archive/templates_v3_root/templates_v3/dashboard/development_profile.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/archive/templates_v3_root/templates_v3/dashboard/development_recommendations.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/archive/templates_v3_root/templates_v3/dashboard/personal_operating_system.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/archive/templates_v3_root/templates_v3/dashboard/professional_resonance.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/archive/templates_v3_root/templates_v3/dashboard/psychomatrix.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/archive/templates_v3_root/templates_v3/dashboard/report_viewer.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/archive/templates_v3_root/templates_v3/edit.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/archive/templates_v3_root/templates_v3/emails/Access Recovery.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/archive/templates_v3_root/templates_v3/emails/Welcome Protocol.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/archive/templates_v3_root/templates_v3/emails/dayly_report.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/archive/templates_v3_root/templates_v3/emails/email_template.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/archive/templates_v3_root/templates_v3/emails/reset_password.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/archive/templates_v3_root/templates_v3/initiation.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/archive/templates_v3_root/templates_v3/layout/head.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/archive/templates_v3_root/templates_v3/lila.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/archive/templates_v3_root/templates_v3/login.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/archive/templates_v3_root/templates_v3/matrix.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/archive/templates_v3_root/templates_v3/nexus_admin.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/archive/templates_v3_root/templates_v3/pdf_print_template.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/archive/templates_v3_root/templates_v3/profile/profile_v3.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/archive/templates_v3_root/templates_v3/profile_full.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/archive/templates_v3_root/templates_v3/register.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/archive/templates_v3_root/templates_v3/reset_request.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/check_archetypes.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/check_db.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/access/payment_access_service.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/admin_helpers.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/admin_stats.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/archetype_content_service.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/archetype_matrix.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/archetype_profiles.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/archetype_service.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/career_service.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/compatibility_service.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/development_engine.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/matrix_interpretation_service.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/matrix_service.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/personality_service.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/profile_service.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/psychology_mapper.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/recommendation_engine.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/report_access_service.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/report_data_builder.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/report_service.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/reports/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/reports/email_builder.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/reports/pdf_builder.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/reports/premium_report_builder.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/reports/preview_report_builder.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/session_history_service.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/relise 9/1.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pythagoras/analyser.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pythagoras/views.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/routes/dashboard.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/css_v3/base.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/css_v3/nexus_ui.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/css_v3/profile.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/css_v3/vocation_matrix.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/js_v3/clock.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/admin/archetype_edit.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/admin/archetype_form.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/admin/archetype_mapping.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/admin/archetypes.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/admin/articles.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/admin/audit_center.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/admin/base.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/admin/career_center.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/admin/competencies.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/admin/content_hub.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/admin/dashboard.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/admin/nexus_hub.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/admin/professions.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/admin/protocols.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/admin/tips.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/admin/users.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/admin/vocation_edit.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/admin/vocation_form.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/admin/vocation_import.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/admin/vocation_matrix.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/admin/vocations.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/matrix.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/nexus_cms.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/templates_v3/dashboard/advanced_analytics.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/templates_v3/dashboard/development_profile.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/templates_v3/dashboard/personal_operating_system.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/templates_v3/profile/profile_v3.html" afterDir="false" />
+    <list default="true" id="6eb95a8b-e607-44a0-8ef5-a6183af34a1e" name="Changes" comment="Genesys .5.0-PRO 07\06\2026&#10;upd_max">
+      <change afterPath="$PROJECT_DIR$/core/competency_registry.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/import_engine.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/import_validator.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/profession_importer.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/seed_competencies.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/profession_importer.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/admin/import_center.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/admin/profession_mapping.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Description.html" beforeDir="false" afterPath="$PROJECT_DIR$/archive/Description.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/content.py" beforeDir="false" afterPath="$PROJECT_DIR$/content.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/BotBuilder.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/archive/admin_legacy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/config/bot_modules.ts" beforeDir="false" afterPath="$PROJECT_DIR$/archive/frontend_experimental/src/config/bot_modules.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/tailwind.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/archive/frontend_experimental/tailwind.config.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/index_backup_2.html" beforeDir="false" afterPath="$PROJECT_DIR$/archive/index_backup_2.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/integrations/payment_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/archive/payment_service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/archetype_content_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/archetype_content_service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/career_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/career_service.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nexus/nexus_engine.py" beforeDir="false" afterPath="$PROJECT_DIR$/archive/Front/nexus_engine.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/admin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/auth.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/profile.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/profile.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates – backup/admin.html" beforeDir="false" afterPath="$PROJECT_DIR$/archive/templates – backup/admin.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates – backup/email_template.html" beforeDir="false" afterPath="$PROJECT_DIR$/archive/templates – backup/email_template.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates – backup/index.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates – backup/lila.html" beforeDir="false" afterPath="$PROJECT_DIR$/archive/templates – backup/lila.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates – backup/pdf_print_template.html" beforeDir="false" afterPath="$PROJECT_DIR$/archive/templates – backup/pdf_print_template.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/index.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/index_backup_230426.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/index_first_one.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/login.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/nexus_admin.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/nexus_admin.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/nexus_hub.html" beforeDir="false" afterPath="$PROJECT_DIR$/archive/templates_v3_root/templates_v3/nexus_hub.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/profile_back_up_300426.html" beforeDir="false" afterPath="$PROJECT_DIR$/archive/profile_back_up_300426.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/admin/archetype_mapping.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/archetype_mapping.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/admin/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/admin/nexus_hub.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/nexus_hub.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -399,7 +289,15 @@
       <option name="project" value="LOCAL" />
       <updated>1778591604599</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Genesys .5.0-PRO 07\06\2026&#10;upd_max">
+      <option name="closed" value="true" />
+      <created>1780817637022</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1780817637022</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -418,6 +316,7 @@
     <MESSAGE value="пред ФИНАЛЬНАЯ РАБОЧАЯ ВЕРСИЯ 9.13 220426" />
     <MESSAGE value="Genesys .2.0-PRO 25\04\2026&#10;full working" />
     <MESSAGE value="Genesys .4.0-PRO 12\05\2026&#10;full working" />
-    <option name="LAST_COMMIT_MESSAGE" value="Genesys .4.0-PRO 12\05\2026&#10;full working" />
+    <MESSAGE value="Genesys .5.0-PRO 07\06\2026&#10;upd_max" />
+    <option name="LAST_COMMIT_MESSAGE" value="Genesys .5.0-PRO 07\06\2026&#10;upd_max" />
   </component>
 </project>

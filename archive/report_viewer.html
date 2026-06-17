@@ -1,0 +1,93 @@
+<div style="background:red;color:white;padding:20px;">
+</div>
+
+{% if result %}
+<section class="genesis-panel">
+    <div class="panel-header">
+        ARCHETYPE PROFILE
+    </div>
+    <div class="report-content">
+        <h2>{{ result.title }}</h2>
+        <p>
+            <strong>Архетип:</strong>
+            {{ result.number }}
+        </p>
+        <p>
+            <strong>Планета:</strong>
+            {{ result.planet }}
+        </p>
+        <p>
+            <strong>Стихия:</strong>
+            {{ result.element }}
+        </p>
+    </div>
+</section>
+<section class="genesis-panel">
+    <div class="panel-header">
+        PYTHAGORAS MATRIX
+    </div>
+    <div class="matrix-grid">
+        <div class="matrix-cell">{{ result.m1 }}</div>
+        <div class="matrix-cell">{{ result.m2 }}</div>
+        <div class="matrix-cell">{{ result.m3 }}</div>
+
+        <div class="matrix-cell">{{ result.m4 }}</div>
+        <div class="matrix-cell">{{ result.m5 }}</div>
+        <div class="matrix-cell">{{ result.m6 }}</div>
+
+        <div class="matrix-cell">{{ result.m7 }}</div>
+        <div class="matrix-cell">{{ result.m8 }}</div>
+        <div class="matrix-cell">{{ result.m9 }}</div>
+    </div>
+</section>
+<section class="genesis-panel">
+    <div class="panel-header">
+        CAREER DIRECTIONS
+    </div>
+    <div class="report-content">
+        <ul>
+            {% for job in result.jobs %}
+                <li>{{ job }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</section>
+{% if result.action_power %}
+<section class="genesis-panel">
+    <div class="panel-header">
+        YOUR POWER
+    </div>
+    <div class="report-content">
+        {{ result.action_power | safe }}
+    </div>
+</section>
+{% endif %}
+{% if result.shadow_side %}
+<section class="genesis-panel">
+    <div class="panel-header">
+        SHADOW SIDE
+    </div>
+    <div class="report-content">
+        {{ result.shadow_side | safe }}
+    </div>
+</section>
+{% endif %}
+{% if result.growth_point %}
+<section class="genesis-panel">
+    <div class="panel-header">
+        GROWTH POINT
+    </div>
+    <div class="report-content">
+        {{ result.growth_point | safe }}
+    </div>
+</section>
+{% endif %}
+<section class="genesis-panel">
+    <div class="panel-header">
+        INTERPRETATION
+    </div>
+    <div class="report-content">
+        {{ result.interpretation | safe }}
+    </div>
+</section>
+{% endif %}

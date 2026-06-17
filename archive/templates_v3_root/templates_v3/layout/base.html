@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    {% include "templates_v3/layout/head.html" %}
+</head>
+
+<body>
+
+    <div class="scanline"></div>
+
+    {% include "templates_v3/layout/sidebar.html" %}
+
+    <main class="main-content">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    {% include "templates_v3/layout/footer.html" %}
+<script src="{{ url_for('static', filename='js_v3/clock.js') }}"></script>
+</body>
+
+</html>
