@@ -1,0 +1,6 @@
+PLATFORM_NAME = "Genesis HR"
+VERSION = "2.0"
+BUILD = "2026.06"
+CODENAME = "Intelligence Platform"
+AUTHOR = "Genesis Research"
+STATUS = "Development"

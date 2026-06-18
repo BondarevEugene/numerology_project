@@ -4,24 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6eb95a8b-e607-44a0-8ef5-a6183af34a1e" name="Changes" comment="Genesys .5.0-PRO 07\06\2026&#10;upd_max">
-      <change afterPath="$PROJECT_DIR$/core/competency_registry.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/import_engine.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/import_validator.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/profession_importer.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/core/seed_competencies.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/services/profession_importer.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/admin/import_center.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/admin/profession_mapping.html" afterDir="false" />
+    <list default="true" id="6eb95a8b-e607-44a0-8ef5-a6183af34a1e" name="Changes" comment="Genesys .5.0-PRO 17\06\2026&#10;lust_update before rebuilds">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/archetype_content_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/archetype_content_service.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/career_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/career_service.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/admin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/admin/archetype_mapping.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/archetype_mapping.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/admin/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/admin/nexus_hub.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/nexus_hub.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -297,7 +282,15 @@
       <option name="project" value="LOCAL" />
       <updated>1780817637022</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Genesys .5.0-PRO 17\06\2026&#10;lust_update before rebuilds">
+      <option name="closed" value="true" />
+      <created>1781678224364</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1781678224364</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -317,6 +310,7 @@
     <MESSAGE value="Genesys .2.0-PRO 25\04\2026&#10;full working" />
     <MESSAGE value="Genesys .4.0-PRO 12\05\2026&#10;full working" />
     <MESSAGE value="Genesys .5.0-PRO 07\06\2026&#10;upd_max" />
-    <option name="LAST_COMMIT_MESSAGE" value="Genesys .5.0-PRO 07\06\2026&#10;upd_max" />
+    <MESSAGE value="Genesys .5.0-PRO 17\06\2026&#10;lust_update before rebuilds" />
+    <option name="LAST_COMMIT_MESSAGE" value="Genesys .5.0-PRO 17\06\2026&#10;lust_update before rebuilds" />
   </component>
 </project>

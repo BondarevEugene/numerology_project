@@ -1872,9 +1872,7 @@ def save_archetype_mapping():
 
     if not mapping:
         mapping = ArchetypeCompetency(
-
             archetype_number=archetype,
-
             competency_id=competency_id
         )
 

@@ -578,87 +578,33 @@ class Profession(db.Model):
     Статусы:raw,curated, published,archived
     """
 
-    id = db.Column(
-        db.Integer,
-        primary_key=True
-    )
+    id = db.Column(db.Integer, primary_key=True)
     # INTERNAL
-    code = db.Column(
-        db.String(100),
-        unique=True
-    )
+    code = db.Column(db.String(100),unique=True)
     # TITLES
-    title = db.Column(
-        db.String(255),
-        nullable=False
-    )
-    title_ru = db.Column(
-        db.String(255)
-    )
-    title_ua = db.Column(
-        db.String(255)
-    )
-
+    title = db.Column(db.String(255),nullable=False)
+    title_ru = db.Column(db.String(255))
+    title_ua = db.Column(db.String(255))
     # CONTENT
-    short_description = db.Column(
-        db.Text
-    )
-
-    description = db.Column(
-        db.Text
-    )
-
+    short_description = db.Column(db.Text)
+    description = db.Column(db.Text)
     # CLASSIFICATION
-    category = db.Column(
-        db.String(100)
-    )
-    subcategory = db.Column(
-        db.String(100)
-    )
-
+    category = db.Column(db.String(100))
+    subcategory = db.Column(db.String(100))
     # IMPORT
-    source = db.Column(
-        db.String(50),
-        default="manual"
-    )
-    external_id = db.Column(
-        db.String(255)
-    )
-    source_url = db.Column(
-        db.Text
-    )
-
+    source = db.Column(db.String(50),default="manual")
+    external_id = db.Column(db.String(255))
+    source_url = db.Column(db.Text)
     # WORK FORMAT
-    remote_available = db.Column(
-        db.Boolean,
-        default=False
-    )
-    freelance_available = db.Column(
-        db.Boolean,
-        default=False
-    )
-    business_potential = db.Column(
-        db.Integer,
-        default=50
-    )
-
+    remote_available = db.Column(db.Boolean,default=False)
+    freelance_available = db.Column(db.Boolean,default=False)
+    business_potential = db.Column(db.Integer,default=50)
     # QUALITY
-    status = db.Column(
-        db.String(50),
-        default="raw"
-    )
-    is_active = db.Column(
-        db.Boolean,
-        default=True
-    )
-
+    status = db.Column(db.String(50),default="raw")
+    is_active = db.Column(db.Boolean,default=True)
     # METADATA
-    keywords = db.Column(
-        db.Text
-    )
-    notes = db.Column(
-        db.Text
-    )
+    keywords = db.Column(db.Text)
+    notes = db.Column(db.Text)
     created_at = db.Column(
         db.DateTime,
         default=datetime.utcnow
