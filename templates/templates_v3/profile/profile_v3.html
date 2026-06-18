@@ -1,0 +1,26 @@
+{% extends "templates_v3/layout/base.html" %}
+{% block content %}
+
+<div class="genesis-panel">
+    <div class="panel-header">
+        GENESIS ACCOUNT
+    </div>
+    <div style="padding:20px;">
+        <h2>
+            {{ current_user.full_name }}
+        </h2>
+        <p>
+            {{ current_user.email }}
+        </p>
+        <hr>
+        <p>
+            Subscription:
+            {{ profile.subscription }}
+        </p>
+        <p>
+            Reports:
+            {{ profile.reports_count }}
+        </p>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,850 @@
+{% extends "admin/base.html" %}
+{% block content %}
+
+<link
+    rel="stylesheet"
+    href="{{ url_for(
+        'static',
+        filename='css_v3/vocation_matrix.css'
+    ) }}">
+
+
+<h1>
+🚀 Genesis Career Intelligence Studio
+</h1>
+
+<div id="save-status" class="card">
+Готов
+</div>
+
+{% if stats %}
+
+<div class="audit-grid">
+
+    <div class="audit-box">
+        <b>Всего профессий</b>
+        <br>
+        {{ stats.total }}
+    </div>
+
+    <div class="audit-box">
+        <b>Без RU</b>
+        <br>
+        {{ stats.missing_ru }}
+    </div>
+
+    <div class="audit-box">
+        <b>Без UA</b>
+        <br>
+        {{ stats.missing_ua }}
+    </div>
+
+    <div class="audit-box">
+        <b>Без Keywords</b>
+        <br>
+        {{ stats.missing_keywords }}
+    </div>
+
+    <div class="audit-box">
+        <b>Без Category</b>
+        <br>
+        {{ stats.missing_category }}
+    </div>
+
+</div>
+
+{% endif %}
+<div class="card">
+
+    <form method="get" class="toolbar">
+
+        <input
+            type="text"
+            name="q"
+            placeholder="Поиск..."
+            value="{{ request.args.get('q','') }}">
+
+        <select name="audit">
+
+            <option value="">
+                Все
+            </option>
+
+            <option value="missing_ru">
+                Без RU
+            </option>
+
+            <option value="missing_ua">
+                Без UA
+            </option>
+
+            <option value="missing_keywords">
+                Без Keywords
+            </option>
+
+            <option value="missing_category">
+                Без Category
+            </option>
+
+        </select>
+
+        <button type="submit">
+            Поиск
+        </button>
+
+    </form>
+
+</div>
+
+<div class="card">
+
+    <h3>
+        Mass Operations Center
+    </h3>
+
+    <b>
+        Выбрано:
+        <span id="selected-count">
+            0
+        </span>
+    </b>
+
+    <hr>
+
+    <div class="toolbar">
+
+        <input
+            type="text"
+            id="bulk-category"
+            placeholder="Категория">
+
+        <button
+            type="button"
+            id="apply-category">
+            Category
+        </button>
+
+        <input
+            type="text"
+            id="bulk-keyword"
+            placeholder="Keyword">
+
+        <button
+            type="button"
+            id="apply-keyword">
+            Keyword
+        </button>
+
+        <select id="bulk-vector">
+
+            <option value="">
+                Vector
+            </option>
+
+            {% for n in range(1,10) %}
+            <option value="{{ n }}">
+                {{ n }}
+            </option>
+            {% endfor %}
+
+        </select>
+
+        <button
+            type="button"
+            id="apply-vector">
+            Vector
+        </button>
+
+        <button
+            type="button"
+            id="bulk-delete">
+            Delete
+        </button>
+
+    </div>
+
+</div>
+
+<div class="card">
+
+    <h3>
+        AI Center
+    </h3>
+
+    <div class="toolbar">
+
+        <button
+            type="button"
+            class="ai-btn">
+            AI Categorize
+        </button>
+
+        <button
+            type="button"
+            class="ai-btn">
+            AI Keywords
+        </button>
+
+        <button
+            type="button"
+            class="ai-btn">
+            AI Translate RU
+        </button>
+
+        <button
+            type="button"
+            class="ai-btn">
+            AI Translate UA
+        </button>
+
+        <button
+            type="button"
+            class="ai-btn">
+            AI Complete
+        </button>
+
+    </div>
+
+</div>
+<div class="card">
+
+    <div style="margin-bottom:15px;">
+
+        <b>Легенда:</b>
+
+        <span class="matrix-green">
+            81-100
+        </span>
+
+        <span class="matrix-blue">
+            61-80
+        </span>
+
+        <span class="matrix-yellow">
+            31-60
+        </span>
+
+        <span class="matrix-red">
+            0-30
+        </span>
+
+    </div>
+
+    <div class="matrix-container">
+
+        <table class="matrix-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        <input
+                            type="checkbox"
+                            id="select-all">
+                    </th>
+
+                    <th>ID</th>
+
+                    <th>VECTOR</th>
+
+                    <th>EN</th>
+
+                    <th>RU</th>
+
+                    <th>UA</th>
+
+                    <th>CATEGORY</th>
+
+                    <th>KEYWORDS</th>
+
+                    <th>STATUS</th>
+
+                    {% for n in range(1,10) %}
+                    <th>
+                        {{ n }}
+                    </th>
+                    {% endfor %}
+
+                    <th>
+                        EDIT
+                    </th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for vocation in vocations %}
+
+                <tr>
+
+                    <td>
+
+                        <input
+                            type="checkbox"
+                            class="bulk-checkbox"
+                            value="{{ vocation.id }}">
+
+                    </td>
+
+                    <td>
+                        {{ vocation.id }}
+                    </td>
+
+                    <td>
+                        {{ vocation.vector_id }}
+                    </td>
+
+                    <td>
+                        {{ vocation.title_en }}
+                    </td>
+
+                    <td>
+                        {{ vocation.title_ru }}
+                    </td>
+
+                    <td>
+                        {{ vocation.title_ua }}
+                    </td>
+
+                    <td>
+                        {{ vocation.category }}
+                    </td>
+
+                    <td>
+
+                        <div style="
+                            max-width:220px;
+                            overflow:hidden;
+                            text-overflow:ellipsis;
+                            white-space:nowrap;
+                        ">
+
+                            {{ vocation.keywords }}
+
+                        </div>
+
+                    </td>
+
+                    <td>
+
+                        {% if vocation.title_ru
+                           and vocation.title_ua
+                           and vocation.category
+                           and vocation.keywords %}
+
+                            <span class="status-complete">
+                                COMPLETE
+                            </span>
+
+                        {% else %}
+
+                            {% if not vocation.title_ru %}
+                            <div class="status-warning">
+                                NO RU
+                            </div>
+                            {% endif %}
+
+                            {% if not vocation.title_ua %}
+                            <div class="status-warning">
+                                NO UA
+                            </div>
+                            {% endif %}
+
+                            {% if not vocation.category %}
+                            <div class="status-error">
+                                NO CAT
+                            </div>
+                            {% endif %}
+
+                            {% if not vocation.keywords %}
+                            <div class="status-error">
+                                NO KW
+                            </div>
+                            {% endif %}
+
+                        {% endif %}
+
+                    </td>
+
+                    {% for n in range(1,10) %}
+
+                        {% set cell = matrix[vocation.id][n] %}
+
+                        <td>
+
+                            {% if cell %}
+
+                            <input
+                                type="number"
+                                min="0"
+                                max="100"
+                                value="{{ cell.compatibility_rate }}"
+                                data-id="{{ cell.id }}"
+                                class="matrix-cell
+
+                                {% if cell.compatibility_rate >= 81 %}
+                                matrix-green
+                                {% elif cell.compatibility_rate >= 61 %}
+                                matrix-blue
+                                {% elif cell.compatibility_rate >= 31 %}
+                                matrix-yellow
+                                {% else %}
+                                matrix-red
+                                {% endif %}
+                                ">
+
+                            {% else %}
+
+                                -
+
+                            {% endif %}
+
+                        </td>
+
+                    {% endfor %}
+
+                    <td>
+
+                        <a
+                            href="/admin/vocations/edit/{{ vocation.id }}">
+                            ✏
+                        </a>
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<div class="card">
+
+    <h3>
+        Career Intelligence Analytics
+    </h3>
+
+    <div class="audit-grid">
+
+        <div class="audit-box">
+
+            <b>
+                Профессий
+            </b>
+
+            <br>
+
+            {{ vocations|length }}
+
+        </div>
+
+        <div class="audit-box">
+
+            <b>
+                Чисел в матрице
+            </b>
+
+            <br>
+
+            9
+
+        </div>
+
+        <div class="audit-box">
+
+            <b>
+                Заполненность
+            </b>
+
+            <br>
+
+            {{ stats.total }}
+
+        </div>
+
+        <div class="audit-box">
+
+            <b>
+                Genesis HR 2026
+            </b>
+
+            <br>
+
+            Career Intelligence Studio
+
+        </div>
+
+    </div>
+
+</div>
+<script>
+
+function recolor(input){
+
+    let value =
+    parseInt(
+        input.value
+    );
+
+    input.classList.remove(
+        'matrix-red',
+        'matrix-yellow',
+        'matrix-blue',
+        'matrix-green'
+    );
+
+    if(value >= 81){
+
+        input.classList.add(
+            'matrix-green'
+        );
+
+    }
+    else if(value >= 61){
+
+        input.classList.add(
+            'matrix-blue'
+        );
+
+    }
+    else if(value >= 31){
+
+        input.classList.add(
+            'matrix-yellow'
+        );
+
+    }
+    else{
+
+        input.classList.add(
+            'matrix-red'
+        );
+
+    }
+
+}
+
+/* ==========================
+   MATRIX SAVE
+========================== */
+
+document
+.querySelectorAll(
+    '.matrix-cell'
+)
+.forEach(
+
+    function(input){
+
+        input.addEventListener(
+
+            'blur',
+
+            function(){
+
+                document
+                .getElementById(
+                    'save-status'
+                )
+                .innerHTML =
+                'Сохранение...';
+
+                fetch(
+
+                    '/admin/vocations/matrix/update',
+
+                    {
+                        method:'POST',
+
+                        headers:{
+                            'Content-Type':
+                            'application/x-www-form-urlencoded'
+                        },
+
+                        body:
+                        'compatibility_id='
+                        +
+                        this.dataset.id
+                        +
+                        '&value='
+                        +
+                        this.value
+                    }
+
+                )
+
+                .then(
+                    r => r.json()
+                )
+
+                .then(
+
+                    data => {
+
+                        recolor(
+                            this
+                        );
+
+                        this.classList.add(
+                            'saved-ok'
+                        );
+
+                        setTimeout(
+
+                            () => {
+
+                                this.classList.remove(
+                                    'saved-ok'
+                                );
+
+                            },
+
+                            1000
+
+                        );
+
+                        document
+                        .getElementById(
+                            'save-status'
+                        )
+                        .innerHTML =
+                        'Сохранено';
+
+                    }
+
+                );
+
+            }
+
+        );
+
+    }
+
+);
+
+/* ==========================
+   SELECT ALL
+========================== */
+
+const selectAll =
+document.getElementById(
+    'select-all'
+);
+
+const checkboxes =
+document.querySelectorAll(
+    '.bulk-checkbox'
+);
+
+function updateCounter(){
+
+    const selected =
+    document.querySelectorAll(
+        '.bulk-checkbox:checked'
+    );
+
+    document
+    .getElementById(
+        'selected-count'
+    )
+    .innerText =
+    selected.length;
+
+}
+
+if(selectAll){
+
+    selectAll.addEventListener(
+
+        'change',
+
+        function(){
+
+            checkboxes.forEach(
+
+                cb =>
+
+                cb.checked =
+                this.checked
+
+            );
+
+            updateCounter();
+
+        }
+
+    );
+
+}
+
+checkboxes.forEach(
+
+    cb =>
+
+    cb.addEventListener(
+        'change',
+        updateCounter
+    )
+
+);
+
+/* ==========================
+   BULK CATEGORY
+========================== */
+
+const applyCategoryBtn =
+document.getElementById(
+    'apply-category'
+);
+
+if(applyCategoryBtn){
+
+    applyCategoryBtn.addEventListener(
+
+        'click',
+
+        function(){
+
+            const selected =
+            document.querySelectorAll(
+                '.bulk-checkbox:checked'
+            );
+
+            const ids = [];
+
+            selected.forEach(
+                cb => ids.push(cb.value)
+            );
+
+            const category =
+            document.getElementById(
+                'bulk-category'
+            ).value;
+
+            const formData =
+            new URLSearchParams();
+
+            ids.forEach(
+                id =>
+                formData.append(
+                    'ids[]',
+                    id
+                )
+            );
+
+            formData.append(
+                'category',
+                category
+            );
+
+            fetch(
+                '/admin/vocations/bulk/category',
+                {
+                    method:'POST',
+                    body:formData
+                }
+            )
+            .then(r => r.json())
+            .then(data => {
+
+                alert(
+                    'Обновлено: ' +
+                    data.updated
+                );
+
+                location.reload();
+
+            });
+
+        }
+
+    );
+
+}
+
+/* ==========================
+   BULK KEYWORD
+========================== */
+
+const applyKeywordBtn =
+document.getElementById(
+    'apply-keyword'
+);
+
+if(applyKeywordBtn){
+
+    applyKeywordBtn.addEventListener(
+
+        'click',
+
+        function(){
+
+            const selected =
+            document.querySelectorAll(
+                '.bulk-checkbox:checked'
+            );
+
+            const ids = [];
+
+            selected.forEach(
+                cb => ids.push(cb.value)
+            );
+
+            const keyword =
+            document.getElementById(
+                'bulk-keyword'
+            ).value;
+
+            const formData =
+            new URLSearchParams();
+
+            ids.forEach(
+                id =>
+                formData.append(
+                    'ids[]',
+                    id
+                )
+            );
+
+            formData.append(
+                'keyword',
+                keyword
+            );
+
+            fetch(
+                '/admin/vocations/bulk/keyword',
+                {
+                    method:'POST',
+                    body:formData
+                }
+            )
+            .then(r => r.json())
+            .then(data => {
+
+                alert(
+                    'Keyword добавлен: ' +
+                    data.updated
+                );
+
+                location.reload();
+
+            });
+
+        }
+
+    );
+
+}
+
+</script>
+
+{% endblock %}

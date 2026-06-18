@@ -1,0 +1,78 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<h1>
+   {% if item %}
+   Редактирование профессии
+   {% else %}
+   Новая профессия
+   {% endif %}
+</h1>
+<form method="post">
+   <div class="card">
+      <p>Число</p>
+      <input
+         type="number"
+         name="vector_id"
+         value="{{ item.vector_id if item else '' }}"
+         style="width:100%;"
+         >
+      <p>Категория</p>
+      <input
+         type="text"
+         name="category"
+         value="{{ item.category if item else '' }}"
+         style="width:100%;"
+         >
+      <p>Название</p>
+      <input
+         type="text"
+         name="vocation_title"
+         value="{{ item.vocation_title if item else '' }}"
+         style="width:100%;"
+         >
+      <p>Навыки</p>
+      <textarea
+         name="skill_stack"
+         rows="8"
+         style="width:100%;"
+         >{{ item.skill_stack if item else '' }}</textarea>
+      <p>Потенциал дохода</p>
+      <input
+         type="text"
+         name="income_potential"
+         value="{{ item.income_potential if item else '' }}"
+         style="width:100%;"
+         >
+      <p>Совместимость</p>
+      <input
+         type="number"
+         name="compatibility_rate"
+         value="{{ item.compatibility_rate if item else '' }}"
+         style="width:100%;"
+         >
+      <p>Риски</p>
+      <textarea
+         name="shadow_risk"
+         rows="6"
+         style="width:100%;"
+         >{{ item.shadow_risk if item else '' }}</textarea>
+      <p>Стратегическая роль</p>
+      <input
+         type="text"
+         name="strategic_role"
+         value="{{ item.strategic_role if item else '' }}"
+         style="width:100%;"
+         >
+      <p>Миссия</p>
+      <textarea
+         name="mission_statement"
+         rows="10"
+         style="width:100%;"
+         >{{ item.mission_statement if item else '' }}</textarea>
+      <br><br>
+      <button type="submit">
+      Сохранить
+      </button>
+   </div>
+</form>
+{% endblock %}

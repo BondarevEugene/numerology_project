@@ -1,0 +1,248 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<div class="page-header">
+   <div class="page-title">
+      💼 Career Intelligence Center
+   </div>
+   <div class="page-subtitle">
+      Professional Resonance Engine • Genesis Human Capability Framework
+   </div>
+</div>
+<div class="career-layout">
+   <!-- LEFT COLUMN -->
+   <div class="career-main">
+      <!-- KPI -->
+      <div class="kpi-grid">
+         <div class="kpi-card">
+            <div class="kpi-label">
+               Career Records
+            </div>
+            <div class="kpi-number">
+               {{ matrix_stats.records }}
+            </div>
+         </div>
+         <div class="kpi-card">
+            <div class="kpi-label">
+               Competencies
+            </div>
+            <div class="kpi-number">
+               40
+            </div>
+         </div>
+         <div class="kpi-card">
+            <div class="kpi-label">
+               Archetype Links
+            </div>
+            <div class="kpi-number">
+               360
+            </div>
+         </div>
+         <div class="kpi-card">
+            <div class="kpi-label">
+               Profession Links
+            </div>
+            <div class="kpi-number">
+               0
+            </div>
+         </div>
+         <div class="kpi-card">
+            <div class="kpi-label">
+               Missing RU
+            </div>
+            <div class="kpi-number">
+               {{ matrix_stats.missing_ru }}
+            </div>
+         </div>
+         <div class="kpi-card">
+            <div class="kpi-label">
+               Missing UA
+            </div>
+            <div class="kpi-number">
+               {{ matrix_stats.missing_ua }}
+            </div>
+         </div>
+      </div>
+      <!-- CORE -->
+      <div class="section-card">
+         <div class="section-title">
+            GENESIS CAREER ENGINE
+         </div>
+         <p>
+            Intelligence layer connecting
+            Archetypes → Competencies → Professions → Recommendations
+         </p>
+      </div>
+      <!-- MODULES -->
+      <div class="section-card">
+         <div class="section-title">
+            CORE MODULES
+         </div>
+         <div class="kpi-grid">
+            <a href="/admin/competencies"
+               class="btn btn-gold">
+            Competency Dictionary
+            </a>
+            <a href="/admin/archetype-mapping"
+               class="btn btn-gold">
+            Archetype Mapping
+            </a>
+            <a href="/admin/profession-mapping"
+               class="btn btn-gold">
+            Profession Mapping
+            </a>
+            <a href="/admin/recommendation-lab"
+               class="btn btn-gold">
+            Recommendation Lab
+            </a>
+         </div>
+      </div>
+      <!-- IMPORT -->
+      <div class="section-card">
+         <div class="section-title">
+            IMPORT CENTER
+         </div>
+         <div class="badge badge-success">
+            Excel Import Ready
+         </div>
+         <div class="badge badge-warning">
+            ESCO Connector Planned
+         </div>
+         <div class="badge badge-warning">
+            O*NET Connector Planned
+         </div>
+         <div class="badge badge-warning">
+            AI Profession Builder Planned
+         </div>
+      </div>
+      <!-- FRAMEWORK -->
+      <div class="section-card">
+         <div class="section-title">
+            HUMAN CAPABILITY FRAMEWORK
+         </div>
+         <div class="badge">Leadership</div>
+         <div class="badge">Strategy</div>
+         <div class="badge">Analysis</div>
+         <div class="badge">Communication</div>
+         <div class="badge">Execution</div>
+         <br><br>
+         <div class="badge">Adaptability</div>
+         <div class="badge">Creativity</div>
+         <div class="badge">Human Factor</div>
+      </div>
+      <!-- ROADMAP -->
+      <div class="section-card">
+         <div class="section-title">
+            CAREER EVOLUTION ROADMAP
+         </div>
+         <pre>
+PHASE 1
+✓ Career Database
+✓ Career Matrix
+
+PHASE 2
+✓ Competency Dictionary
+⏳ Archetype Mapping
+⏳ Profession Mapping
+
+PHASE 3
+⏳ Recommendation Engine
+
+PHASE 4
+⏳ Excel Import
+⏳ ESCO Import
+⏳ O*NET Import
+
+PHASE 5
+⏳ AI Career Intelligence
+</pre>
+      </div>
+      <!-- FUTURE -->
+      <div class="section-card">
+         <div class="section-title">
+            FUTURE AI MODULES
+         </div>
+         <div class="badge badge-warning">
+            AI Career Audit
+         </div>
+         <div class="badge badge-warning">
+            AI Profession Matcher
+         </div>
+         <div class="badge badge-warning">
+            AI Competency Builder
+         </div>
+         <div class="badge badge-warning">
+            AI Career Advisor
+         </div>
+      </div>
+   </div>
+   <!-- RIGHT COLUMN -->
+   <div class="career-sidebar">
+      <!-- ACTIVE PROFILE -->
+      <div class="section-card">
+         <div class="section-title">
+            GENESIS PREDICTION ENGINE
+         </div>
+         <div class="prediction-value">
+            8
+         </div>
+         <div class="badge badge-success">
+            COMMANDER
+         </div>
+      </div>
+      <!-- TOP PROFESSIONS -->
+      <div class="section-card">
+         <div class="section-title">
+            TOP PROFESSIONS
+         </div>
+         <ul>
+            <li>Project Manager — 94%</li>
+            <li>Operations Director — 92%</li>
+            <li>Business Owner — 91%</li>
+            <li>Sales Director — 89%</li>
+            <li>Product Manager — 88%</li>
+         </ul>
+      </div>
+      <!-- STRENGTHS -->
+      <div class="section-card">
+         <div class="section-title">
+            CORE STRENGTHS
+         </div>
+         <ul>
+            <li>Leadership — 95</li>
+            <li>Decision Making — 95</li>
+            <li>Responsibility — 95</li>
+            <li>Strategy — 90</li>
+            <li>Execution — 90</li>
+         </ul>
+      </div>
+      <!-- RISKS -->
+      <div class="section-card">
+         <div class="section-title">
+            DEVELOPMENT ZONES
+         </div>
+         <ul>
+            <li>Empathy — 35</li>
+            <li>Mentoring — 35</li>
+            <li>Conflict Resolution — 35</li>
+         </ul>
+      </div>
+      <!-- STATUS -->
+      <div class="section-card">
+         <div class="section-title">
+            ENGINE STATUS
+         </div>
+         <div class="badge badge-success">
+            Archetype Engine Online
+         </div>
+         <br><br>
+         <div class="badge badge-warning">
+            Profession Engine Building
+         </div>
+         <br><br>
+         <div class="badge badge-warning">
+            AI Engine Planned
+         </div>
+      </div>
+   </div>
+</div>
+{% endblock %}

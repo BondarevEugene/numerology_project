@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Genesis | Initialization Protocol v9.0</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=JetBrains+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #b89b5e;
+            --gold-bright: #f4cf6d;
+            --bg: #030303;
+            --panel: #0a0a0a;
+            --border: rgba(184, 155, 94, 0.2);
+            --text: #dcdcdc;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--gold);
+            font-family: 'JetBrains Mono', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+            font-size: 12px;
+        }
+
+        /* Фоновый матричный эффект */
+        canvas#bgCanvas { position: fixed; inset: 0; z-index: -1; opacity: 0.15; }
+
+        .reg-container {
+            width: 100%;
+            max-width: 450px;
+            background: var(--panel);
+            padding: 40px;
+            border: 1px solid var(--border);
+            position: relative;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            z-index: 1;
+        }
+
+        .reg-container::before {
+            content: ""; position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px;
+            background: linear-gradient(45deg, var(--border), transparent, var(--border));
+            z-index: -1;
+        }
+
+        h2 { font-family: 'Cinzel'; text-align: center; letter-spacing: 5px; margin-bottom: 30px; color: #fff; }
+
+        .input-group { margin-bottom: 20px; position: relative; }
+        label { display: block; font-size: 8px; letter-spacing: 2px; margin-bottom: 8px; color: var(--gold); opacity: 0.8; }
+
+        input, select {
+            width: 100%; background: rgba(255,255,255,0.03); border: 1px solid #222;
+            padding: 12px; color: #fff; font-family: 'JetBrains Mono'; font-size: 11px;
+            box-sizing: border-box; transition: all 0.3s;
+        }
+
+        input:focus { border-color: var(--gold); outline: none; background: rgba(184,155,94,0.05); }
+
+        /* Сила пароля */
+        .strength-meter { height: 2px; width: 0; background: #ff4444; margin-top: 5px; transition: 0.5s; }
+
+        /* Стили паттерна */
+        #patternCanvas { background: rgba(0,0,0,0.3); border-radius: 8px; touch-action: none; cursor: crosshair; border: 1px solid #222; }
+
+        button {
+            width: 100%; padding: 15px; background: transparent; border: 1px solid var(--gold);
+            color: var(--gold); font-family: 'Cinzel'; cursor: pointer; transition: 0.4s;
+            letter-spacing: 3px; margin-top: 20px; font-weight: bold;
+        }
+
+        button:hover { background: var(--gold); color: #000; box-shadow: 0 0 20px var(--border); }
+
+        .links { text-align: center; margin-top: 20px; font-size: 9px; opacity: 0.6; }
+        .links a { color: #fff; text-decoration: none; }
+        .links a:hover { color: var(--gold); }
+
+        .archetype-hint { font-size: 9px; color: var(--gold-bright); margin-top: 5px; height: 12px; }
+    </style>
+</head>
+<body>
+
+    <canvas id="bgCanvas"></canvas>
+
+    <div class="reg-container">
+        <h2>INITIALIZATION</h2>
+
+        <form action="{{ url_for('auth.register') }}" method="POST" id="regForm">
+            <input type="hidden" name="pattern" id="pattern-input">
+
+            <div class="input-group">
+                <label>SUBJECT_IDENTIFIER [FULL_NAME]</label>
+                <input type="text" name="full_name" placeholder="IVAN IVANOV" required>
+            </div>
+
+            <div class="input-group">
+                <label>DIGITAL_UPLINK [EMAIL]</label>
+                <input type="email" name="email" placeholder="SUBJECT@DOMAIN.COM" required>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="input-group">
+                    <label>MATRIX_ORIGIN [BIRTH_DATE]</label>
+                    <input type="date" name="birth_date" id="birth_date" required style="color-scheme: dark;">
+                    <div id="archetype-hint" class="archetype-hint"></div>
+                </div>
+                <div class="input-group">
+                    <label>GENDER_POLARITY</label>
+                    <select name="gender" required>
+                        <option value="" disabled selected>SELECT</option>
+                        <option value="male">MALE</option>
+                        <option value="female">FEMALE</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>SECURITY_HASH [PASSWORD]</label>
+                <input type="password" name="password" id="password" placeholder="•••••••••" required>
+                <div id="strength-meter" class="strength-meter"></div>
+            </div>
+
+            <div class="input-group">
+                <label>GRAPHIC_ACCESS_KEY [SEQUENCE_1-9]</label>
+                <div style="position: relative; text-align: center;">
+                    <canvas id="patternCanvas" width="260" height="260"></canvas>
+                    <div id="pattern-status" style="font-size: 8px; color: var(--gold); margin-top: 8px; letter-spacing: 1px;">STATUS: AWAITING_INPUT</div>
+                    <div style="font-size: 7px; color: #444; cursor: pointer; text-decoration: underline;" onclick="clearPattern()">RESET_CANVAS</div>
+                </div>
+            </div>
+
+            <button type="submit">COMMIT PROTOCOL</button>
+        </form>
+
+        <div class="links">
+            <a href="{{ url_for('auth.login') }}">// EXIST_SUBJECT? ACCESS_SYSTEM</a>
+        </div>
+    </div>
+
+    <script>
+        // 1. ФОНОВАЯ АНИМАЦИЯ (Матрица)
+        const bgCanvas = document.getElementById('bgCanvas');
+        const bgCtx = bgCanvas.getContext('2d');
+        bgCanvas.width = window.innerWidth;
+        bgCanvas.height = window.innerHeight;
+        const columns = Math.floor(bgCanvas.width / 20);
+        const drops = Array(columns).fill(1);
+
+        function drawMatrix() {
+            bgCtx.fillStyle = 'rgba(3, 3, 3, 0.05)';
+            bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
+            bgCtx.fillStyle = '#b89b5e';
+            bgCtx.font = '15px monospace';
+            drops.forEach((y, i) => {
+                const text = String.fromCharCode(Math.random() * 128);
+                bgCtx.fillText(text, i * 20, y * 20);
+                if (y * 20 > bgCanvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            });
+        }
+        setInterval(drawMatrix, 50);
+
+        // 2. ГРАФИЧЕСКИЙ ПАТТЕРН
+        const canvas = document.getElementById('patternCanvas');
+        const ctx = canvas.getContext('2d');
+        const patternInput = document.getElementById('pattern-input');
+        const statusText = document.getElementById('pattern-status');
+        let isDrawing = false;
+        let points = [];
+        let selectedPoints = [];
+
+        function initGrid() {
+            const step = canvas.width / 4;
+            let count = 1;
+            for (let row = 1; row <= 3; row++) {
+                for (let col = 1; col <= 3; col++) {
+                    points.push({ x: col * step, y: row * step, id: count++ });
+                }
+            }
+            drawGrid();
+        }
+
+        function drawGrid() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (selectedPoints.length > 0) {
+                ctx.beginPath();
+                ctx.strokeStyle = '#b89b5e';
+                ctx.lineWidth = 4;
+                ctx.lineJoin = 'round';
+                const start = points[selectedPoints[0] - 1];
+                ctx.moveTo(start.x, start.y);
+                selectedPoints.forEach(id => ctx.lineTo(points[id - 1].x, points[id - 1].y));
+                ctx.stroke();
+            }
+            points.forEach(p => {
+                const isSelected = selectedPoints.includes(p.id);
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, isSelected ? 18 : 12, 0, Math.PI * 2);
+                ctx.fillStyle = isSelected ? '#b89b5e' : 'rgba(255,255,255,0.05)';
+                ctx.fill();
+                ctx.fillStyle = isSelected ? '#000' : '#444';
+                ctx.font = 'bold 10px JetBrains Mono';
+                ctx.textAlign = 'center';
+                ctx.fillText(p.id, p.x, p.y + 4);
+            });
+        }
+
+        const handleMove = (e) => {
+            if (!isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX || e.touches[0].clientX) - rect.left;
+            const y = (e.clientY || e.touches[0].clientY) - rect.top;
+            points.forEach(p => {
+                const d = Math.hypot(p.x - x, p.y - y);
+                if (d < 25 && !selectedPoints.includes(p.id)) {
+                    selectedPoints.push(p.id);
+                    patternInput.value = selectedPoints.join('');
+                    statusText.innerText = `SEQUENCE: ${selectedPoints.join('-')}`;
+                    drawGrid();
+                    if(navigator.vibrate) navigator.vibrate(10);
+                }
+            });
+        };
+
+        function clearPattern() { selectedPoints = []; patternInput.value = ''; statusText.innerText = 'STATUS: AWAITING_INPUT'; drawGrid(); }
+        canvas.addEventListener('mousedown', () => isDrawing = true);
+        window.addEventListener('mouseup', () => isDrawing = false);
+        canvas.addEventListener('mousemove', handleMove);
+        canvas.addEventListener('touchstart', (e) => { isDrawing = true; handleMove(e); e.preventDefault(); });
+        canvas.addEventListener('touchmove', (e) => { handleMove(e); e.preventDefault(); });
+        canvas.addEventListener('touchend', () => isDrawing = false);
+        initGrid();
+
+        // 3. ФУНКЦИОНАЛ: СЛОЖНОСТЬ ПАРОЛЯ
+        document.getElementById('password').addEventListener('input', function(e) {
+            const val = e.target.value;
+            const meter = document.getElementById('strength-meter');
+            let strength = val.length * 10;
+            if (/[A-Z]/.test(val)) strength += 20;
+            if (/[0-9]/.test(val)) strength += 20;
+            meter.style.width = Math.min(strength, 100) + '%';
+            meter.style.background = strength < 40 ? '#ff4444' : strength < 70 ? '#ffbb33' : '#00c851';
+        });
+
+        // 4. ФУНКЦИОНАЛ: ОПРЕДЕЛЕНИЕ АРХЕТИПА НА ЛЕТУ
+        document.getElementById('birth_date').addEventListener('change', function(e) {
+            const date = new Date(e.target.value);
+            if (!isNaN(date.getTime())) {
+                const day = date.getDate();
+                const archetype = (day > 9) ? Math.floor(day / 10) + (day % 10) : day;
+                const finalArc = (archetype > 9) ? Math.floor(archetype / 10) + (archetype % 10) : archetype;
+                document.getElementById('archetype-hint').innerText = `DETECTED_ARCHETYPE: CODE_${finalArc}`;
+            }
+        });
+    </script>
+</body>
+</html>

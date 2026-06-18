@@ -1,0 +1,61 @@
+
+
+{% if result %}
+<section class="genesis-panel">
+   <div class="panel-header">
+      PERSONAL PROFILE
+   </div>
+   <div class="report-content">
+      <pre>{{ result }}</pre>
+      <pre>
+      {{ result }}
+      </pre>
+
+      <div class="overview-block">
+
+         <h3>WHO YOU ARE</h3>
+         <p>{{ result.short_desc }}</p>
+      </div>
+      <hr>
+      <div class="overview-block">
+         <h3>YOUR MAIN STRENGTH</h3>
+         <p>{{ result.action_power }}</p>
+      </div>
+      <hr>
+      <div class="overview-block">
+         <h3>SHADOW SIDE</h3>
+         <p>{{ result.shadow_side }}</p>
+      </div>
+      <hr>
+      <div class="overview-block">
+         <h3>GROWTH POINT</h3>
+         <p>{{ result.growth_point }}</p>
+
+         <div style="background:red;color:white;padding:10px;">
+         TEST AFTER GROWTH
+         </div>
+
+      </div>
+      <hr>
+      <div class="overview-block">
+         <h3>REALIZATION STRATEGY</h3>
+         <p>{{ result.realization }}</p>
+      </div>
+      <hr>
+      <div class="overview-block">
+         <h3>FINANCIAL STRATEGY</h3>
+         <p>{{ result.financial_tip }}</p>
+      </div>
+      <hr>
+      <div class="overview-block">
+         <h3>RELATIONSHIP MODEL</h3>
+         <p>{{ result.partner_type }}</p>
+      </div>
+      <hr>
+      <div class="overview-block">
+         <h3>LIFE RESULT</h3>
+         <p>{{ result.life_result }}</p>
+      </div>
+   </div>
+</section>
+{% endif %}

@@ -1,0 +1,31 @@
+{% if result.advanced %}
+<section class="genesis-panel">
+    <div class="panel-header">
+        PERSONAL ANALYTICS
+    </div>
+    <div class="report-content">
+        <h3>Социальная роль</h3>
+        <p>
+            {{ result.advanced.social_role }}
+        </p>
+        <h3>Темперамент</h3>
+        <p>
+            {{ result.advanced.temperament }}
+        </p>
+        <h3>Отношения</h3>
+        <p>
+            {{ result.advanced.family_line }}
+        </p>
+        <h3>Духовность</h3>
+        <p>
+            {{ result.advanced.spirituality.description }}
+        </p>
+        <h3>Кармические задачи</h3>
+        <ul>
+        {% for item in result.advanced.karma %}
+            <li>{{ item }}</li>
+        {% endfor %}
+        </ul>
+    </div>
+</section>
+{% endif %}

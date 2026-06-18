@@ -4,32 +4,24 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6eb95a8b-e607-44a0-8ef5-a6183af34a1e" name="Changes" comment="Genesys .2.0-PRO 25\04\2026&#10;full working">
-      <change afterPath="$PROJECT_DIR$/admin/evolution.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/public_offer.docx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/components/BotBuilder.tsx" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/src/config/bot_modules.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/frontend/tailwind.config.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mobile_app/main.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/initiation.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/profile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/profile_back_up_300426.html" afterDir="false" />
+    <list default="true" id="6eb95a8b-e607-44a0-8ef5-a6183af34a1e" name="Changes" comment="Genesys .5.0-PRO 07\06\2026&#10;upd_max">
+      <change afterPath="$PROJECT_DIR$/core/competency_registry.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/import_engine.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/import_validator.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/profession_importer.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/seed_competencies.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/services/profession_importer.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/admin/import_center.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/admin/profession_mapping.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/instance/genesis_v2.db" beforeDir="false" afterPath="$PROJECT_DIR$/instance/genesis_v2.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/archetype_content_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/archetype_content_service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/career_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/core/career_service.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nexus/nexus_hub.html" beforeDir="false" afterPath="$PROJECT_DIR$/nexus/nexus_hub.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nexus/profile.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/admin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/auth.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/profile.py" beforeDir="false" afterPath="$PROJECT_DIR$/routes/profile.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/email_template.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/emails/email_template.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/profile.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/разовые сервисные/fix_db.py" beforeDir="false" afterPath="$PROJECT_DIR$/разовые сервисные/fix_db.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/разовые сервисные/seed_genesis.py" beforeDir="false" afterPath="$PROJECT_DIR$/seed_genesis.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/admin/archetype_mapping.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/archetype_mapping.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/admin/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/admin/nexus_hub.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin/nexus_hub.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,8 +31,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Python Script" />
         <option value="HTML File" />
+        <option value="Python Script" />
       </list>
     </option>
   </component>
@@ -57,8 +49,24 @@
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/BondarevEugene/numerology_project&quot;,
     &quot;accountId&quot;: &quot;a5bc0d04-974a-4304-8acc-2987b417382a&quot;
+  },
+  &quot;recentNewPullRequestHead&quot;: {
+    &quot;server&quot;: {
+      &quot;useHttp&quot;: false,
+      &quot;host&quot;: &quot;github.com&quot;,
+      &quot;port&quot;: null,
+      &quot;suffix&quot;: null
+    },
+    &quot;owner&quot;: &quot;BondarevEugene&quot;,
+    &quot;repository&quot;: &quot;numerology_project&quot;
   }
 }</component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/templates/index.html" root0="SKIP_INSPECTION" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6
 }</component>
@@ -72,33 +80,36 @@
     <option name="showLibraryContents" value="true" />
     <option name="showMembers" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
-    &quot;Python.admin.executor&quot;: &quot;Run&quot;,
-    &quot;Python.app.executor&quot;: &quot;Run&quot;,
-    &quot;Python.fix_db.executor&quot;: &quot;Run&quot;,
-    &quot;Python.force_update.executor&quot;: &quot;Run&quot;,
-    &quot;Python.init_db_LK.executor&quot;: &quot;Run&quot;,
-    &quot;Python.main.executor&quot;: &quot;Run&quot;,
-    &quot;Python.seed_genesis.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;Shell Script.deploy.sh.executor&quot;: &quot;Run&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;#3 on master__new__fetch&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/bonda/PycharmProjects/Personal_Web_Spase&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.appearance&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultHtmlFileTemplate": "HTML File",
+    "Python.admin.executor": "Run",
+    "Python.app.executor": "Run",
+    "Python.fix_db.executor": "Run",
+    "Python.force_update.executor": "Run",
+    "Python.init_db_LK.executor": "Run",
+    "Python.main.executor": "Run",
+    "Python.seed_genesis.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "Shell Script.deploy.sh.executor": "Run",
+    "git-widget-placeholder": "master__new__fetch",
+    "last_opened_file_path": "C:/Users/bonda/PycharmProjects/numerology_project/templates/admin",
+    "settings.editor.selected.configurable": "editor.preferences.appearance"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\bonda\PycharmProjects\numerology_project\templates\admin" />
+      <recent name="C:\Users\bonda\PycharmProjects\numerology_project\templates_v3" />
+      <recent name="C:\Users\bonda\PycharmProjects\numerology_project\archive" />
       <recent name="C:\Users\bonda\PycharmProjects\numerology_project\templates" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\bonda\PycharmProjects\numerology_project\frontend\src\components" />
-      <recent name="C:\Users\bonda\PycharmProjects\numerology_project" />
-      <recent name="C:\Users\bonda\PycharmProjects\numerology_project\static\docs" />
-      <recent name="C:\Users\bonda\PycharmProjects\numerology_project\разовые сервисные" />
-      <recent name="C:\Users\bonda\PycharmProjects\numerology_project\templates\emails" />
+      <recent name="C:\Users\bonda\PycharmProjects\numerology_project\templates\admin" />
+      <recent name="C:\Users\bonda\PycharmProjects\numerology_project\archive" />
+      <recent name="C:\Users\bonda\PycharmProjects\numerology_project\core" />
+      <recent name="C:\Users\bonda\PycharmProjects\numerology_project\archive\Front" />
+      <recent name="C:\Users\bonda\PycharmProjects\numerology_project\archive\templates_v3_root" />
     </key>
   </component>
   <component name="RunManager" selected="Python.app">
@@ -270,7 +281,23 @@
       <option name="project" value="LOCAL" />
       <updated>1777108384893</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Genesys .4.0-PRO 12\05\2026&#10;full working">
+      <option name="closed" value="true" />
+      <created>1778591604599</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1778591604599</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Genesys .5.0-PRO 07\06\2026&#10;upd_max">
+      <option name="closed" value="true" />
+      <created>1780817637022</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1780817637022</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -288,6 +315,8 @@
     <MESSAGE value="&quot;fix error 500 and update lila portal&quot;" />
     <MESSAGE value="пред ФИНАЛЬНАЯ РАБОЧАЯ ВЕРСИЯ 9.13 220426" />
     <MESSAGE value="Genesys .2.0-PRO 25\04\2026&#10;full working" />
-    <option name="LAST_COMMIT_MESSAGE" value="Genesys .2.0-PRO 25\04\2026&#10;full working" />
+    <MESSAGE value="Genesys .4.0-PRO 12\05\2026&#10;full working" />
+    <MESSAGE value="Genesys .5.0-PRO 07\06\2026&#10;upd_max" />
+    <option name="LAST_COMMIT_MESSAGE" value="Genesys .5.0-PRO 07\06\2026&#10;upd_max" />
   </component>
 </project>

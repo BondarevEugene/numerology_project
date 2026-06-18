@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<body style="background-color: #030303; font-family: sans-serif; padding: 40px;">
+    <div style="max-width: 500px; margin: 0 auto; background: #0a0a0a; border: 2px solid #b89b5e; padding: 40px; color: #ffffff;">
+        <h2 style="color: #b89b5e; text-align: center; letter-spacing: 3px;">ЗАПРОС ВОССТАНОВЛЕНИЯ</h2>
+        <p style="font-size: 14px; line-height: 1.6; color: #dcdcdc;">
+            Система зафиксировала попытку сброса пароля для вашего аккаунта. Если это были вы, используйте временный токен ниже для генерации новой фразы доступа.
+        </p>
+        <div style="background: rgba(184, 155, 94, 0.1); border-left: 4px solid #b89b5e; padding: 15px; margin: 25px 0;">
+            <p style="margin: 0; font-size: 12px; color: #b89b5e;">SECURITY_TOKEN:</p>
+            <p style="margin: 5px 0 0 0; font-family: monospace; font-size: 18px; letter-spacing: 2px;">{{ reset_code }}</p>
+        </div>
+        <p style="font-size: 12px; color: #888;">Срок действия токена: 30 минут. Если вы не запрашивали смену данных, просто проигнорируйте это сообщение.</p>
+        <center>
+            <a href="{{ reset_url }}" style="color: #000; background: #b89b5e; padding: 15px 30px; text-decoration: none; font-weight: bold; display: block; margin-top: 20px;">СБРОСИТЬ ПАРОЛЬ</a>
+        </center>
+    </div>
+</body>
+</html>

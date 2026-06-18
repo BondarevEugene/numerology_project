@@ -1,0 +1,42 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<h1>
+   Архетип {{ item.number }}
+</h1>
+<form method="post">
+   <div class="card">
+      <p>Номер</p>
+      <input type="text" name="number" value="{{ item.number }}" style="width:100%;">
+      <p>Название</p>
+      <input type="text" name="title" value="{{ item.title }}" style="width:100%;">
+      <p>Планета</p>
+      <input type="text" name="planet" value="{{ item.planet }}" style="width:100%;">
+      <p>Стихия</p>
+      <input type="text" name="element" value="{{ item.element }}" style="width:100%;">
+      <p>Сила действия</p>
+      <textarea name="action_power" rows="6" style="width:100%;">{{ item.action_power }}</textarea>
+      <p>Теневая сторона</p>
+      <textarea name="shadow_side" rows="6" style="width:100%;">{{ item.shadow_side }}</textarea>
+      <p>Точка роста</p>
+      <textarea name="growth_point" rows="6" style="width:100%;">{{ item.growth_point }}</textarea>
+      <p>Реализация</p>
+      <textarea name="realization" rows="6" style="width:100%;">{{ item.realization }}</textarea>
+      <p>Кармические задачи</p>
+      <textarea name="karmic_tasks" rows="6" style="width:100%;">{{ item.karmic_tasks }}</textarea>
+      <p>Финансы</p>
+      <textarea name="financial_tip" rows="6" style="width:100%;">{{ item.financial_tip }}</textarea>
+      <p>Партнер</p>
+      <textarea name="partner_type" rows="6" style="width:100%;">{{ item.partner_type }}</textarea>
+      <p>Здоровье</p>
+      <textarea name="health_tips" rows="6" style="width:100%;">{{ item.health_tips }}</textarea>
+      <p>Сила разума</p>
+      <textarea name="mind_power" rows="6" style="width:100%;">{{ item.mind_power }}</textarea>
+      <p>Итог жизни</p>
+      <textarea name="life_result" rows="6" style="width:100%;">{{ item.life_result }}</textarea>
+      <br><br>
+      <button type="submit">
+      Сохранить
+      </button>
+   </div>
+</form>
+{% endblock %}

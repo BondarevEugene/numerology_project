@@ -1,0 +1,36 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<h1>Новый архетип</h1>
+<form method="post">
+   <div class="card">
+      <p>Номер</p>
+      <input
+         type="text"
+         name="number"
+         style="width:100%;padding:10px;"
+         >
+      <p>Название</p>
+      <input
+         type="text"
+         name="title"
+         style="width:100%;padding:10px;"
+         >
+      <p>Планета</p>
+      <input
+         type="text"
+         name="planet"
+         style="width:100%;padding:10px;"
+         >
+      <p>Стихия</p>
+      <input
+         type="text"
+         name="element"
+         style="width:100%;padding:10px;"
+         >
+      <br><br>
+      <button type="submit">
+      Сохранить
+      </button>
+   </div>
+</form>
+{% endblock %}

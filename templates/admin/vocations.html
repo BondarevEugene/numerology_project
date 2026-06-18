@@ -1,0 +1,109 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<h1>Карьерный интеллект</h1>
+<div class="card">
+   <h3>Статистика</h3>
+   <div>
+      Всего профессий:
+      <b>{{ content|length }}</b>
+   </div>
+   <br>
+   <div>
+      <a href="/admin/vocations">Все</a>
+      {% for n in range(1,10) %}
+      | <a href="/admin/vocations?number={{ n }}">
+      {{ n }} </a>
+      {% endfor %}
+   </div>
+</div>
+<div class="card">
+   <form method="get">
+      <input
+         type="text"
+         name="q"
+         placeholder="Поиск по названию, ключевым словам, категории..."
+         value="{{ request.args.get('q','') }}"
+         style="
+         width:350px;
+         padding:10px;
+         background:#111;
+         color:#b89b5e;
+         border:1px solid rgba(184,155,94,.2);
+         ">
+      <select
+         name="sort"
+         style="
+         padding:10px;
+         background:#111;
+         color:#b89b5e;
+         border:1px solid rgba(184,155,94,.2);
+         ">
+         <option value="number">
+            По числу
+         </option>
+         <option value="title">
+            По названию
+         </option>
+         <option value="compatibility_desc">
+            Совместимость ↓
+         </option>
+         <option value="compatibility_asc">
+            Совместимость ↑
+         </option>
+      </select>
+      <button type="submit">
+      Поиск
+      </button>
+      <a href="/admin/vocations/new">
+      ➕ Добавить
+      </a>
+      <a href="/admin/vocations/import">
+      📥 Импорт
+      </a>
+   </form>
+</div>
+<table style="width:100%;border-collapse:collapse;">
+   <tr>
+      <th>ID</th>
+      <th>Число</th>
+      <th>EN</th>
+      <th>RU</th>
+      <th>UA</th>
+      <th>Совм.</th>
+      <th>Активна</th>
+      <th>Действия</th>
+   </tr>
+   {% for item in content %}
+   <tr style="border-bottom:1px solid rgba(184,155,94,.15);">
+      <td>{{ item.id }}</td>
+      <td>{{ item.vector_id }}</td>
+      <td>{{ item.title_en }}</td>
+      <td>{{ item.title_ru }}</td>
+      <td>{{ item.title_ua }}</td>
+      <td>{{ item.compatibility_rate }}%</td>
+      <td>
+         {% if item.is_active %}
+         ✓
+         {% else %}
+         ✗
+         {% endif %}
+      </td>
+      <td>
+         <a href="/admin/vocations/edit/{{ item.id }}">
+         ✏
+         </a>
+         |
+         <a href="/admin/vocations/clone/{{ item.id }}">
+         📄
+         </a>
+         |
+         <a
+            href="/admin/vocations/delete/{{ item.id }}"
+            onclick="return confirm('Удалить запись?');"
+            >
+         🗑 </a>
+      </td>
+   </tr>
+   {% endfor %}
+</table>
+{% endblock %}

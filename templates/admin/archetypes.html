@@ -1,0 +1,20 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<h1>Архетипы</h1>
+<p>
+   <a href="/admin/archetypes/new">
+   ➕ Добавить архетип
+   </a>
+</p>
+{% for item in content %}
+<div class="card">
+   <b>{{ item.number }}</b>
+   —
+   {{ item.title }}
+   <br><br>
+   <a href="/admin/archetypes/edit/{{ item.id }}">
+   Редактировать
+   </a>
+</div>
+{% endfor %}
+{% endblock %}

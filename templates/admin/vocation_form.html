@@ -1,0 +1,30 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<h1>Новая профессия</h1>
+<form method="post">
+   <div class="card">
+      <p>Число</p>
+      <input type="text" name="vector_id" style="width:100%;">
+      <p>Категория</p>
+      <input type="text" name="category" style="width:100%;">
+      <p>Профессия</p>
+      <input type="text" name="vocation_title" style="width:100%;">
+      <p>Навыки</p>
+      <textarea name="skill_stack" rows="5" style="width:100%;"></textarea>
+      <p>Доход</p>
+      <input type="text" name="income_potential" style="width:100%;">
+      <p>Совместимость</p>
+      <input type="number" name="compatibility_rate" style="width:100%;">
+      <p>Риски</p>
+      <textarea name="shadow_risk" rows="5" style="width:100%;"></textarea>
+      <p>Стратегическая роль</p>
+      <input type="text" name="strategic_role" style="width:100%;">
+      <p>Миссия</p>
+      <textarea name="mission_statement" rows="6" style="width:100%;"></textarea>
+      <br><br>
+      <button type="submit">
+      Сохранить
+      </button>
+   </div>
+</form>
+{% endblock %}

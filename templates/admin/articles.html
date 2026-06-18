@@ -1,0 +1,11 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<h1>TEST PAGE</h1>
+<div class="card">
+{% for item in content %}
+<div>
+{{ item.id }}
+</div>
+{% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,182 @@
+{% extends "admin/base.html" %}
+{% block content %}
+
+<div class="page-header">
+
+```
+<div class="page-title">
+    📚 Genesis Content Hub
+</div>
+
+<div class="page-subtitle">
+    Knowledge Layer Management Center
+</div>
+```
+
+</div>
+
+<div class="kpi-grid">
+
+```
+<div class="kpi-card">
+
+    <div class="kpi-label">
+        Archetypes
+    </div>
+
+    <div class="kpi-number">
+        {{ stats.archetypes }}
+    </div>
+
+    <br>
+
+    <a
+        href="/admin/archetypes"
+        class="btn btn-gold">
+
+        Open Studio
+
+    </a>
+
+</div>
+
+<div class="kpi-card">
+
+    <div class="kpi-label">
+        Articles
+    </div>
+
+    <div class="kpi-number">
+        {{ stats.articles }}
+    </div>
+
+    <br>
+
+    <a
+        href="/admin/articles"
+        class="btn btn-gold">
+
+        Open Studio
+
+    </a>
+
+</div>
+
+<div class="kpi-card">
+
+    <div class="kpi-label">
+        Daily Coach
+    </div>
+
+    <div class="kpi-number">
+        {{ stats.daily_coach }}
+    </div>
+
+    <br>
+
+    <a
+        href="/admin/tips"
+        class="btn btn-gold">
+
+        Open Studio
+
+    </a>
+
+</div>
+
+<div class="kpi-card">
+
+    <div class="kpi-label">
+        Protocols
+    </div>
+
+    <div class="kpi-number">
+        {{ stats.protocols }}
+    </div>
+
+    <br>
+
+    <a
+        href="/admin/protocols"
+        class="btn btn-gold">
+
+        Open Studio
+
+    </a>
+
+</div>
+
+<div class="kpi-card">
+
+    <div class="kpi-label">
+        Professions
+    </div>
+
+    <div class="kpi-number">
+        {{ stats.professions }}
+    </div>
+
+    <br>
+
+    <a
+        href="/admin/professions"
+        class="btn btn-gold">
+
+        Open Studio
+
+    </a>
+
+</div>
+```
+
+</div>
+
+<div class="section-card">
+
+```
+<div class="section-title">
+    CONTENT HEALTH
+</div>
+
+<div class="badge badge-success">
+    Archetype Engine Active
+</div>
+
+<div class="badge badge-success">
+    Daily Coach Active
+</div>
+
+<div class="badge badge-success">
+    Protocol Engine Active
+</div>
+
+<div class="badge badge-success">
+    Profession Layer Active
+</div>
+```
+
+</div>
+
+<div class="section-card">
+
+```
+<div class="section-title">
+    FUTURE AI TOOLS
+</div>
+
+<div class="badge badge-warning">
+    AI Content Audit
+</div>
+
+<div class="badge badge-warning">
+    AI Duplicate Finder
+</div>
+
+<div class="badge badge-warning">
+    AI Translation Review
+</div>
+```
+
+</div>
+
+{% endblock %}

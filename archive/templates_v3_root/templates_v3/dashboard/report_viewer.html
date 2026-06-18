@@ -1,0 +1,19 @@
+{% if result and result.interpretation %}
+
+<section class="genesis-panel report-viewer">
+
+    <div class="panel-header">
+
+        GENESIS INTERPRETATION
+
+    </div>
+
+    <div class="report-content">
+
+        {{ result.interpretation | safe }}
+
+    </div>
+
+</section>
+
+{% endif %}

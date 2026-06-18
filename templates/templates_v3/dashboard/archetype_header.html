@@ -1,0 +1,57 @@
+{% if result %}
+
+<section class="archetype-header">
+
+    <div class="archetype-number">
+        {{ result.number }}
+    </div>
+
+    <div class="archetype-content">
+
+        <h1>
+
+            {{ result.title
+                | replace('᚛','')
+                | replace('᚜','') }}
+
+        </h1>
+
+        <div class="archetype-meta">
+
+            <div>
+
+                Планета:
+
+                <span>
+                    {{ result.planet }}
+                </span>
+
+            </div>
+
+            <div>
+
+                Стихия:
+
+                <span>
+                    {{ result.element }}
+                </span>
+
+            </div>
+
+            <div>
+
+                Вектор:
+
+                <span>
+                    {{ result.number }}
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endif %}

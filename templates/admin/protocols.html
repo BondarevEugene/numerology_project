@@ -1,0 +1,9 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<h1>Протоколы</h1>
+{% for item in content %}
+<div class="card">
+   {{ item.title }}
+</div>
+{% endfor %}
+{% endblock %}

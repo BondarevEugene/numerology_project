@@ -1,0 +1,43 @@
+{% if result and result.jobs %}
+
+<section class="genesis-panel">
+
+    <div class="panel-header">
+
+        PROFESSIONAL RESONANCE
+
+    </div>
+
+    <div class="career-subtitle">
+
+        Рекомендуемые профессиональные направления
+
+    </div>
+
+    <div class="career-grid">
+
+        {% for job in result.jobs %}
+
+            <div class="career-card">
+
+                <div class="career-icon">
+
+                    ⬢
+
+                </div>
+
+                <div class="career-title">
+
+                    {{ job }}
+
+                </div>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+{% endif %}

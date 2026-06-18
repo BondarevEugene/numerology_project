@@ -1,0 +1,147 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<div class="action-toolbar">
+    <button class="btn btn-gold">
+        Auto Build
+    </button>
+    <button class="btn btn-gold">
+        Save Profile
+    </button>
+</div>
+<div class="page-header">
+   <div class="page-title">
+      🧠 Genesis Archetype Intelligence Matrix
+   </div>
+   <div class="page-subtitle">
+      Human Capability Modeling Engine
+   </div>
+</div>
+<div class="kpi-grid">
+   <div class="kpi-card">
+      <div class="kpi-label">
+         Archetypes
+      </div>
+      <div class="kpi-number">
+         9
+      </div>
+   </div>
+   <div class="kpi-card">
+      <div class="kpi-label">
+         Competencies
+      </div>
+      <div class="kpi-number">
+         40
+      </div>
+   </div>
+   <div class="kpi-card">
+      <div class="kpi-label">
+         Matrix Cells
+      </div>
+      <div class="kpi-number">
+         360
+      </div>
+   </div>
+   <div class="kpi-card">
+      <div class="kpi-label">
+         Engine Status
+      </div>
+      <div class="kpi-number">
+         ONLINE
+      </div>
+   </div>
+</div>
+<div class="career-layout">
+   <div class="career-main">
+      {% for archetype, profile in profiles.items() %}
+      <div class="section-card">
+         <div class="section-title">
+            ARCHETYPE {{ archetype }}
+            •
+            {{ profile.title }}
+         </div>
+         <div class="kpi-grid">
+            <div class="kpi-card">
+               <div class="kpi-label">
+                  PRIMARY
+               </div>
+               {% for item in profile.primary %}
+               <div class="badge badge-success">
+                  {{ item }}
+               </div>
+               {% endfor %}
+            </div>
+            <div class="kpi-card">
+               <div class="kpi-label">
+                  SECONDARY
+               </div>
+               {% for item in profile.secondary %}
+               <div class="badge badge-warning">
+                  {{ item }}
+               </div>
+               {% endfor %}
+            </div>
+            <div class="kpi-card">
+               <div class="kpi-label">
+                  LOW
+               </div>
+               {% for item in profile.low %}
+               <div class="badge badge-error">
+                  {{ item }}
+               </div>
+               {% endfor %}
+            </div>
+         </div>
+      </div>
+      {% endfor %}
+   </div>
+   <div class="career-sidebar">
+      <div class="section-card">
+         <div class="section-title">
+            MATRIX EXPLAINER
+         </div>
+         <p>
+            Primary = 90
+         </p>
+         <p>
+            Secondary = 75
+         </p>
+         <p>
+            Normal = 55
+         </p>
+         <p>
+            Low = 35
+         </p>
+      </div>
+      <div class="section-card">
+         <div class="section-title">
+            MATCHING MODEL
+         </div>
+         <pre>
+Archetype
+    ↓
+Competencies
+    ↓
+Profession
+    ↓
+Resonance
+            </pre>
+      </div>
+      <div class="section-card">
+         <div class="section-title">
+            NEXT MODULES
+         </div>
+         <div class="badge badge-success">
+            Archetype Profiles
+         </div>
+         <br><br>
+         <div class="badge badge-warning">
+            Profession Mapping
+         </div>
+         <br><br>
+         <div class="badge badge-warning">
+            Recommendation Lab
+         </div>
+      </div>
+   </div>
+</div>
+{% endblock %}

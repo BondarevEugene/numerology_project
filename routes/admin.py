@@ -1,180 +1,2088 @@
-"""
---------------------------------------------------------------------------------
-MODULE: admin.py
-PROJECT: Genesis HR® | Intelligence Systems
-VERSION: 2.2.1 (Stability Fix)
-DATE: 2024-05-21
-DESCRIPTION: Administrative Console & Nexus Orchestrator Logic.
---------------------------------------------------------------------------------
-"""
+from datetime import datetime
 
-import os
-import re
-import importlib
-import inspect
-from flask import Blueprint, render_template, request, jsonify, current_app
-from models import db, ArchetypeContent
-from flask_login import login_required, current_user # Добавьте login_required здесь
+from flask import (
+    Blueprint,
+    render_template,
+    request,
+    redirect,
+    flash
+)
+from werkzeug.utils import secure_filename
 
-admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
+from sqlalchemy import or_
 
-# --- [ СЕКЦИЯ: ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ] ---
+from flask_login import login_required
 
-def scan_blueprint_fields(filepath):
-    """[ SYNAPSE: CODE SCANNER ]"""
-    if not filepath or not os.path.exists(filepath): return []
-    found = set()
-    try:
-        with open(filepath, 'r', encoding='utf-8') as f:
-            content = f.read()
-            found.update(re.findall(r"request\.(?:form|args)\.get\(['\"](\w+)['\"]", content))
-            found.update(re.findall(r"def (nexus_\w+)", content))
-    except: pass
-    return sorted(list(found))
+from flask import url_for
 
-# --- [ СЕКЦИЯ: УПРАВЛЕНИЕ КОНТЕНТОМ ] ---
+from core.admin_helpers import get_search_query
+from core.admin_stats import build_stats
 
+from core.archetype_profiles import (ARCHETYPE_PROFILES)
+
+from models import (
+    db,
+    ArchetypeContent,
+    ArchetypeCompetency,
+    Article,
+    Competency,
+    DailyCoachTip,
+    EvolutionProtocol,
+    SessionArchive,
+    Profession,
+    ProfessionContent,
+    ProfessionCompetency,
+    VocationIntelligence,
+    VocationCompatibility,
+    User
+)
+
+import time
+
+from flask import jsonify
+
+from core.archetype_profiles import (
+    ARCHETYPE_PROFILES
+)
+
+admin_bp = Blueprint(
+    'admin',
+    __name__,
+    url_prefix='/admin'
+)
+
+from core.import_engine import (
+    ImportEngine
+)
+
+from models import (
+    ImportJob
+)
+
+
+# ================================ CODE ROUTES ==========================
 @admin_bp.route('/')
-def admin_panel():
-    return render_template('admin.html')
-
-@admin_bp.route('/get/<number>')
-def get_content(number):
-    try:
-        item = ArchetypeContent.query.filter_by(number=str(number)).first()
-        if item:
-            columns = [c.name for c in item.__table__.columns if c.name != 'id']
-            data = {col: getattr(item, col) or "" for col in columns}
-            return jsonify({"status": "success", "data": data})
-        return jsonify({"status": "error", "message": "Аркан не найден"}), 404
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
-
-@admin_bp.route('/update', methods=['POST'])
-def update_content():
-    try:
-        data = request.json
-        number = str(data.get('number'))
-        item = ArchetypeContent.query.filter_by(number=number).first()
-        if not item:
-            item = ArchetypeContent(number=number)
-            db.session.add(item)
-
-        fields = ['title', 'planet', 'element', 'tarot_arcane', 'action_power', 'shadow_side',
-                  'growth_point', 'realization', 'karmic_tasks', 'development_cycle',
-                  'mind_power', 'life_result', 'partner_type', 'financial_tip',
-                  'health_tips', 'exit_minus', 'search_queries']
-        for field in fields:
-            if field in data: setattr(item, field, data.get(field))
-        db.session.commit()
-        return jsonify({"status": "success"})
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"status": "error", "message": str(e)}), 500
-
-# --- [ СЕКЦИЯ: NEXUS ORCHESTRATION ] ---
-
-@admin_bp.route('/get_menu_structure')
-def get_menu_structure():
-    """[ SYNAPSE: MENU GENERATOR ]"""
-    structure = {
-        "GENESIS": [
-            {"id": "main", "label": "Core Kernel", "url": "/"},
-            {"id": "admin", "label": "Control Panel", "url": "/admin/"}
-        ],
-        "HR_INTELLIGENCE": [
-            {"id": "profile", "label": "User Profiles", "url": "/profile/"},
-            {"id": "auth", "label": "Access Vault", "url": "/auth/login"}
-        ],
-        "LEELA_PATH": []
-    }
-    for name, bp in current_app.blueprints.items():
-        if name not in ['admin', 'main', 'auth', 'profile', 'static']:
-            structure["LEELA_PATH"].append({
-                "id": name, "label": name.upper().replace('_', ' '), "url": f"/{name}/"
-            })
-    return jsonify(structure)
-
-@admin_bp.route('/nexus/nodes')
-def nexus_nodes():
-    nodes = []
-    edges = []
-    try:
-        nodes.append({"data": {"id": "ADMIN", "label": "IL_CENTRO", "type": "center"}})
-        nodes.append({"data": {"id": "DATABASE", "label": "BIBLIOTECA", "type": "database"}})
-        edges.append({"data": {"source": "ADMIN", "target": "DATABASE"}})
-        for name, bp in current_app.blueprints.items():
-            if name == 'admin': continue
-            nodes.append({"data": {"id": name.upper(), "label": name.upper(), "type": "module"}})
-            edges.append({"data": {"source": "ADMIN", "target": name.upper()}})
-        return jsonify({"nodes": nodes, "edges": edges})
-    except Exception as e: return jsonify({"status": "error", "message": str(e)}), 500
-
-@admin_bp.route('/nexus/forge', methods=['POST'])
-def nexus_forge():
-    """[ PROTOCOL: THE FORGE ]"""
-    try:
-        data = request.json
-        raw_name = data.get('name', '').strip()
-        if not raw_name: return jsonify({"status": "error", "message": "Empty name"}), 400
-        module_id = re.sub(r'[^a-zA-Z0-9_]', '', raw_name).lower()
-        filename = f"blueprint_{module_id}.py"
-        filepath = os.path.join(current_app.root_path, filename)
-
-        if os.path.exists(filepath): return jsonify({"status": "error", "message": "Exists"}), 400
-
-        template = f"from flask import Blueprint\n{module_id}_bp = Blueprint('{module_id}', __name__)\n"
-        with open(filepath, 'w', encoding='utf-8') as f: f.write(template)
-        return jsonify({"status": "success", "message": f"Module {filename} forged."})
-    except Exception as e: return jsonify({"status": "error", "message": str(e)}), 500
-
-@admin_bp.route('/sync')
-def admin_sync():
-    """[ OPERATION: DATA REFLECTION ]"""
-    try:
-        from services import sync_data_to_local
-        if sync_data_to_local(): return "✅ Synced", 200
-        return "❌ Sync Error", 500
-    except Exception as e: return f"❌ Error: {str(e)}", 500
-
-
-@admin_bp.route('/evolution/manage', methods=['GET', 'POST'])
 @login_required
-# Здесь должен быть декоратор проверки прав админа (например, current_user.is_admin)
-def manage_evolution():
-    if request.method == 'POST':
-        # Логика добавления нового протокола
-        new_p = EvolutionProtocol(
-            category=request.form.get('category'),
-            sector_trigger=request.form.get('sector'),
-            condition=request.form.get('condition'),
-            title=request.form.get('title'),
-            content=request.form.get('content'),
-            xp_reward=int(request.form.get('xp', 50))
-        )
-        db.session.add(new_p)
-        db.session.commit()
+def dashboard():
+    platform_stats = {
 
-    protocols = EvolutionProtocol.query.all()
-    return render_template('admin/evolution.html', protocols=protocols)
+        "users":
+            User.query.count(),
+        "sessions":
+            0,
+        "articles":
+            Article.query.count(),
+        "protocols":
+            EvolutionProtocol.query.count()
+    }
+
+    knowledge_stats = {
+
+        "archetypes":
+            ArchetypeContent.query.count(),
+        "professions":
+            ProfessionContent.query.count(),
+        "daily_coach":
+            DailyCoachTip.query.count()
+    }
+
+    career_stats = {
+
+        "records":
+            VocationIntelligence.query.count(),
+        "missing_ru":
+            VocationIntelligence.query.filter(
+                or_(
+                    VocationIntelligence.title_ru == None,
+                    VocationIntelligence.title_ru == ''
+                )
+            ).count(),
+
+        "missing_ua":
+            VocationIntelligence.query.filter(
+                or_(
+                    VocationIntelligence.title_ua == None,
+                    VocationIntelligence.title_ua == ''
+                )
+            ).count(),
+
+        "missing_keywords":
+            VocationIntelligence.query.filter(
+                or_(
+                    VocationIntelligence.keywords == None,
+                    VocationIntelligence.keywords == ''
+                )
+            ).count(),
+
+        "missing_category":
+            VocationIntelligence.query.filter(
+                or_(
+                    VocationIntelligence.category == None,
+                    VocationIntelligence.category == ''
+                )
+            ).count()
+
+    }
+
+    nexus_stats = {
+
+        "graph":
+            "PLANNED",
+
+        "orchestrator":
+            "PLANNED",
+
+        "automation":
+            "PLANNED",
+
+        "inspector":
+            "PLANNED"
+
+    }
+    audit = []
+    for n in range(1, 10):
+        vocation_count = (
+            VocationIntelligence
+            .query
+            .filter_by(
+                vector_id=n
+            )
+            .count()
+        )
+        if vocation_count == 0:
+            audit.append(
+                f"Нет профессий для числа {n}"
+            )
+    for n in range(1, 10):
+        archetype_count = (
+            ArchetypeContent
+            .query
+            .filter_by(
+                number=str(n)
+            )
+            .count()
+        )
+        if archetype_count == 0:
+            audit.append(
+                f"Нет архетипа {n}"
+            )
+    # TEMP DISABLED
+    # for n in range(1, 10):
+    #     tips_count = (
+    #         DailyCoachTip
+    #         .query
+    #         .filter_by(
+    #             number=str(n)
+    #         )
+    #         .count()
+    #     )
+    #     if tips_count == 0:
+    #         audit.append(
+    #             f"Нет Daily Coach для числа {n}"
+    #         )
+    return render_template(
+        'admin/dashboard.html',
+        platform_stats=platform_stats,
+        knowledge_stats=knowledge_stats,
+        career_stats=career_stats,
+        nexus_stats=nexus_stats,
+        audit=audit
+    )
+
+
+@admin_bp.route('/users')
+@login_required
+def users():
+    content = (
+        User
+        .query
+        .all()
+    )
+
+    return render_template(
+        'admin/users.html',
+        content=content
+    )
+
+
+@admin_bp.route('/protocols')
+@login_required
+def protocols():
+    content = (
+        EvolutionProtocol
+        .query
+        .all()
+    )
+
+    return render_template(
+        'admin/protocols.html',
+        content=content
+    )
+
 
 @admin_bp.route('/archetypes')
 @login_required
-def manage_archetypes():
-    # Проверка на админа (если у вас есть поле is_admin)
-    # if not current_user.is_admin: return "Access Denied", 403
-    all_content = ArchetypeContent.query.order_by(ArchetypeContent.number).all()
-    return render_template('admin/archetypes.html', content=all_content)
+def archetypes():
+    content = (
+        ArchetypeContent
+        .query
+        .order_by(
+            ArchetypeContent.number
+        )
+        .all()
+    )
 
-@admin_bp.route('/archetypes/edit/<int:id>', methods=['GET', 'POST'])
+    return render_template(
+        'admin/archetypes.html',
+        content=content
+    )
+
+
+@admin_bp.route('/professions')
 @login_required
-def edit_archetype(id):
-    item = ArchetypeContent.query.get_or_404(id)
+def professions():
+    content = (
+        ProfessionContent
+        .query
+        .order_by(
+            ProfessionContent.number
+        )
+        .all()
+    )
+
+    return render_template(
+        'admin/professions.html',
+        content=content
+    )
+
+
+@admin_bp.route('/tips')
+@login_required
+def tips():
+    content = (
+        DailyCoachTip
+        .query
+        .order_by(
+            DailyCoachTip.archetype_id
+        )
+        .all()
+    )
+
+    return render_template(
+        'admin/tips.html',
+        content=content
+    )
+
+
+@admin_bp.route('/articles')
+@login_required
+def articles():
+    content = (
+        Article
+        .query
+        .all()
+    )
+
+    return render_template(
+        'admin/articles.html',
+        content=content
+    )
+
+
+'''@admin_bp.route('/courses')
+@login_required
+def courses():
+
+    content = (
+        Course
+        .query
+        .all()
+    )
+
+    return render_template(
+        'admin/courses.html',
+        content=content
+    )'''
+
+
+@admin_bp.route('/archetypes/new', methods=['GET', 'POST'])
+@login_required
+def archetype_new():
     if request.method == 'POST':
-        item.title = request.form.get('title')
-        item.content = request.form.get('content')
-        item.shadow = request.form.get('shadow')
-        item.advice = request.form.get('advice')
+        item = ArchetypeContent()
+        item.number = request.form.get(
+            'number'
+        )
+        item.title = request.form.get(
+            'title'
+        )
+        item.planet = request.form.get(
+            'planet'
+        )
+        item.element = request.form.get(
+            'element'
+        )
+        db.session.add(
+            item
+        )
         db.session.commit()
-        return redirect(url_for('admin.manage_archetypes'))
-    return render_template('admin/edit_archetype.html', item=item)
+        return redirect(
+            '/admin/archetypes'
+        )
+    return render_template(
+        'admin/archetype_form.html',
+        item=None
+    )
+
+
+@admin_bp.route(
+    '/archetypes/edit/<int:item_id>',
+    methods=['GET', 'POST']
+)
+@login_required
+def archetype_edit(item_id):
+    item = ArchetypeContent.query.get_or_404(
+        item_id
+    )
+
+    if request.method == 'POST':
+        item.number = request.form.get(
+            'number'
+        )
+        item.title = request.form.get(
+            'title'
+        )
+        item.planet = request.form.get(
+            'planet'
+        )
+        item.element = request.form.get(
+            'element'
+        )
+        item.action_power = request.form.get(
+            'action_power'
+        )
+        item.shadow_side = request.form.get(
+            'shadow_side'
+        )
+        item.growth_point = request.form.get(
+            'growth_point'
+        )
+        item.realization = request.form.get(
+            'realization'
+        )
+        item.karmic_tasks = request.form.get(
+            'karmic_tasks'
+        )
+        item.financial_tip = request.form.get(
+            'financial_tip'
+        )
+        item.partner_type = request.form.get(
+            'partner_type'
+        )
+        item.health_tips = request.form.get(
+            'health_tips'
+        )
+        item.mind_power = request.form.get(
+            'mind_power'
+        )
+        item.life_result = request.form.get(
+            'life_result'
+        )
+        db.session.commit()
+        return redirect(
+            '/admin/archetypes'
+        )
+    return render_template(
+        'admin/archetype_edit.html',
+        item=item
+    )
+
+
+@admin_bp.route('/vocations')
+@login_required
+def vocations():
+    q = request.args.get(
+        'q',
+        ''
+    )
+    number = request.args.get(
+        'number',
+        ''
+    )
+    sort = request.args.get(
+        'sort',
+        'number'
+    )
+    query = (
+        VocationIntelligence
+        .query
+    )
+    # ПОИСК
+    if q:
+        query = query.filter(
+
+            or_(
+
+                VocationIntelligence
+                .title_en
+                .ilike(f"%{q}%"),
+
+                VocationIntelligence
+                .title_ru
+                .ilike(f"%{q}%"),
+
+                VocationIntelligence
+                .title_ua
+                .ilike(f"%{q}%"),
+
+                VocationIntelligence
+                .keywords
+                .ilike(f"%{q}%"),
+
+                VocationIntelligence
+                .category
+                .ilike(f"%{q}%"),
+
+                VocationIntelligence
+                .strategic_role
+                .ilike(f"%{q}%")
+            )
+        )
+    # ФИЛЬТР ПО ЧИСЛУ
+    if number:
+        query = query.filter(
+            VocationIntelligence.vector_id == int(number)
+        )
+    # СОРТИРОВКА
+    if sort == 'compatibility_desc':
+        query = query.order_by(
+            VocationIntelligence
+            .compatibility_rate
+            .desc()
+        )
+    elif sort == 'compatibility_asc':
+        query = query.order_by(
+            VocationIntelligence
+            .compatibility_rate
+            .asc()
+        )
+    elif sort == 'title':
+        query = query.order_by(
+            VocationIntelligence
+            .title_en
+            .asc()
+        )
+    else:
+        query = query.order_by(
+            VocationIntelligence
+            .vector_id
+            .asc()
+        )
+    content = query.all()
+    return render_template(
+        'admin/vocations.html',
+        content=content
+    )
+
+
+@admin_bp.route(
+    '/vocations/edit/<int:item_id>',
+    methods=['GET', 'POST']
+)
+@login_required
+def vocation_edit(item_id):
+    item = VocationIntelligence.query.get_or_404(
+        item_id
+    )
+    if request.method == 'POST':
+        item.vector_id = request.form.get(
+            'vector_id'
+        )
+        item.category = request.form.get(
+            'category'
+        )
+        item.vocation_title = request.form.get(
+            'vocation_title'
+        )
+        item.skill_stack = request.form.get(
+            'skill_stack'
+        )
+        item.income_potential = request.form.get(
+            'income_potential'
+        )
+        item.compatibility_rate = request.form.get(
+            'compatibility_rate'
+        )
+        item.shadow_risk = request.form.get(
+            'shadow_risk'
+        )
+        item.strategic_role = request.form.get(
+            'strategic_role'
+        )
+        item.mission_statement = request.form.get(
+            'mission_statement'
+        )
+        db.session.commit()
+        return redirect(
+            '/admin/vocations'
+        )
+    return render_template(
+        'admin/vocation_edit.html',
+        item=item
+    )
+
+
+@admin_bp.route(
+    '/vocations/delete/<int:item_id>'
+)
+@login_required
+def vocation_delete(item_id):
+    item = (
+        VocationIntelligence
+        .query
+        .get_or_404(item_id)
+    )
+    db.session.delete(
+        item
+    )
+    db.session.commit()
+    return redirect(
+        '/admin/vocations'
+    )
+
+
+@admin_bp.route(
+    '/vocations/new',
+    methods=['GET', 'POST']
+)
+@login_required
+def vocation_new():
+    if request.method == 'POST':
+        item = VocationIntelligence()
+        item.vector_id = request.form.get(
+            'vector_id'
+        )
+        item.category = request.form.get(
+            'category'
+        )
+        item.vocation_title = request.form.get(
+            'vocation_title'
+        )
+        item.skill_stack = request.form.get(
+            'skill_stack'
+        )
+        item.income_potential = request.form.get(
+            'income_potential'
+        )
+        item.compatibility_rate = request.form.get(
+            'compatibility_rate'
+        )
+        item.shadow_risk = request.form.get(
+            'shadow_risk'
+        )
+        item.strategic_role = request.form.get(
+            'strategic_role'
+        )
+        item.mission_statement = request.form.get(
+            'mission_statement'
+        )
+        db.session.add(
+            item
+        )
+        db.session.commit()
+        return redirect(
+            '/admin/vocations'
+        )
+    return render_template(
+        'admin/vocation_edit.html',
+        item=None
+    )
+
+
+@admin_bp.route(
+    '/vocations/import',
+    methods=['GET', 'POST']
+)
+@login_required
+def vocations_import():
+    if request.method == 'POST':
+        raw_text = request.form.get(
+            'content',
+            ''
+        )
+        lines = raw_text.splitlines()
+        created = 0
+        skipped = 0
+        for line in lines:
+            title = line.strip()
+            print("=" * 50)
+            print("IMPORT:", title)
+            if not title:
+                continue
+            slug = (
+                title
+                .lower()
+                .replace(' ', '-')
+                .replace('/', '-')
+            )
+            exists = (
+                VocationIntelligence
+                .query
+                .filter_by(
+                    slug=slug
+                )
+                .first()
+            )
+            if exists:
+                skipped += 1
+                continue
+            vocation = VocationIntelligence(
+                vector_id=1,  # временно для теста
+
+                slug=slug,
+
+                title_en=title,
+
+                vocation_title=title,
+
+                is_active=True,
+
+                created_at=datetime.utcnow(),
+
+                updated_at=datetime.utcnow()
+            )
+            db.session.add(
+                vocation
+            )
+            db.session.flush()
+            for n in range(1, 10):
+                compatibility = (
+                    VocationCompatibility(
+                        vocation_id=vocation.id,
+                        number=n,
+                        compatibility_rate=50
+                    )
+                )
+                db.session.add(
+                    compatibility
+                )
+            created += 1
+        print("CREATED:", created)
+        print("SKIPPED:", skipped)
+        db.session.commit()
+        flash(
+            f'Создано: {created}. '
+            f'Пропущено: {skipped}'
+        )
+        return redirect(
+            '/admin/vocations'
+        )
+    return render_template(
+        'admin/vocation_import.html'
+    )
+
+
+@admin_bp.route('/vocations/matrix')
+@login_required
+def vocation_matrix():
+    start_time = time.time()
+
+    q = request.args.get(
+        'q',
+        ''
+    )
+    audit = request.args.get(
+        'audit',
+        ''
+    )
+    query = (
+        VocationIntelligence
+        .query
+    )
+    if q:
+        query = query.filter(
+            or_(
+                VocationIntelligence
+                .title_en
+                .ilike(f"%{q}%"),
+                VocationIntelligence
+                .title_ru
+                .ilike(f"%{q}%"),
+                VocationIntelligence
+                .title_ua
+                .ilike(f"%{q}%"),
+                VocationIntelligence
+                .keywords
+                .ilike(f"%{q}%"),
+                VocationIntelligence
+                .category
+                .ilike(f"%{q}%")
+            )
+        )
+    # AUDIT FILTERS
+    if audit == 'missing_ru':
+        query = query.filter(
+            or_(
+                VocationIntelligence.title_ru == None,
+                VocationIntelligence.title_ru == ''
+            )
+        )
+    elif audit == 'missing_ua':
+        query = query.filter(
+            or_(
+                VocationIntelligence.title_ua == None,
+                VocationIntelligence.title_ua == ''
+            )
+        )
+    elif audit == 'missing_keywords':
+        query = query.filter(
+            or_(
+                VocationIntelligence.keywords == None,
+                VocationIntelligence.keywords == ''
+            )
+        )
+    elif audit == 'missing_category':
+        query = query.filter(
+            or_(
+                VocationIntelligence.category == None,
+                VocationIntelligence.category == ''
+            )
+        )
+    vocations = (
+        query
+        .order_by(
+            VocationIntelligence.title_en
+        )
+        .all()
+    )
+
+    vocation_ids = [
+        item.id
+        for item in vocations
+    ]
+
+    compatibilities = (
+        VocationCompatibility
+        .query
+        .filter(
+            VocationCompatibility
+            .vocation_id
+            .in_(vocation_ids)
+        )
+        .all()
+    )
+
+    matrix = {}
+
+    for vocation in vocations:
+        matrix[vocation.id] = {}
+
+    for item in compatibilities:
+        matrix[item.vocation_id][item.number] = item
+
+    stats = {
+
+        "total":
+            VocationIntelligence
+            .query
+            .count(),
+
+        "missing_ru":
+            VocationIntelligence
+            .query
+            .filter(
+                or_(
+                    VocationIntelligence.title_ru == None,
+                    VocationIntelligence.title_ru == ''
+                )
+            )
+            .count(),
+
+        "missing_ua":
+            VocationIntelligence
+            .query
+            .filter(
+                or_(
+                    VocationIntelligence.title_ua == None,
+                    VocationIntelligence.title_ua == ''
+                )
+            )
+            .count(),
+
+        "missing_keywords":
+            VocationIntelligence
+            .query
+            .filter(
+                or_(
+                    VocationIntelligence.keywords == None,
+                    VocationIntelligence.keywords == ''
+                )
+            )
+            .count(),
+
+        "missing_category":
+            VocationIntelligence
+            .query
+            .filter(
+                or_(
+                    VocationIntelligence.category == None,
+                    VocationIntelligence.category == ''
+                )
+            )
+            .count()
+    }
+
+    print(
+        "MATRIX LOAD:",
+        round(
+            time.time() - start_time,
+            3
+        ),
+        "sec"
+    )
+
+    return render_template(
+        'admin/vocation_matrix.html',
+        vocations=vocations,
+        matrix=matrix,
+        stats=stats
+    )
+
+
+@admin_bp.route(
+    '/vocations/matrix/update',
+    methods=['POST']
+)
+@login_required
+def vocation_matrix_update():
+    print("=" * 50)
+    print("UPDATE CALLED")
+
+    compatibility_id = request.form.get(
+        'compatibility_id'
+    )
+
+    value = request.form.get(
+        'value'
+    )
+
+    item = (
+        VocationCompatibility
+        .query
+        .get_or_404(
+            compatibility_id
+        )
+    )
+
+    item.compatibility_rate = int(
+        value
+    )
+
+    db.session.commit()
+
+    return {
+        "success": True
+    }
+
+
+# ====================================
+# BULK CATEGORY
+# ====================================
+
+@admin_bp.route(
+    '/vocations/bulk/category',
+    methods=['POST']
+)
+@admin_bp.route(
+    '/vocations/bulk/category',
+    methods=['POST']
+)
+@login_required
+def bulk_category():
+    return {
+        "success": True,
+        "updated": updated
+    }
+
+
+# ====================================
+# BULK KEYWORD
+# ====================================
+
+@admin_bp.route(
+    '/vocations/bulk/keyword',
+    methods=['POST']
+)
+@login_required
+def bulk_keyword():
+    ids = request.form.getlist(
+        'ids[]'
+    )
+
+    keyword = request.form.get(
+        'keyword',
+        ''
+    )
+
+    updated = 0
+
+    for vocation_id in ids:
+
+        item = (
+            VocationIntelligence
+            .query
+            .get(vocation_id)
+        )
+
+        if not item:
+            continue
+
+        current = (
+                item.keywords
+                or ''
+        )
+
+        if keyword not in current:
+
+            if current:
+
+                item.keywords = (
+                        current
+                        +
+                        ', '
+                        +
+                        keyword
+                )
+
+            else:
+
+                item.keywords = keyword
+
+        updated += 1
+
+    db.session.commit()
+
+    return {
+        "success": True,
+        "updated": updated
+    }
+
+
+# ====================================
+# BULK VECTOR
+# ====================================
+
+@admin_bp.route(
+    '/vocations/bulk/vector',
+    methods=['POST']
+)
+@login_required
+def bulk_vector():
+    ids = request.form.getlist(
+        'ids[]'
+    )
+
+    vector = request.form.get(
+        'vector'
+    )
+
+    updated = 0
+
+    for vocation_id in ids:
+
+        item = (
+            VocationIntelligence
+            .query
+            .get(vocation_id)
+        )
+
+        if not item:
+            continue
+
+        item.vector_id = int(
+            vector
+        )
+
+        updated += 1
+
+    db.session.commit()
+
+    return {
+        "success": True,
+        "updated": updated
+    }
+
+
+# ====================================
+# BULK DELETE
+# ====================================
+
+@admin_bp.route(
+    '/vocations/bulk/delete',
+    methods=['POST']
+)
+@login_required
+def bulk_delete():
+    ids = request.form.getlist(
+        'ids[]'
+    )
+
+    deleted = 0
+
+    for vocation_id in ids:
+
+        item = (
+            VocationIntelligence
+            .query
+            .get(vocation_id)
+        )
+
+        if not item:
+            continue
+
+        db.session.delete(
+            item
+        )
+
+        deleted += 1
+
+    db.session.commit()
+
+    return {
+        "success": True,
+        "deleted": deleted
+    }
+
+
+@login_required
+def bulk_category():
+    ids = request.form.getlist(
+        'ids[]'
+    )
+
+    category = request.form.get(
+        'category',
+        ''
+    )
+
+    if not ids:
+        return {
+            "success": False,
+            "message": "No IDs"
+        }
+
+    updated = 0
+
+    for vocation_id in ids:
+
+        item = (
+            VocationIntelligence
+            .query
+            .get(vocation_id)
+        )
+
+        if not item:
+            continue
+
+        item.category = category
+
+        updated += 1
+
+    db.session.commit()
+
+    return {
+        "success": True,
+        "updated": updated
+    }
+
+
+@login_required
+def vocation_matrix_update():
+    print("=" * 50)
+    print("UPDATE CALLED")
+    compatibility_id = request.form.get(
+        'compatibility_id'
+    )
+    value = request.form.get(
+        'value'
+    )
+    print(
+        "ID:",
+        compatibility_id
+    )
+    print(
+        "VALUE:",
+        value
+    )
+    item = (
+        VocationCompatibility
+        .query
+        .get_or_404(
+            compatibility_id
+        )
+    )
+    item.compatibility_rate = int(
+        value
+    )
+    db.session.commit()
+    print(
+        "SAVED TO DB"
+    )
+    return {
+        "success": True
+    }
+
+
+@admin_bp.route('/content-hub')
+@login_required
+def content_hub():
+    stats = {
+
+        "archetypes":
+            ArchetypeContent.query.count(),
+
+        "articles":
+            Article.query.count(),
+
+        "protocols":
+            EvolutionProtocol.query.count(),
+
+        "daily_coach":
+            DailyCoachTip.query.count(),
+
+        "professions":
+            ProfessionContent.query.count()
+
+    }
+
+    return render_template(
+        'admin/content_hub.html',
+        stats=stats
+    )
+
+
+@admin_bp.route('/audit-center')
+@login_required
+def audit_center():
+    audit_data = {
+
+        "missing_ru":
+            VocationIntelligence.query.filter(
+                or_(
+                    VocationIntelligence.title_ru == None,
+                    VocationIntelligence.title_ru == ''
+                )
+            ).count(),
+
+        "missing_ua":
+            VocationIntelligence.query.filter(
+                or_(
+                    VocationIntelligence.title_ua == None,
+                    VocationIntelligence.title_ua == ''
+                )
+            ).count(),
+
+        "missing_keywords":
+            VocationIntelligence.query.filter(
+                or_(
+                    VocationIntelligence.keywords == None,
+                    VocationIntelligence.keywords == ''
+                )
+            ).count(),
+
+        "missing_category":
+            VocationIntelligence.query.filter(
+                or_(
+                    VocationIntelligence.category == None,
+                    VocationIntelligence.category == ''
+                )
+            ).count()
+
+    }
+
+    return render_template(
+        'admin/audit_center.html',
+        audit_data=audit_data
+    )
+
+
+#### ===================N E X U S =========================
+@admin_bp.route('/nexus-hub')
+@login_required
+def nexus_hub():
+    return render_template(
+        'admin/nexus_hub.html'
+    )
+
+
+# ================== БЛОК УПРАВЛЕНИЯ ГРАФАМИ НА ==============
+@admin_bp.route('/nexus/nodes')
+@login_required
+def nexus_nodes():
+    nodes = [
+
+        # ROOT
+        {
+            "data": {
+                "id": "GENESIS",
+                "label": "GENESIS",
+                "type": "root"
+            }
+        },
+
+        # LAYERS
+        {
+            "data": {
+                "id": "CLIENT",
+                "label": "CLIENT",
+                "type": "layer"
+            }
+        },
+        {
+            "data": {
+                "id": "CONTENT",
+                "label": "CONTENT",
+                "type": "layer"
+            }
+        },
+        {
+            "data": {
+                "id": "CAREER",
+                "label": "CAREER",
+                "type": "layer"
+            }
+        },
+        {
+            "data": {
+                "id": "ADMIN",
+                "label": "ADMIN",
+                "type": "layer"
+            }
+        },
+        {
+            "data": {
+                "id": "NEXUS",
+                "label": "NEXUS",
+                "type": "layer"
+            }
+        },
+        # CLIENT MODULES
+        {
+            "data": {
+                "id": "DASHBOARD_V3",
+                "label": "Dashboard V3",
+                "type": "module"
+            }
+        },
+        {
+            "data": {
+                "id": "PERSONAL_OS",
+                "label": "Personal OS",
+                "type": "module"
+            }
+        },
+        {
+            "data": {
+                "id": "PROFESSIONAL_RESONANCE",
+                "label": "Professional Resonance",
+                "type": "module"
+            }
+        },
+        {
+            "data": {
+                "id": "PSYCHOMATRIX",
+                "label": "Psychomatrix",
+                "type": "module"
+            }
+        },
+        {
+            "data": {
+                "id": "DEVELOPMENT_PROFILE",
+                "label": "Development Profile",
+                "type": "module"
+            }
+        },
+        # CONTENT MODULES
+        {
+            "data": {
+                "id": "ARCHETYPES",
+                "label": "Archetypes",
+                "type": "module"
+            }
+        },
+        {
+            "data": {
+                "id": "ARTICLES",
+                "label": "Articles",
+                "type": "module"
+            }
+        },
+        {
+            "data": {
+                "id": "DAILY_COACH",
+                "label": "Daily Coach",
+                "type": "module"
+            }
+        },
+        {
+            "data": {
+                "id": "PROTOCOLS",
+                "label": "Protocols",
+                "type": "module"
+            }
+        },
+        {
+            "data": {
+                "id": "PROFESSIONS",
+                "label": "Professions",
+                "type": "module"
+            }
+        },
+        # CAREER MODULES
+        {
+            "data": {
+                "id": "CAREER_CENTER",
+                "label": "Career Center",
+                "type": "module"
+            }
+        },
+        {
+            "data": {
+                "id": "CAREER_MATRIX",
+                "label": "Career Matrix",
+                "type": "module"
+            }
+        },
+        # ADMIN MODULES
+        {
+            "data": {
+                "id": "CONTENT_HUB",
+                "label": "Content Hub",
+                "type": "module"
+            }
+        },
+        {
+            "data": {
+                "id": "AUDIT_CENTER",
+                "label": "Audit Center",
+                "type": "module"
+            }
+        },
+        {
+            "data": {
+                "id": "USER_CENTER",
+                "label": "User Intelligence",
+                "type": "module"
+            }
+        },
+        # NEXUS MODULES
+        {
+            "data": {
+                "id": "GRAPH",
+                "label": "Graph",
+                "type": "module"
+            }
+        },
+
+        {
+            "data": {
+                "id": "INSPECTOR",
+                "label": "Inspector",
+                "type": "module"
+            }
+        },
+
+        {
+            "data": {
+                "id": "COMPETENCIES",
+                "label": "Competencies",
+                "type": "module",
+                "status": "active"
+            }
+        },
+
+        {
+            "data": {
+                "id": "ARCHETYPE_MAPPING",
+                "label": "Archetype Mapping",
+                "type": "module",
+                "status": "active"
+            }
+        },
+
+        {
+            "data": {
+                "id": "PROFESSION_MAPPING",
+                "label": "Profession Mapping",
+                "type": "module",
+                "status": "planned"
+            }
+        },
+
+        {
+            "data": {
+                "id": "RECOMMENDATION_LAB",
+                "label": "Recommendation Lab",
+                "type": "module",
+                "status": "planned"
+            }
+        }
+
+    ]
+
+    edges = [
+
+        {"data": {"source": "GENESIS", "target": "CLIENT"}},
+        {"data": {"source": "GENESIS", "target": "CONTENT"}},
+        {"data": {"source": "GENESIS", "target": "CAREER"}},
+        {"data": {"source": "GENESIS", "target": "ADMIN"}},
+        {"data": {"source": "GENESIS", "target": "NEXUS"}},
+
+        {"data": {"source": "CLIENT", "target": "DASHBOARD_V3"}},
+        {"data": {"source": "CLIENT", "target": "PERSONAL_OS"}},
+        {"data": {"source": "CLIENT", "target": "PROFESSIONAL_RESONANCE"}},
+        {"data": {"source": "CLIENT", "target": "PSYCHOMATRIX"}},
+        {"data": {"source": "CLIENT", "target": "DEVELOPMENT_PROFILE"}},
+
+        {"data": {"source": "CONTENT", "target": "ARCHETYPES"}},
+        {"data": {"source": "CONTENT", "target": "ARTICLES"}},
+        {"data": {"source": "CONTENT", "target": "DAILY_COACH"}},
+        {"data": {"source": "CONTENT", "target": "PROTOCOLS"}},
+        {"data": {"source": "CONTENT", "target": "PROFESSIONS"}},
+
+        {"data": {"source": "CAREER", "target": "CAREER_CENTER"}},
+        {"data": {"source": "CAREER", "target": "CAREER_MATRIX"}},
+
+        {"data": {"source": "ADMIN", "target": "CONTENT_HUB"}},
+        {"data": {"source": "ADMIN", "target": "AUDIT_CENTER"}},
+        {"data": {"source": "ADMIN", "target": "USER_CENTER"}},
+
+        {"data": {"source": "NEXUS", "target": "GRAPH"}},
+        {"data": {"source": "NEXUS", "target": "INSPECTOR"}},
+
+        {"data": {"source": "CAREER", "target": "COMPETENCIES"}},
+        {"data": {"source": "CAREER", "target": "ARCHETYPE_MAPPING"}},
+        {"data": {"source": "CAREER", "target": "PROFESSION_MAPPING"}},
+        {"data": {"source": "CAREER", "target": "RECOMMENDATION_LAB"}},
+
+    ]
+
+    return {
+        "nodes": nodes,
+        "edges": edges
+    }
+
+
+@admin_bp.route('/nexus/inspect')
+@login_required
+def nexus_inspect():
+    path = request.args.get(
+        'path',
+        ''
+    )
+
+    descriptions = {
+
+        "GENESIS":
+            """
+            GENESIS PLATFORM
+
+            Root ecosystem node
+
+            Status: ACTIVE
+            Version: V3
+            """,
+
+        "CLIENT":
+            """
+            CLIENT LAYER
+
+            Dashboard V3
+            Personal Operating System
+            Professional Resonance
+            Psychomatrix
+            Development Profile
+
+            Status: ACTIVE
+            """,
+
+        "DASHBOARD_V3":
+            """
+            CLIENT DASHBOARD
+
+            Main user entry point
+
+            Status: ACTIVE
+            """,
+
+        "PERSONAL_OS":
+            """
+            PERSONAL OPERATING SYSTEM
+
+            User operating profile
+
+            Status: ACTIVE
+            """,
+
+        "PROFESSIONAL_RESONANCE":
+            """
+            PROFESSIONAL RESONANCE
+
+            Career matching engine
+
+            Status: ACTIVE
+            """,
+
+        "PSYCHOMATRIX":
+            """
+            PSYCHOMATRIX
+
+            Matrix analysis module
+
+            Status: ACTIVE
+            """,
+
+        "DEVELOPMENT_PROFILE":
+            """
+            DEVELOPMENT PROFILE
+
+            Growth trajectory engine
+
+            Status: ACTIVE
+            """,
+
+        "CONTENT":
+            """
+            CONTENT LAYER
+
+            Archetypes
+            Articles
+            Daily Coach
+            Protocols
+            Professions
+
+            Status: ACTIVE
+            """,
+
+        "ARCHETYPES":
+            f"""
+            ARCHETYPE ENGINE
+
+            Records:
+            {ArchetypeContent.query.count()}
+
+            Status: ACTIVE
+            """,
+
+        "ARTICLES":
+            f"""
+            ARTICLE DATABASE
+
+            Records:
+            {Article.query.count()}
+
+            Status: ACTIVE
+            """,
+
+        "DAILY_COACH":
+            f"""
+            DAILY COACH
+
+            Records:
+            {DailyCoachTip.query.count()}
+
+            Status: ACTIVE
+            """,
+
+        "PROTOCOLS":
+            f"""
+            PROTOCOL ENGINE
+
+            Records:
+            {EvolutionProtocol.query.count()}
+
+            Status: ACTIVE
+            """,
+
+        "PROFESSIONS":
+            f"""
+            PROFESSION DATABASE
+
+            Records:
+            {ProfessionContent.query.count()}
+
+            Status: ACTIVE
+            """,
+
+        "CAREER":
+            """
+            CAREER LAYER
+
+            Career Intelligence
+            Career Matrix
+            Recommendations
+
+            Status: ACTIVE
+            """,
+
+        "CAREER_CENTER":
+            """
+            CAREER CENTER
+
+            Main intelligence dashboard
+
+            Status: ACTIVE
+            """,
+
+        "CAREER_MATRIX":
+            f"""
+            CAREER MATRIX
+
+            Records:
+            {VocationIntelligence.query.count()}
+
+            Status: ACTIVE
+            """,
+
+        "ADMIN":
+            """
+            ADMIN LAYER
+
+            Dashboard
+            Content Hub
+            Audit Center
+
+            Status: ACTIVE
+            """,
+
+        "CONTENT_HUB":
+            """
+            CONTENT HUB
+
+            Central content management
+
+            Status: ACTIVE
+            """,
+
+        "AUDIT_CENTER":
+            """
+            AUDIT CENTER
+
+            Quality control
+
+            Status: ACTIVE
+            """,
+
+        "USER_CENTER":
+            """
+            USER INTELLIGENCE
+
+            User analytics
+
+            Status: PLANNED
+            """,
+
+        "NEXUS":
+            """
+            NEXUS CORE
+
+            Graph
+            Inspector
+            Automation
+            Orchestrator
+
+            Status: IN DEVELOPMENT
+            """,
+
+        "GRAPH":
+            """
+            NEXUS GRAPH
+
+            Ecosystem visualization
+
+            Status: IN DEVELOPMENT
+            """,
+
+        "INSPECTOR":
+            """
+            NEXUS INSPECTOR
+
+            Dependency explorer
+
+            Status: IN DEVELOPMENT
+            """
+    }
+
+    return descriptions.get(
+        path,
+        f"""
+        UNKNOWN NODE
+
+        {path}
+
+        Status: UNREGISTERED
+        """
+    )
+
+
+###==========Career Center =========
+@admin_bp.route('/career-center')
+@login_required
+def career_center():
+    matrix_stats = {
+
+        "records":
+            VocationIntelligence.query.count(),
+
+        "missing_ru":
+            VocationIntelligence.query.filter(
+                or_(
+                    VocationIntelligence.title_ru == None,
+                    VocationIntelligence.title_ru == ''
+                )
+            ).count(),
+
+        "missing_ua":
+            VocationIntelligence.query.filter(
+                or_(
+                    VocationIntelligence.title_ua == None,
+                    VocationIntelligence.title_ua == ''
+                )
+            ).count(),
+
+        "missing_keywords":
+            VocationIntelligence.query.filter(
+                or_(
+                    VocationIntelligence.keywords == None,
+                    VocationIntelligence.keywords == ''
+                )
+            ).count(),
+
+        "missing_category":
+            VocationIntelligence.query.filter(
+                or_(
+                    VocationIntelligence.category == None,
+                    VocationIntelligence.category == ''
+                )
+            ).count()
+
+    }
+
+    return render_template(
+        'admin/career_center.html',
+        matrix_stats=matrix_stats
+    )
+
+
+@admin_bp.route('/competencies')
+@login_required
+def competencies():
+    content = (
+        Competency
+        .query
+        .order_by(
+            Competency.category,
+            Competency.title
+        )
+        .all()
+    )
+
+    return render_template(
+        'admin/competencies.html',
+        content=content
+    )
+
+
+@admin_bp.route('/archetype-mapping')
+@login_required
+def archetype_mapping():
+    competencies = (
+        Competency
+        .query
+        .order_by(
+            Competency.category,
+            Competency.title
+        )
+        .all()
+    )
+
+    mappings = (
+        ArchetypeCompetency
+        .query
+        .all()
+    )
+
+    return render_template(
+        'admin/archetype_mapping.html',
+        profiles=ARCHETYPE_PROFILES,
+        competencies=competencies,
+        mappings=mappings
+    )
+
+
+@admin_bp.route(
+    '/api/archetype/<number>'
+)
+@login_required
+def archetype_profile_api(number):
+    mappings = (
+        ArchetypeCompetency.query
+        .filter_by(
+            archetype_number=number
+        )
+        .all()
+    )
+    result = []
+    for item in mappings:
+        result.append({
+            "id":
+                item.competency.id,
+            "title":
+                item.competency.title,
+            "category":
+                item.competency.category,
+            "weight":
+                item.weight
+        })
+    return jsonify(result)
+
+
+@admin_bp.route(
+    '/api/archetype/save',
+    methods=['POST']
+)
+@login_required
+def save_archetype_mapping():
+    data = request.json
+
+    archetype = data["archetype"]
+
+    competency_id = data["competency_id"]
+
+    weight = data["weight"]
+
+    mapping = (
+        ArchetypeCompetency.query
+        .filter_by(
+            archetype_number=archetype,
+            competency_id=competency_id
+        )
+        .first()
+    )
+
+    if not mapping:
+        mapping = ArchetypeCompetency(
+
+            archetype_number=archetype,
+
+            competency_id=competency_id
+        )
+
+        db.session.add(mapping)
+
+    mapping.weight = weight
+
+    db.session.commit()
+
+    return jsonify({
+        "success": True
+    })
+
+
+#======== Роут-заготовка на будущее =======
+@admin_bp.route('/career-lab')
+@login_required
+def career_lab():
+    stats = {
+        "competencies": 0,
+        "profession_links": 0,
+        "archetype_links": 0,
+        "recommendations": 0
+    }
+
+    return render_template(
+        'admin/career_lab.html',
+        stats=stats
+    )
+
+
+# ==================== Импорты ===========================
+@admin_bp.route('/import-center')
+@login_required
+def import_center():
+    jobs = (
+        ImportJob
+        .query
+        .order_by(
+            ImportJob.id.desc()
+        )
+        .all()
+    )
+
+    return render_template(
+        'admin/import_center.html',
+        jobs=jobs
+    )
+
+
+@admin_bp.route(
+    '/import-center/upload', methods=['POST'])
+@login_required
+def import_upload():
+    file = request.files['file']
+
+    path = os.path.join(
+        'uploads/imports',
+        file.filename
+    )
+    file.save(path)
+    job = ImportJob(
+        filename=file.filename,
+        import_type="profession"
+    )
+    db.session.add(job)
+    db.session.commit()
+    result = (
+        ImportEngine.run(
+            "profession",
+            path
+        )
+    )
+    job.status = "completed"
+    job.imported_rows = (
+        result["imported"]
+    )
+    job.failed_rows = (
+        result["failed"]
+    )
+    db.session.commit()
+    return redirect(
+        url_for(
+            'admin.import_center'
+        )
+    )
+
+
+@admin_bp.route('/profession-mapping')
+@login_required
+def profession_mapping():
+    professions = (
+        Profession
+        .query
+        .order_by(
+            Profession.title
+        )
+        .all()
+    )
+
+    competencies = (
+        Competency
+        .query
+        .order_by(
+            Competency.category,
+            Competency.title
+        )
+        .all()
+    )
+
+    return render_template(
+        'admin/profession_mapping.html',
+
+        professions=professions,
+
+        competencies=competencies
+    )
+
+
+@admin_bp.route(
+    '/api/profession/<int:profession_id>/competencies'
+)
+@login_required
+def profession_competencies_api(
+        profession_id
+):
+    links = (
+
+        ProfessionCompetency
+
+        .query
+
+        .filter_by(
+            profession_id=profession_id
+        )
+
+        .all()
+
+    )
+
+    result = []
+
+    for link in links:
+        result.append({
+
+            "id":
+                link.competency.id,
+
+            "title":
+                link.competency.title,
+
+            "weight":
+                link.weight
+
+        })
+    return jsonify(
+        result
+    )
+
+
+# ==========================
+# PROFESSION API
+# ==========================
+
+@admin_bp.route('/api/profession/<int:profession_id>')
+@login_required
+def profession_profile_api(profession_id):
+    profession = (
+        Profession
+        .query
+        .get_or_404(
+            profession_id
+        )
+    )
+    return jsonify({
+        "id":
+            profession.id,
+        "title":
+            profession.title,
+        "category":
+            profession.category,
+        "source":
+            profession.source,
+        "status":
+            profession.status,
+        "business_potential":
+            profession.business_potential,
+        "future_demand":
+            profession.future_demand,
+        "automation_risk":
+            profession.automation_risk
+    })
+
+
+from core.seed_competencies import (
+    seed_competencies
+)
+
+
+@admin_bp.route(
+    '/seed-competencies'
+)
+@login_required
+def seed_competencies_route():
+    created = (
+        seed_competencies()
+    )
+
+    return f"""
+    Created: {created}
+    """
