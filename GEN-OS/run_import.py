@@ -5,7 +5,7 @@ Knowledge Import Launcher
 ═══════════════════════════════════════════════════════
 """
 
-from genesis_knowledge.importers.profession_importer import (
+from genesis_engine.importers.profession_importer import (
     ProfessionImporter
 )
 

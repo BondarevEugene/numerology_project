@@ -1,0 +1,33 @@
+<div class="gen-panel">
+
+    {% if title %}
+
+    <div class="gen-panel-header">
+
+        <div class="gen-panel-title">
+
+            {{ icon }} {{ title }}
+
+        </div>
+
+        <div class="gen-panel-actions">
+
+            {% block actions %}
+
+            {% endblock %}
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+    <div class="gen-panel-body">
+
+        {% block body %}
+
+        {% endblock %}
+
+    </div>
+
+</div>
