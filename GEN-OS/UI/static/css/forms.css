@@ -1,0 +1,51 @@
+/*
+══════════════════════════════════════════════════════
+Forms
+══════════════════════════════════════════════════════
+*/
+
+.gen-input,
+.gen-select,
+.gen-textarea{
+width:100%;
+background:#15181d;
+border:1px solid var(--border);
+border-radius:12px;
+padding:12px 14px;
+color:var(--text);
+font-size:14px;
+transition:.2s;
+outline:none;
+}
+
+.gen-input:focus,
+.gen-select:focus,
+.gen-textarea:focus{
+border-color:var(--accent);
+box-shadow:0 0 0 3px rgba(200,164,77,.15);
+}
+
+.gen-btn{
+background:#252a30;
+border:1px solid var(--border);
+padding:12px 20px;
+border-radius:12px;
+color:var(--text);
+cursor:pointer;
+transition:.2s;
+font-weight:600;
+}
+
+.gen-btn:hover{
+background:#30363d;
+}
+
+.gen-btn-primary{
+background:var(--accent);
+color:#1b1b1b;
+font-weight:700;
+}
+
+.gen-btn-primary:hover{
+background:var(--accent-light);
+}

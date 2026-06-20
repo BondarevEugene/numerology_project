@@ -1,0 +1,33 @@
+/*
+══════════════════════════════════════════════════════
+Tables
+══════════════════════════════════════════════════════
+*/
+
+.gen-table{
+width:100%;
+border-collapse:collapse;
+}
+
+.gen-table th{
+padding:16px;
+background:#1d2025;
+color:var(--accent-light);
+text-align:left;
+font-size:13px;
+letter-spacing:.12em;
+text-transform:uppercase;
+}
+
+.gen-table td{
+padding:16px;
+border-top:1px solid var(--border);
+}
+
+.gen-table tr{
+transition:.2s;
+}
+
+.gen-table tr:hover{
+background:#20242b;
+}

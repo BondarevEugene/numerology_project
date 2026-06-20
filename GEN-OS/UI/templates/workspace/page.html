@@ -1,0 +1,15 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<div class="gen-workspace">
+    {% include "workspace/toolbar.html" %}
+    <div class="gen-workspace-body">
+        {% include "workspace/sidebar.html" %}
+        <main class="gen-workspace-main">
+            {% block workspace %}
+            {% endblock %}
+        </main>
+        {% include "workspace/inspector.html" %}
+    </div>
+    {% include "workspace/statusbar.html" %}
+</div>
+{% endblock %}
