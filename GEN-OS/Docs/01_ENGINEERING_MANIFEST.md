@@ -1,3 +1,80 @@
+КАТАЛОГ ПО СОСТОЯНИЮ НА 21\06\26
+
+
+
+GENESIS v1 Architecture (LOCKED)
+GEN-OS/
+│
+├── kernel/
+├── ui/
+├── importer/
+├── ai/
+│
+└── genesis_knowledge/
+    │
+    ├── entities/
+    ├── registry/
+    ├── providers/
+    ├── pipeline/
+    ├── storage/
+    │
+    └── domains/
+        │
+        ├── career/
+        ├── development/
+        ├── psychology/
+        ├── education/
+        ├── health/
+        ├── finance/
+        ├── relationships/
+        ├── family/
+        ├── business/
+        └── lifestyle/
+
+Больше структуру не меняем.
+
+
+
+GEN-OS/
+└── genesis_knowledge/
+    │
+    ├── entities/
+    │
+    ├── relations/
+    │   │
+    │   ├── profession_competency/
+    │   ├── competency_habit/
+    │   ├── competency_book/
+    │   ├── competency_course/
+    │   ├── competency_sport/
+    │   ├── competency_hobby/
+    │   ├── competency_behavior/
+    │   ├── competency_environment/
+    │   ├── profession_environment/
+    │   ├── profession_tool/
+    │   ├── profession_salary/
+    │   ├── profession_future/
+    │   └── ...
+    │
+    ├── professions/
+    ├── competencies/
+    ├── habits/
+    ├── books/
+    ├── sports/
+    ├── hobbies/
+    ├── environments/
+    ├── behaviors/
+    ├── protocols/
+    ├── courses/
+    ├── providers/
+    ├── pipeline/
+    ├── registry/
+    └── storage/
+
+
+
+
+
 GENESIS MANIFEST v0.1
 
 АРХИЕКТУРНЫЕ ПРИНЦИПЫ СИСТЕМЫ GENOS

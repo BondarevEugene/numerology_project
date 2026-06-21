@@ -1,8 +1,7 @@
 """
-==========================================================
 GENESIS HR®
+
 Relation Factory
-==========================================================
 """
 
 from .relation import Relation
@@ -12,16 +11,33 @@ class RelationFactory:
 
     @staticmethod
     def create(
-            source,
-            relation,
-            target,
-            weight=100,
-            description=""
+
+        source,
+
+        target,
+
+        relation_type,
+
+        weight=1.0,
+
+        confidence=1.0,
+
+        metadata=None
+
     ):
+
         return Relation(
+
             source=source,
+
             target=target,
-            relation=relation,
+
+            relation_type=relation_type,
+
             weight=weight,
-            description=description
+
+            confidence=confidence,
+
+            metadata=metadata or {}
+
         )

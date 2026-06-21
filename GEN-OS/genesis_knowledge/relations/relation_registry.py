@@ -1,31 +1,28 @@
 """
-==========================================================
-GENESIS HR®
-Relation Registry
-==========================================================
+Registry всех связей системы.
 """
 
-from collections import defaultdict
+from .relation import Relation
 
 
 class RelationRegistry:
 
     def __init__(self):
-        self._relations = []
-        self._index = defaultdict(list)
 
-    def add(self, relation):
+        self._relations=[]
+
+    def add(self,relation):
+
         self._relations.append(relation)
-        self._index[relation.source].append(relation)
 
     def all(self):
+
         return self._relations
 
-    def by_source(self, entity):
-        return self._index.get(entity, [])
+    def count(self):
 
-    def statistics(self):
-        return {
-            "relations": len(self._relations),
-            "nodes": len(self._index)
-        }
+        return len(self._relations)
+
+    def clear(self):
+
+        self._relations.clear()

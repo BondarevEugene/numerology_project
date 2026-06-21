@@ -1,31 +1,28 @@
 """
-==========================================================
-GENESIS HR®
-Knowledge Graph
-Relation Types
-Version: 1.0
-==========================================================
+GENESIS Relation Types
 """
 
-from enum import Enum
-
-
-class RelationType(Enum):
-    REQUIRES = "requires"
-    DEVELOPS = "develops"
-    IMPROVES = "improves"
-    REDUCES = "reduces"
-    RECOMMENDS = "recommends"
-    RECOMMENDED_BOOK = "recommended_book"
-    RECOMMENDED_COURSE = "recommended_course"
-    RECOMMENDED_HOBBY = "recommended_hobby"
-    RECOMMENDED_SPORT = "recommended_sport"
-    LEADS_TO = "leads_to"
-    PART_OF = "part_of"
-    PARENT = "parent"
-    CHILD = "child"
-    SIMILAR = "similar"
-    OPPOSITE = "opposite"
-    NEXT_LEVEL = "next_level"
-    PREVIOUS_LEVEL = "previous_level"
-    BELONGS_TO = "belongs_to"
+REQUIRES = "requires"
+DEVELOPS = "develops"
+IMPROVES = "improves"
+WEAKENS = "weakens"
+SUPPORTS = "supports"
+DESTROYS = "destroys"
+USES = "uses"
+WORKS_IN = "works_in"
+LEADS_TO = "leads_to"
+RELATED_TO = "related_to"
+SIMILAR_TO = "similar_to"
+NEXT_STEP = "next_step"
+PREVIOUS_STEP = "previous_step"
+RECOMMENDS = "recommends"
+LEARNS_FROM = "learns_from"
+TRAINED_BY = "trained_by"
+CONTRAINDICATED_FOR = "contraindicated_for"
+GOOD_FOR_CHILDREN = "good_for_children"
+GOOD_FOR_ADULTS = "good_for_adults"
+REQUIRES_LEVEL = "requires_level"
+PART_OF = "part_of"
+HAS_SKILL = "has_skill"
+HAS_TRAIT = "has_trait"
+USES_TOOL = "uses_tool"
