@@ -1,40 +1,121 @@
 /*
-══════════════════════════════════════════════════════
-Cards
-══════════════════════════════════════════════════════
+══════════════════════════════════════════════════════════════════════
+GENESIS HR®
+
+GENOS Design Language
+Cards System
+
+BUILD-0020
+══════════════════════════════════════════════════════════════════════
 */
 
 .gen-card{
-background:var(--panel);
+display:flex;
+flex-direction:column;
+gap:18px;
+padding:28px;
+background:linear-gradient(180deg,var(--panel),var(--bg2));
 border:1px solid var(--border);
-border-radius:var(--radius);
+border-radius:22px;
 box-shadow:var(--shadow);
-padding:24px;
+transition:all .28s ease;
+position:relative;
+overflow:hidden;
+min-height:180px;
+}
+
+.gen-card::before{
+content:"";
+position:absolute;
+top:0;
+left:0;
+width:4px;
+height:100%;
+background:linear-gradient(var(--accent),transparent);
+opacity:.35;
 transition:.25s;
 }
 
 .gen-card:hover{
-transform:translateY(-3px);
-background:var(--panel-hover);
+transform:translateY(-8px);
+border-color:rgba(200,164,77,.35);
+box-shadow:
+0 28px 70px rgba(0,0,0,.45),
+0 0 40px rgba(200,164,77,.08);
+}
+
+.gen-card:hover::before{
+opacity:1;
+}
+
+.gen-card-header{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:16px;
+}
+
+.gen-card-icon{
+width:56px;
+height:56px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:26px;
+border-radius:16px;
+background:rgba(200,164,77,.12);
+color:var(--accent);
 }
 
 .gen-card-title{
-font-size:15px;
+font-size:22px;
 font-weight:700;
+color:var(--text);
+}
+
+.gen-card-subtitle{
+font-size:13px;
 letter-spacing:.12em;
 text-transform:uppercase;
 color:var(--accent-light);
-margin-bottom:18px;
 }
 
-.gen-card-body{
+.gen-card-content{
 display:flex;
 flex-direction:column;
 gap:14px;
+flex:1;
+}
+
+.gen-card-content p{
+color:var(--muted);
+font-size:15px;
+line-height:1.75;
 }
 
 .gen-card-footer{
-margin-top:20px;
-padding-top:18px;
-border-top:1px solid var(--border);
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding-top:12px;
+border-top:1px solid rgba(255,255,255,.05);
+}
+
+.gen-card-badge{
+padding:6px 12px;
+border-radius:999px;
+background:rgba(200,164,77,.12);
+color:var(--accent-light);
+font-size:12px;
+font-weight:700;
+}
+
+.gen-card-arrow{
+font-size:20px;
+color:var(--accent);
+transition:.25s;
+}
+
+.gen-card:hover .gen-card-arrow{
+transform:translateX(8px);
 }

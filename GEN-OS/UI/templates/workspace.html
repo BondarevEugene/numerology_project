@@ -1,28 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>
-GENESIS HR®
-</title>
-<link
-rel="stylesheet"
-href="/genesis/static/css/genesis.css">
-</head>
-<body>
-<gen-workspace>
-    {% include "components/toolbar.html" %}
-    <div class="gen-body">
-        {% include "components/explorer.html" %}
-        <main class="gen-main">
-            {% block workspace %}
-            {% endblock %}
-        </main>
-        {% include "components/inspector.html" %}
-    </div>
-    {% include "components/console.html" %}
-    {% include "components/statusbar.html" %}
-</gen-workspace>
-<script src="/genesis/static/js/workspace.js"></script>
-</body>
+   <head>
+      <meta charset="UTF-8">
+      <title>
+         GENESIS HR®
+      </title>
+      <link
+         rel="stylesheet"
+         href="/genesis/static/css/genesis.css">
+   </head>
+   <body>
+      <gen-workspace>
+         {% include "components/toolbar.html" %}
+         <div class="gen-body">
+            {% include "components/explorer.html" %}
+            <main class="gen-main">
+               {% block workspace %}
+               {% endblock %}
+            </main>
+            {% include "components/inspector.html" %}
+         </div>
+         {% include "components/console.html" %}
+         {% include "components/statusbar.html" %}
+      </gen-workspace>
+      <script src="/genesis/static/js/workspace.js"></script>
+   </body>
 </html>

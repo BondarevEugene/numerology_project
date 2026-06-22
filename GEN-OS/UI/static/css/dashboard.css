@@ -41,3 +41,182 @@ letter-spacing:.18em;
 text-transform:uppercase;
 color:var(--accent-light);
 }
+
+/*
+══════════════════════════════════════════════════════
+Workspace Hero
+══════════════════════════════════════════════════════
+*/
+
+.dashboard{
+display:flex;
+flex-direction:column;
+gap:28px;
+padding:32px;
+overflow:auto;
+height:100%;
+}
+
+.hero{
+display:grid;
+grid-template-columns:1.6fr .9fr;
+gap:28px;
+padding:36px;
+border-radius:28px;
+background:linear-gradient(135deg,var(--panel),var(--bg2));
+border:1px solid var(--border);
+box-shadow:var(--shadow);
+position:relative;
+overflow:hidden;
+}
+
+.hero::before{
+content:"";
+position:absolute;
+top:-180px;
+right:-120px;
+width:420px;
+height:420px;
+border-radius:50%;
+background:radial-gradient(circle,rgba(200,164,77,.14),transparent 72%);
+pointer-events:none;
+}
+
+.hero-left{
+display:flex;
+flex-direction:column;
+justify-content:center;
+gap:18px;
+z-index:2;
+}
+
+.hero-left h2{
+font-size:42px;
+font-weight:800;
+line-height:1.1;
+color:var(--text);
+}
+
+.hero-left p{
+font-size:17px;
+line-height:1.8;
+color:var(--muted);
+max-width:720px;
+}
+
+.hero-buttons{
+display:flex;
+gap:16px;
+margin-top:10px;
+}
+
+.hero-right{
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.hero-circle{
+width:240px;
+height:240px;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:86px;
+font-weight:700;
+color:var(--accent);
+background:radial-gradient(circle at center,var(--panel-hover),var(--panel));
+border:1px solid rgba(200,164,77,.28);
+box-shadow:
+0 0 60px rgba(200,164,77,.08),
+inset 0 0 30px rgba(255,255,255,.02);
+transition:.35s;
+}
+
+.hero-circle:hover{
+transform:scale(1.04) rotate(6deg);
+box-shadow:
+0 0 80px rgba(200,164,77,.18),
+inset 0 0 30px rgba(255,255,255,.05);
+}
+
+/*
+══════════════════════════════════════════════════════
+Workspace Cards
+══════════════════════════════════════════════════════
+*/
+
+.cards-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+gap:24px;
+}
+
+.cards-grid .gen-card{
+min-height:180px;
+cursor:pointer;
+transition:.28s;
+display:flex;
+flex-direction:column;
+justify-content:space-between;
+}
+
+.cards-grid .gen-card:hover{
+transform:translateY(-8px);
+}
+
+.cards-grid h3{
+font-size:22px;
+font-weight:700;
+color:var(--accent-light);
+margin-bottom:12px;
+}
+
+.cards-grid p{
+font-size:15px;
+line-height:1.8;
+color:var(--muted);
+}
+
+/*
+══════════════════════════════════════════════════════
+Adaptive
+══════════════════════════════════════════════════════
+*/
+
+@media(max-width:1200px){
+
+.hero{
+grid-template-columns:1fr;
+}
+
+.hero-right{
+display:none;
+}
+
+}
+
+@media(max-width:760px){
+
+.dashboard{
+padding:18px;
+}
+
+.hero{
+padding:24px;
+}
+
+.hero-left h2{
+font-size:32px;
+}
+
+.cards-grid{
+grid-template-columns:1fr;
+}
+
+.hero-buttons{
+flex-direction:column;
+}
+
+}
