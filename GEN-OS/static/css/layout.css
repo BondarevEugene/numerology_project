@@ -1,0 +1,85 @@
+/*
+GEN Layout
+*/
+
+.gen-shell {
+
+	width: 100vw;
+
+	height: 100vh;
+
+	overflow: hidden;
+
+	background: var(--bg);
+
+}
+
+.shell-window {
+
+	display: flex;
+
+	flex-direction: column;
+
+	width: 100%;
+
+	height: 100%;
+
+}
+
+.shell-toolbar {
+
+	height: 70px;
+
+	background: #0f1218;
+
+	border-bottom: 1px solid var(--border);
+
+}
+
+.shell-body {
+
+	flex: 1;
+
+	display: grid;
+
+	grid-template-columns:
+
+		320px 1fr 330px;
+
+}
+
+.shell-explorer {
+
+	overflow: auto;
+
+	border-right: 1px solid var(--border);
+
+}
+
+.shell-workspace {
+
+	overflow: auto;
+
+	background: #15191f;
+
+}
+
+.shell-inspector {
+
+	overflow: auto;
+
+	border-left: 1px solid var(--border);
+
+}
+
+.shell-console {
+
+	height: 180px;
+
+}
+
+.shell-statusbar {
+
+	height: 32px;
+
+}

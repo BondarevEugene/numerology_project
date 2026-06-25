@@ -1,0 +1,70 @@
+<div class="gen-toolbar">
+   <div class="gen-toolbar-left">
+      <div class="gen-logo">
+         <div class="gen-logo-icon">
+            ◎
+         </div>
+         <div class="gen-logo-text">
+            <div class="gen-title">
+               GEN-OS
+            </div>
+            <div class="gen-subtitle">
+               Genesys Operating System
+            </div>
+         </div>
+      </div>
+      <nav class="gen-workspace-tabs">
+         {% for workspace in workspaces %}
+         <button
+            class="gen-tab {% if workspace.opened %}active{% endif %}"
+            data-workspace="{{ workspace.id }}">
+         <span class="gen-tab-icon">
+         {{ workspace.icon }}
+         </span>
+         <span>
+         {{ workspace.title }}
+         </span>
+         </button>
+         {% endfor %}
+      </nav>
+   </div>
+   <div class="gen-toolbar-center">
+      <div class="gen-search">
+         <svg viewBox="0 0 24 24" class="gen-search-icon">
+            <path d="M21 21l-5.2-5.2"/>
+            <circle cx="10" cy="10" r="7"/>
+         </svg>
+         <input
+            id="global-search"
+            class="gen-search-input"
+            type="text"
+            placeholder="Search entity, profession, competency, protocol ...">
+      </div>
+   </div>
+   <div class="gen-toolbar-right">
+      <div class="gen-kernel">
+         <div class="kernel-dot"></div>
+         <span>
+         Kernel Online
+         </span>
+      </div>
+      <div class="gen-clock">
+         <span id="gen-clock">
+         00:00
+         </span>
+      </div>
+      <div class="gen-user">
+         <div class="user-avatar">
+            YB
+         </div>
+         <div>
+            <div class="user-name">
+               Administrator
+            </div>
+            <div class="user-role">
+               Genesis Architect
+            </div>
+         </div>
+      </div>
+   </div>
+</div>

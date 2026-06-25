@@ -1,0 +1,1452 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8">
+      <meta
+         name="viewport"
+         content="width=device-width,initial-scale=1.0">
+      <title>
+         GEN-OS®
+         Genesys Operating System
+      </title>
+      <link
+         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+         rel="stylesheet">
+      <style>
+         :root{
+         --bg:#101214;
+         --bg2:#171A1E;
+         --panel:#1E2227;
+         --panel2:#262C33;
+         --line:#2F363F;
+         --gold:#C8A44D;
+         --gold2:#E0C16D;
+         --text:#F2F3F5;
+         --muted:#8E959F;
+         --success:#2ECC71;
+         --danger:#FF5A5F;
+         --radius:18px;
+         --shadow:
+         0 25px 60px rgba(0,0,0,.45);
+         }
+         *{
+         margin:0;
+         padding:0;
+         box-sizing:border-box;
+         }
+         html{
+         height:100%;
+         }
+         body{
+         height:100%;
+         background:linear-gradient(
+         135deg,
+         #101214,
+         #16191D,
+         #1B1F24);
+         font-family:Inter,sans-serif;
+         color:var(--text);
+         overflow:hidden;
+         }
+         button{
+         font-family:inherit;
+         }
+         .shell{
+         height:100vh;
+         display:grid;
+         grid-template-columns:
+         74px
+         280px
+         1fr
+         340px;
+         grid-template-rows:
+         72px
+         1fr
+         170px
+         34px;
+         grid-template-areas:
+         "top top top top"
+         "dock explorer workspace inspector"
+         "dock console console inspector"
+         "status status status status";
+         }
+         .panel{
+         background:rgba(30,34,39,.82);
+         backdrop-filter:blur(18px);
+         border:1px solid rgba(255,255,255,.04);
+         box-shadow:var(--shadow);
+         }
+         .topbar{
+         grid-area:top;
+         display:flex;
+         align-items:center;
+         justify-content:space-between;
+         padding:0 28px;
+         border-bottom:1px solid var(--line);
+         }
+         .logo{
+         display:flex;
+         align-items:center;
+         gap:16px;
+         }
+         .logo-mark{
+         width:42px;
+         height:42px;
+         border-radius:14px;
+         display:flex;
+         align-items:center;
+         justify-content:center;
+         font-size:18px;
+         background:linear-gradient(
+         135deg,
+         var(--gold),
+         #8D6C1C);
+         color:#111;
+         font-weight:800;
+         }
+         .logo-title{
+         display:flex;
+         flex-direction:column;
+         }
+         .logo-title h1{
+         font-size:19px;
+         font-weight:700;
+         letter-spacing:.08em;
+         }
+         .logo-title span{
+         font-size:11px;
+         letter-spacing:.28em;
+         color:var(--muted);
+         text-transform:uppercase;
+         margin-top:3px;
+         }
+         .top-right{
+         display:flex;
+         align-items:center;
+         gap:18px;
+         }
+         .build{
+         font-size:12px;
+         color:var(--gold);
+         letter-spacing:.18em;
+         }
+         .user{
+         display:flex;
+         align-items:center;
+         gap:12px;
+         padding:10px 16px;
+         border-radius:14px;
+         background:rgba(255,255,255,.03);
+         }
+         .user-avatar{
+         width:34px;
+         height:34px;
+         border-radius:50%;
+         background:linear-gradient(
+         135deg,
+         var(--gold),
+         #80611A);
+         }
+         .user-info{
+         display:flex;
+         flex-direction:column;
+         }
+         .user-info strong{
+         font-size:13px;
+         }
+         .user-info span{
+         font-size:11px;
+         color:var(--muted);
+         }
+      </style>
+   </head>
+   <body>
+      <div class="shell">
+      <!-- ================================================= -->
+      <!-- TOP BAR -->
+      <!-- ================================================= -->
+      <header class="panel topbar">
+         <div class="logo">
+            <div class="logo-mark">
+               G
+            </div>
+            <div class="logo-title">
+               <h1>
+                  GEN-OS®
+               </h1>
+               <span>
+               Genesys Operating System
+               </span>
+            </div>
+         </div>
+         <div class="top-right">
+            <div class="build">
+               BUILD 0016
+            </div>
+            <div class="user">
+               <div class="user-avatar">
+               </div>
+               <div class="user-info">
+                  <strong>
+                  Administrator
+                  </strong>
+                  <span>
+                  ONLINE
+                  </span>
+               </div>
+            </div>
+         </div>
+      </header>
+          <!-- ================================================= -->
+<!-- LEFT DOCK -->
+<!-- ================================================= -->
+<style>
+   .dock{
+   grid-area:dock;
+   display:flex;
+   flex-direction:column;
+   align-items:center;
+   padding:22px 0;
+   border-right:1px solid var(--line);
+   gap:12px;
+   }
+   .dock-button{
+   width:54px;
+   height:54px;
+   border-radius:18px;
+   display:flex;
+   align-items:center;
+   justify-content:center;
+   font-size:24px;
+   cursor:pointer;
+   transition:.25s;
+   color:var(--muted);
+   background:rgba(255,255,255,.02);
+   border:1px solid transparent;
+   }
+   .dock-button:hover{
+   background:rgba(200,164,77,.12);
+   border-color:rgba(200,164,77,.35);
+   transform:translateY(-2px);
+   color:var(--gold);
+   box-shadow:
+   0 0 20px rgba(200,164,77,.18);
+   }
+   .dock-button.active{
+   background:linear-gradient(
+   135deg,
+   rgba(200,164,77,.22),
+   rgba(200,164,77,.08));
+   border-color:var(--gold);
+   color:var(--gold2);
+   }
+   .dock-separator{
+   width:30px;
+   height:1px;
+   background:var(--line);
+   margin:8px 0;
+   }
+   .explorer{
+   grid-area:explorer;
+   display:flex;
+   flex-direction:column;
+   border-right:1px solid var(--line);
+   overflow:hidden;
+   }
+   .explorer-header{
+   height:56px;
+   display:flex;
+   align-items:center;
+   padding:0 20px;
+   border-bottom:1px solid var(--line);
+   font-size:12px;
+   letter-spacing:.24em;
+   color:var(--gold);
+   text-transform:uppercase;
+   font-weight:700;
+   }
+   .tree{
+   flex:1;
+   overflow:auto;
+   padding:18px;
+   }
+   .tree-group{
+   margin-bottom:24px;
+   }
+   .tree-title{
+   font-size:12px;
+   font-weight:700;
+   letter-spacing:.14em;
+   text-transform:uppercase;
+   color:#B6BDC8;
+   margin-bottom:10px;
+   }
+   .tree-item{
+   display:flex;
+   align-items:center;
+   gap:10px;
+   padding:10px 12px;
+   border-radius:12px;
+   cursor:pointer;
+   transition:.18s;
+   font-size:14px;
+   color:#D7DADF;
+   }
+   .tree-item:hover{
+   background:rgba(255,255,255,.05);
+   }
+   .tree-item.active{
+   background:rgba(200,164,77,.12);
+   border-left:3px solid var(--gold);
+   padding-left:9px;
+   }
+   .tree-icon{
+   width:20px;
+   text-align:center;
+   font-size:15px;
+   }
+</style>
+<aside class="panel dock">
+   <div class="dock-button active">
+      ◎
+   </div>
+   <div class="dock-button">
+      ◈
+   </div>
+   <div class="dock-button">
+      ⬒
+   </div>
+   <div class="dock-button">
+      ⬢
+   </div>
+   <div class="dock-button">
+      ✦
+   </div>
+   <div class="dock-button">
+      ◉
+   </div>
+   <div class="dock-separator">
+   </div>
+   <div class="dock-button">
+      ⚙
+   </div>
+</aside>
+<aside class="panel explorer">
+   <div class="explorer-header">
+      WORKSPACE EXPLORER
+   </div>
+   <div class="tree">
+      <div class="tree-group">
+         <div class="tree-title">
+            DIGITAL TWIN
+         </div>
+         <div class="tree-item active">
+            <div class="tree-icon">
+               👤
+            </div>
+            <div>
+               Human Profile
+            </div>
+         </div>
+         <div class="tree-item">
+            <div class="tree-icon">
+               🧠
+            </div>
+            <div>
+               Competencies
+            </div>
+         </div>
+         <div class="tree-item">
+            <div class="tree-icon">
+               🎯
+            </div>
+            <div>
+               Goals
+            </div>
+         </div>
+         <div class="tree-item">
+            <div class="tree-icon">
+               💼
+            </div>
+            <div>
+               Career
+            </div>
+         </div>
+      </div>
+      <div class="tree-group">
+         <div class="tree-title">
+            KNOWLEDGE
+         </div>
+         <div class="tree-item">
+            <div class="tree-icon">
+               📚
+            </div>
+            <div>
+               Professions
+            </div>
+         </div>
+         <div class="tree-item">
+            <div class="tree-icon">
+               ⭐
+            </div>
+            <div>
+               Competencies
+            </div>
+         </div>
+         <div class="tree-item">
+            <div class="tree-icon">
+               🏃
+            </div>
+            <div>
+               Habits
+            </div>
+         </div>
+         <div class="tree-item">
+            <div class="tree-icon">
+               📖
+            </div>
+            <div>
+               Books
+            </div>
+         </div>
+         <div class="tree-item">
+            <div class="tree-icon">
+               ⚽
+            </div>
+            <div>
+               Sports
+            </div>
+         </div>
+      </div>
+      <div class="tree-group">
+         <div class="tree-title">
+            IMPORT
+         </div>
+         <div class="tree-item">
+            <div class="tree-icon">
+               📥
+            </div>
+            <div>
+               Excel
+            </div>
+         </div>
+         <div class="tree-item">
+            <div class="tree-icon">
+               🌍
+            </div>
+            <div>
+               ESCO
+            </div>
+         </div>
+         <div class="tree-item">
+            <div class="tree-icon">
+               🇺🇸
+            </div>
+            <div>
+               O*NET
+            </div>
+         </div>
+         <div class="tree-item">
+            <div class="tree-icon">
+               🧩
+            </div>
+            <div>
+               JSON
+            </div>
+         </div>
+      </div>
+   </div>
+</aside>
+         <!-- ================================================= -->
+<!-- WORKSPACE -->
+<!-- ================================================= -->
+<style>
+   .workspace{
+   grid-area:workspace;
+   display:flex;
+   flex-direction:column;
+   overflow:hidden;
+   background:
+   radial-gradient(circle at top right,
+   rgba(200,164,77,.05),
+   transparent 45%),
+   linear-gradient(
+   180deg,
+   rgba(255,255,255,.02),
+   rgba(255,255,255,.01));
+   }
+   .workspace-header{
+   height:64px;
+   display:flex;
+   justify-content:space-between;
+   align-items:center;
+   padding:0 28px;
+   border-bottom:1px solid var(--line);
+   }
+   .workspace-title{
+   display:flex;
+   flex-direction:column;
+   gap:4px;
+   }
+   .workspace-title h2{
+   font-size:22px;
+   font-weight:700;
+   letter-spacing:.05em;
+   }
+   .workspace-title span{
+   font-size:12px;
+   color:var(--muted);
+   letter-spacing:.16em;
+   text-transform:uppercase;
+   }
+   .workspace-actions{
+   display:flex;
+   gap:12px;
+   }
+   .action-button{
+   height:42px;
+   padding:0 18px;
+   display:flex;
+   align-items:center;
+   gap:10px;
+   border-radius:12px;
+   background:#242930;
+   border:1px solid var(--line);
+   cursor:pointer;
+   transition:.22s;
+   font-size:13px;
+   font-weight:600;
+   }
+   .action-button:hover{
+   border-color:var(--gold);
+   color:var(--gold);
+   transform:translateY(-2px);
+   }
+   .workspace-body{
+   flex:1;
+   padding:28px;
+   overflow:auto;
+   display:grid;
+   grid-template-columns:repeat(12,1fr);
+   grid-auto-rows:minmax(160px,auto);
+   gap:22px;
+   }
+   .widget{
+   background:rgba(255,255,255,.025);
+   border:1px solid rgba(255,255,255,.05);
+   border-radius:18px;
+   padding:22px;
+   display:flex;
+   flex-direction:column;
+   transition:.22s;
+   position:relative;
+   overflow:hidden;
+   }
+   .widget:hover{
+   border-color:rgba(200,164,77,.28);
+   transform:translateY(-3px);
+   }
+   .widget::before{
+   content:"";
+   position:absolute;
+   top:0;
+   left:0;
+   right:0;
+   height:2px;
+   background:
+   linear-gradient(
+   90deg,
+   transparent,
+   var(--gold),
+   transparent);
+   opacity:.35;
+   }
+   .widget.large{
+   grid-column:span 8;
+   }
+   .widget.medium{
+   grid-column:span 4;
+   }
+   .widget.full{
+   grid-column:1/-1;
+   }
+   .widget-title{
+   font-size:12px;
+   letter-spacing:.18em;
+   text-transform:uppercase;
+   color:var(--gold);
+   margin-bottom:18px;
+   font-weight:700;
+   }
+   .widget-value{
+   font-size:52px;
+   font-weight:800;
+   margin-top:auto;
+   }
+   .widget-sub{
+   font-size:13px;
+   color:var(--muted);
+   margin-top:8px;
+   line-height:1.6;
+   }
+   .metric{
+   display:flex;
+   justify-content:space-between;
+   padding:10px 0;
+   border-bottom:1px solid rgba(255,255,255,.05);
+   font-size:14px;
+   }
+   .metric:last-child{
+   border:none;
+   }
+   .progress{
+   height:10px;
+   border-radius:10px;
+   background:#111;
+   margin-top:16px;
+   overflow:hidden;
+   }
+   .progress div{
+   height:100%;
+   width:84%;
+   background:
+   linear-gradient(
+   90deg,
+   #8B6A1E,
+   var(--gold));
+   }
+</style>
+<section class="workspace">
+   <div class="workspace-header">
+      <div class="workspace-title">
+         <h2>
+            Digital Twin
+         </h2>
+         <span>
+         Genesis Human Intelligence Workspace
+         </span>
+      </div>
+      <div class="workspace-actions">
+         <div class="action-button">
+            📥 Import
+         </div>
+         <div class="action-button">
+            🧠 Analyse
+         </div>
+         <div class="action-button">
+            📈 Predict
+         </div>
+         <div class="action-button">
+            ⚙ Settings
+         </div>
+      </div>
+   </div>
+   <div class="workspace-body">
+      <div class="widget medium">
+         <div class="widget-title">
+            PROFILE COMPLETENESS
+         </div>
+         <div class="widget-value">
+            84%
+         </div>
+         <div class="progress">
+            <div>
+            </div>
+         </div>
+         <div class="widget-sub">
+            Digital Twin readiness level
+         </div>
+      </div>
+      <div class="widget medium">
+         <div class="widget-title">
+            CAREER SCORE
+         </div>
+         <div class="widget-value">
+            91
+         </div>
+         <div class="widget-sub">
+            AI Professional Potential
+         </div>
+      </div>
+      <div class="widget medium">
+         <div class="widget-title">
+            ACTIVE GOALS
+         </div>
+         <div class="widget-value">
+            12
+         </div>
+         <div class="widget-sub">
+            Development roadmap
+         </div>
+      </div>
+      <div class="widget large">
+         <div class="widget-title">
+            SYSTEM OVERVIEW
+         </div>
+         <div class="metric">
+            <span>
+            Knowledge Registry
+            </span>
+            <strong>
+            127 442 entities
+            </strong>
+         </div>
+         <div class="metric">
+            <span>
+            Relations
+            </span>
+            <strong>
+            1 904 335
+            </strong>
+         </div>
+         <div class="metric">
+            <span>
+            Professions
+            </span>
+            <strong>
+            6 842
+            </strong>
+         </div>
+         <div class="metric">
+            <span>
+            Competencies
+            </span>
+            <strong>
+            2 180
+            </strong>
+         </div>
+         <div class="metric">
+            <span>
+            AI Models
+            </span>
+            <strong>
+            ONLINE
+            </strong>
+         </div>
+         <div class="metric">
+            <span>
+            Graph Engine
+            </span>
+            <strong>
+            READY
+            </strong>
+         </div>
+      </div>
+      <div class="widget full">
+         <div class="widget-title">
+            WELCOME TO GEN-OS®
+         </div>
+         <div class="widget-sub">
+            This workspace will become the operational center of the entire platform.
+            From here the operator will manage the Digital Twin, knowledge graph, career intelligence, simulations, AI recommendations, imports and development protocols.
+            Every module in GEN-OS is loaded into this workspace without changing the surrounding shell, making the interface feel like a real operating system instead of a traditional website.
+         </div>
+      </div>
+   </div>
+</section>
+         <!-- ================================================= -->
+<!-- INSPECTOR -->
+<!-- ================================================= -->
+<style>
+   .inspector{
+   grid-area:inspector;
+   display:flex;
+   flex-direction:column;
+   border-left:1px solid var(--line);
+   overflow:hidden;
+   }
+   .inspector-header{
+   height:64px;
+   display:flex;
+   align-items:center;
+   padding:0 22px;
+   border-bottom:1px solid var(--line);
+   font-size:12px;
+   letter-spacing:.18em;
+   text-transform:uppercase;
+   font-weight:700;
+   color:var(--gold);
+   }
+   .inspector-scroll{
+   flex:1;
+   overflow:auto;
+   padding:20px;
+   }
+   .inspector-card{
+   background:rgba(255,255,255,.025);
+   border:1px solid rgba(255,255,255,.05);
+   border-radius:16px;
+   padding:18px;
+   margin-bottom:18px;
+   transition:.22s;
+   }
+   .inspector-card:hover{
+   border-color:rgba(200,164,77,.25);
+   }
+   .inspector-label{
+   font-size:11px;
+   letter-spacing:.16em;
+   text-transform:uppercase;
+   color:var(--gold);
+   margin-bottom:8px;
+   }
+   .inspector-title{
+   font-size:20px;
+   font-weight:700;
+   margin-bottom:6px;
+   }
+   .inspector-description{
+   font-size:13px;
+   line-height:1.7;
+   color:var(--muted);
+   }
+   .property{
+   display:flex;
+   justify-content:space-between;
+   padding:12px 0;
+   border-bottom:1px solid rgba(255,255,255,.05);
+   font-size:13px;
+   }
+   .property:last-child{
+   border:none;
+   }
+   .property span{
+   color:var(--muted);
+   }
+   .tag-list{
+   display:flex;
+   flex-wrap:wrap;
+   gap:8px;
+   margin-top:14px;
+   }
+   .tag{
+   padding:7px 12px;
+   border-radius:999px;
+   background:rgba(200,164,77,.10);
+   border:1px solid rgba(200,164,77,.18);
+   font-size:11px;
+   letter-spacing:.08em;
+   text-transform:uppercase;
+   color:var(--gold2);
+   }
+   .health{
+   margin-top:18px;
+   display:flex;
+   flex-direction:column;
+   gap:12px;
+   }
+   .health-row{
+   display:flex;
+   justify-content:space-between;
+   font-size:13px;
+   }
+   .health-bar{
+   height:8px;
+   border-radius:8px;
+   overflow:hidden;
+   background:#111;
+   }
+   .health-fill{
+   height:100%;
+   width:92%;
+   background:linear-gradient(90deg,#6d5518,var(--gold));
+   }
+</style>
+<aside class="panel inspector">
+   <div class="inspector-header">
+      Inspector
+   </div>
+   <div class="inspector-scroll">
+      <div class="inspector-card">
+         <div class="inspector-label">
+            Selected Entity
+         </div>
+         <div class="inspector-title">
+            Digital Twin
+         </div>
+         <div class="inspector-description">
+            The active digital representation of a human profile.
+            Every action inside GEN-OS modifies this model in real time.
+         </div>
+         <div class="tag-list">
+            <div class="tag">
+               ACTIVE
+            </div>
+            <div class="tag">
+               AI READY
+            </div>
+            <div class="tag">
+               PROFILE
+            </div>
+         </div>
+      </div>
+      <div class="inspector-card">
+         <div class="inspector-label">
+            Properties
+         </div>
+         <div class="property">
+            <span>ID</span>
+            <strong>H-000001</strong>
+         </div>
+         <div class="property">
+            <span>Status</span>
+            <strong>ONLINE</strong>
+         </div>
+         <div class="property">
+            <span>Knowledge</span>
+            <strong>84%</strong>
+         </div>
+         <div class="property">
+            <span>Competencies</span>
+            <strong>162</strong>
+         </div>
+         <div class="property">
+            <span>Relations</span>
+            <strong>1847</strong>
+         </div>
+         <div class="property">
+            <span>Last Analysis</span>
+            <strong>Today</strong>
+         </div>
+      </div>
+      <div class="inspector-card">
+         <div class="inspector-label">
+            System Health
+         </div>
+         <div class="health">
+            <div class="health-row">
+               <span>Registry</span>
+               <strong>100%</strong>
+            </div>
+            <div class="health-bar">
+               <div class="health-fill"></div>
+            </div>
+            <div class="health-row">
+               <span>Graph</span>
+               <strong>97%</strong>
+            </div>
+            <div class="health-bar">
+               <div class="health-fill" style="width:97%;"></div>
+            </div>
+            <div class="health-row">
+               <span>AI Engine</span>
+               <strong>91%</strong>
+            </div>
+            <div class="health-bar">
+               <div class="health-fill" style="width:91%;"></div>
+            </div>
+            <div class="health-row">
+               <span>Prediction</span>
+               <strong>88%</strong>
+            </div>
+            <div class="health-bar">
+               <div class="health-fill" style="width:88%;"></div>
+            </div>
+         </div>
+      </div>
+   </div>
+</aside>
+         <!-- ================================================= -->
+<!-- ENGINEERING CONSOLE -->
+<!-- ================================================= -->
+<style>
+   .console{
+   grid-area:console;
+   display:flex;
+   flex-direction:column;
+   border-top:1px solid var(--line);
+   overflow:hidden;
+   background:
+   linear-gradient(
+   180deg,
+   rgba(0,0,0,.20),
+   rgba(0,0,0,.45));
+   }
+   .console-header{
+   height:46px;
+   display:flex;
+   justify-content:space-between;
+   align-items:center;
+   padding:0 22px;
+   border-bottom:1px solid var(--line);
+   }
+   .console-title{
+   font-size:12px;
+   font-weight:700;
+   letter-spacing:.18em;
+   text-transform:uppercase;
+   color:var(--gold);
+   }
+   .console-actions{
+   display:flex;
+   gap:10px;
+   }
+   .console-button{
+   padding:6px 12px;
+   border-radius:10px;
+   background:#262C33;
+   border:1px solid var(--line);
+   font-size:11px;
+   cursor:pointer;
+   transition:.18s;
+   }
+   .console-button:hover{
+   border-color:var(--gold);
+   color:var(--gold);
+   }
+   .console-body{
+   flex:1;
+   overflow:auto;
+   padding:18px;
+   font-family:
+   Consolas,
+   "JetBrains Mono",
+   monospace;
+   font-size:13px;
+   line-height:1.75;
+   color:#B7C3CE;
+   }
+   .console-line{
+   display:flex;
+   gap:12px;
+   margin-bottom:6px;
+   white-space:pre-wrap;
+   }
+   .console-time{
+   width:82px;
+   color:#7F8791;
+   }
+   .console-info{
+   color:#8ED0FF;
+   }
+   .console-success{
+   color:#59D185;
+   }
+   .console-warning{
+   color:#F5B942;
+   }
+   .console-error{
+   color:#FF6B6B;
+   }
+   .console-command{
+   color:var(--gold);
+   font-weight:600;
+   }
+   .cursor{
+   display:inline-block;
+   width:8px;
+   height:15px;
+   background:var(--gold);
+   margin-left:4px;
+   animation:blink .9s infinite;
+   }
+   @keyframes blink{
+   50%{
+   opacity:0;
+   }
+   }
+</style>
+<section class="panel console">
+   <div class="console-header">
+      <div class="console-title">
+         Mission Console
+      </div>
+      <div class="console-actions">
+         <div class="console-button">
+            CLEAR
+         </div>
+         <div class="console-button">
+            EXPORT
+         </div>
+         <div class="console-button">
+            COPY
+         </div>
+      </div>
+   </div>
+   <div class="console-body">
+      <div class="console-line">
+         <div class="console-time">
+            08:41:17
+         </div>
+         <div>
+            <span class="console-success">
+            SYSTEM
+            </span>
+            Genesis Kernel initialized.
+         </div>
+      </div>
+      <div class="console-line">
+         <div class="console-time">
+            08:41:18
+         </div>
+         <div>
+            <span class="console-success">
+            DATABASE
+            </span>
+            PostgreSQL connection established.
+         </div>
+      </div>
+      <div class="console-line">
+         <div class="console-time">
+            08:41:18
+         </div>
+         <div>
+            <span class="console-success">
+            GRAPH
+            </span>
+            Knowledge Registry loaded.
+         </div>
+      </div>
+      <div class="console-line">
+         <div class="console-time">
+            08:41:19
+         </div>
+         <div>
+            <span class="console-success">
+            AI
+            </span>
+            Recommendation Engine ONLINE.
+         </div>
+      </div>
+      <div class="console-line">
+         <div class="console-time">
+            08:41:20
+         </div>
+         <div>
+            <span class="console-info">
+            READY
+            </span>
+            Waiting for operator...
+         </div>
+      </div>
+      <div class="console-line">
+         <div class="console-time">
+            08:41:21
+         </div>
+         <div>
+            <span class="console-command">
+            genos&gt;
+            </span>
+            <span class="cursor"></span>
+         </div>
+      </div>
+   </div>
+</section>
+         <!-- ================================================= -->
+<!-- STATUS BAR -->
+<!-- ================================================= -->
+<style>
+   .statusbar{
+   grid-area:status;
+   display:flex;
+   align-items:center;
+   justify-content:space-between;
+   padding:0 18px;
+   border-top:1px solid var(--line);
+   background:#16191D;
+   font-size:12px;
+   }
+   .status-left{
+   display:flex;
+   align-items:center;
+   gap:18px;
+   }
+   .status-right{
+   display:flex;
+   align-items:center;
+   gap:18px;
+   }
+   .status-item{
+   display:flex;
+   align-items:center;
+   gap:8px;
+   color:var(--muted);
+   }
+   .status-dot{
+   width:8px;
+   height:8px;
+   border-radius:50%;
+   background:#2ECC71;
+   box-shadow:
+   0 0 10px rgba(46,204,113,.45);
+   }
+   .status-dot.warning{
+   background:#F5B942;
+   box-shadow:
+   0 0 10px rgba(245,185,66,.45);
+   }
+   .status-dot.error{
+   background:#FF6B6B;
+   box-shadow:
+   0 0 10px rgba(255,107,107,.45);
+   }
+   .status-value{
+   color:white;
+   font-weight:600;
+   }
+   .clock{
+   font-weight:600;
+   letter-spacing:.08em;
+   color:var(--gold);
+   }
+</style>
+<footer class="statusbar panel">
+   <div class="status-left">
+      <div class="status-item">
+         <div class="status-dot"></div>
+         <span>
+         Kernel
+         </span>
+         <strong class="status-value">
+         ONLINE
+         </strong>
+      </div>
+      <div class="status-item">
+         <div class="status-dot"></div>
+         <span>
+         Database
+         </span>
+         <strong class="status-value">
+         CONNECTED
+         </strong>
+      </div>
+      <div class="status-item">
+         <div class="status-dot"></div>
+         <span>
+         Knowledge
+         </span>
+         <strong class="status-value">
+         127 442
+         </strong>
+      </div>
+      <div class="status-item">
+         <div class="status-dot"></div>
+         <span>
+         Relations
+         </span>
+         <strong class="status-value">
+         1 904 335
+         </strong>
+      </div>
+      <div class="status-item">
+         <div class="status-dot"></div>
+         <span>
+         AI
+         </span>
+         <strong class="status-value">
+         READY
+         </strong>
+      </div>
+   </div>
+   <div class="status-right">
+      <div class="status-item">
+         BUILD
+         <strong class="status-value">
+         0016
+         </strong>
+      </div>
+      <div class="status-item">
+         FPS
+         <strong class="status-value">
+         60
+         </strong>
+      </div>
+      <div class="status-item">
+         RAM
+         <strong class="status-value">
+         412 MB
+         </strong>
+      </div>
+      <div class="clock"
+         id="clock">
+         00:00:00
+      </div>
+   </div>
+</footer>
+<script>
+   function updateClock(){
+
+   const d=new Date();
+
+   document.getElementById("clock").innerHTML=
+
+   d.toLocaleTimeString();
+
+   }
+
+   setInterval(updateClock,1000);
+
+   updateClock();
+
+</script>
+         <!-- ===================================================== -->
+<!-- WORKSPACE LOADER -->
+<!-- ===================================================== -->
+<script>
+   const workspaces={
+
+   human:{
+
+   title:"Digital Twin",
+
+   subtitle:"Human Intelligence Workspace"
+
+   },
+
+   career:{
+
+   title:"Career Intelligence",
+
+   subtitle:"Professional Analytics"
+
+   },
+
+   import:{
+
+   title:"Knowledge Import",
+
+   subtitle:"Excel • ESCO • O*NET"
+
+   },
+
+   knowledge:{
+
+   title:"Knowledge Explorer",
+
+   subtitle:"Human Knowledge Graph"
+
+   },
+
+   simulation:{
+
+   title:"Future Simulator",
+
+   subtitle:"Predictive Intelligence"
+
+   },
+
+   ai:{
+
+   title:"AI Advisor",
+
+   subtitle:"Genesis Neural Assistant"
+
+   },
+
+   platform:{
+
+   title:"Platform",
+
+   subtitle:"System Configuration"
+
+   }
+
+   };
+
+   function loadWorkspace(name){
+
+   const ws=workspaces[name];
+
+   if(!ws)return;
+
+   document.querySelector(".workspace-title h2").innerHTML=ws.title;
+
+   document.querySelector(".workspace-title span").innerHTML=ws.subtitle;
+
+   document.querySelectorAll(".dock-button")
+
+   .forEach(b=>b.classList.remove("active"));
+
+   document
+
+   .querySelector(".dock-button[data-workspace='"+name+"']")
+
+   .classList.add("active");
+
+   consoleLog(
+
+   "Workspace loaded",
+
+   ws.title,
+
+   "success"
+
+   );
+
+   }
+
+   function consoleLog(title,text,type){
+
+   const body=document.querySelector(".console-body");
+
+   const line=document.createElement("div");
+
+   line.className="console-line";
+
+   const t=new Date().toLocaleTimeString();
+
+   let color="console-info";
+
+   if(type==="success")color="console-success";
+
+   if(type==="warning")color="console-warning";
+
+   if(type==="error")color="console-error";
+
+   line.innerHTML=
+
+   '<div class="console-time">'+t+'</div>'+
+
+   '<div><span class="'+color+'">'+title+
+
+   '</span> '+text+'</div>';
+
+   body.insertBefore(
+
+   line,
+
+   body.lastElementChild
+
+   );
+
+   body.scrollTop=body.scrollHeight;
+
+   }
+
+   document
+
+   .querySelectorAll(".dock-button")
+
+   .forEach((button,index)=>{
+
+   const names=[
+
+   "human",
+
+   "career",
+
+   "import",
+
+   "knowledge",
+
+   "ai",
+
+   "simulation",
+
+   "platform"
+
+   ];
+
+   button.dataset.workspace=names[index];
+
+   button.onclick=()=>loadWorkspace(
+
+   button.dataset.workspace
+
+   );
+
+   });
+
+</script>
+</body>
+</html>

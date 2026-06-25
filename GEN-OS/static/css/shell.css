@@ -1,0 +1,41 @@
+.gen-shell{
+margin:0;
+padding:0;
+background:#111317;
+color:#f1f1f1;
+font-family:Inter,sans-serif;
+height:100vh;
+overflow:hidden;
+}
+.shell-window{
+display:flex;
+flex-direction:column;
+height:100vh;
+}
+.shell-body{
+flex:1;
+display:grid;
+grid-template-columns:
+320px
+1fr
+320px;
+overflow:hidden;
+}
+.shell-explorer{
+border-right:1px solid var(--border);
+background:#171a1f;
+}
+.shell-workspace{
+overflow:auto;
+}
+.shell-inspector{
+border-left:1px solid var(--border);
+background:#171a1f;
+}
+.shell-console{
+height:160px;
+border-top:1px solid var(--border);
+}
+.shell-statusbar{
+height:34px;
+}

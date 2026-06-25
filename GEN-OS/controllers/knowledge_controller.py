@@ -135,3 +135,41 @@ class KnowledgeController:
 
 
 knowledge = KnowledgeController()
+
+"""
+═══════════════════════════════════════════════════════════════════════
+GENESIS HR®
+
+Knowledge Controller
+
+BUILD:0102
+
+═══════════════════════════════════════════════════════════════════════
+"""
+
+from flask import render_template
+
+from services.entity_service import entity_service
+from services.relation_service import relation_service
+
+
+class KnowledgeController:
+
+    def workspace(self):
+        return render_template(
+            "workspaces/knowledge_workspace.html",
+            entities=entity_service.count(),
+            relations=relation_service.count()
+        )
+
+    def statistics(self):
+
+        return {
+            "entities":
+                entity_service.count(),
+            "relations":
+                relation_service.count()
+        }
+
+
+knowledge_controller = KnowledgeController()

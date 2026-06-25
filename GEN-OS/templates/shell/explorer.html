@@ -1,0 +1,73 @@
+<div class="gen-explorer">
+   <div class="gen-panel-header">
+      <div>
+         <div class="gen-panel-title">
+            Knowledge Explorer
+         </div>
+         <div class="gen-panel-subtitle">
+            Entity Registry
+         </div>
+      </div>
+      <button class="gen-icon-button">
+      ＋
+      </button>
+   </div>
+   <div class="gen-explorer-filter">
+      <input
+         class="gen-input"
+         type="text"
+         placeholder="Filter entities...">
+   </div>
+   <div class="gen-tree">
+      {% for group in tree %}
+      <div class="gen-tree-group">
+         <div class="gen-tree-group-header">
+            <span class="gen-tree-arrow">
+            ▼
+            </span>
+            <span class="gen-tree-icon">
+            {{ group.icon }}
+            </span>
+            <span class="gen-tree-title">
+            {{ group.title }}
+            </span>
+            <span class="gen-tree-count">
+            {{ group.children|length }}
+            </span>
+         </div>
+         <div class="gen-tree-items">
+            {% for node in group.children %}
+            <div
+               class="gen-tree-item {% if node.selected %}active{% endif %}"
+               data-id="{{ node.id }}">
+               <div class="gen-tree-item-icon">
+                  {{ node.icon }}
+               </div>
+               <div class="gen-tree-item-title">
+                  {{ node.title }}
+               </div>
+            </div>
+            {% endfor %}
+         </div>
+      </div>
+      {% endfor %}
+   </div>
+   <div class="gen-explorer-footer">
+      <div class="gen-footer-row">
+         <span>
+         Entities
+         </span>
+         <strong>
+         {{ tree|length }}
+         </strong>
+      </div>
+      <div class="gen-footer-row">
+         <span>
+         Registry
+         </span>
+         <strong>
+         ONLINE
+         </strong>
+      </div>
+   </div>
+</div>

@@ -105,3 +105,49 @@ class ImportController:
 
 
 import_controller = ImportController()
+
+
+"""
+═══════════════════════════════════════════════════════════════════════
+GENESIS HR®
+
+Import Controller
+
+BUILD:0105
+
+═══════════════════════════════════════════════════════════════════════
+"""
+
+from flask import render_template
+
+from services.import_service import import_service
+
+
+class ImportController:
+
+    def workspace(self):
+
+        return render_template(
+            "workspaces/import_workspace.html"
+        )
+
+    def preview(
+        self,
+        filepath
+    ):
+
+        return import_service.preview(
+            filepath
+        )
+
+    def execute(
+        self,
+        filepath
+    ):
+
+        return import_service.import_file(
+            filepath
+        )
+
+
+import_controller = ImportController()

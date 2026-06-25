@@ -1,0 +1,58 @@
+<div class="gen-workspace-host">
+   <div class="gen-workspace-header">
+      <div>
+         <div class="gen-workspace-title">
+            {{ workspace.title if workspace else "Human Workspace" }}
+         </div>
+         <div class="gen-workspace-description">
+            {{ workspace.description if workspace else "Digital Twin Environment" }}
+         </div>
+      </div>
+      <div class="gen-workspace-actions">
+         <button class="gen-btn">
+         Refresh
+         </button>
+         <button class="gen-btn">
+         Export
+         </button>
+         <button class="gen-btn gen-btn-primary">
+         Run Analysis
+         </button>
+      </div>
+   </div>
+   <div class="gen-workspace-body">
+      {% if workspace %}
+      {% include workspace.template %}
+      {% else %}
+      <div class="gen-empty">
+         <div class="gen-empty-icon">
+            🧠
+         </div>
+         <div class="gen-empty-title">
+            No Workspace Loaded
+         </div>
+         <div class="gen-empty-text">
+            Select a workspace from the left navigation.
+         </div>
+      </div>
+      {% endif %}
+   </div>
+   <div class="gen-workspace-footer">
+      <div class="gen-footer-item">
+         <span>Status</span>
+         <strong>READY</strong>
+      </div>
+      <div class="gen-footer-item">
+         <span>Entities</span>
+         <strong>{{ entity_count|default(0) }}</strong>
+      </div>
+      <div class="gen-footer-item">
+         <span>Relations</span>
+         <strong>{{ relation_count|default(0) }}</strong>
+      </div>
+      <div class="gen-footer-item">
+         <span>Kernel</span>
+         <strong>ONLINE</strong>
+      </div>
+   </div>
+</div>

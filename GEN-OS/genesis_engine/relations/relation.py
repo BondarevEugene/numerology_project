@@ -35,7 +35,7 @@ from typing import Dict
 from typing import Any
 
 
-@dataclass(slots=True)
+@dataclass
 class Relation:
 
     # ==========================================================

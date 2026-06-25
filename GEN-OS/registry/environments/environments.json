@@ -1,0 +1,32 @@
+[
+  {
+    "id":"env_startup",
+    "title":"Startup",
+    "category":"Business"
+  },
+  {
+    "id":"env_corporation",
+    "title":"Corporation",
+    "category":"Business"
+  },
+  {
+    "id":"env_remote",
+    "title":"Remote Team",
+    "category":"Work"
+  },
+  {
+    "id":"env_military",
+    "title":"Military Unit",
+    "category":"Military"
+  },
+  {
+    "id":"env_research",
+    "title":"Research Laboratory",
+    "category":"Science"
+  },
+  {
+    "id":"env_university",
+    "title":"University",
+    "category":"Education"
+  }
+]

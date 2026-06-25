@@ -39,7 +39,7 @@ from uuid import uuid4
 from ..schema.knowledge_schema import EntityType
 
 
-@dataclass(slots=True)
+@dataclass
 class Entity:
     # ==========================================================
     # IDENTIFICATION

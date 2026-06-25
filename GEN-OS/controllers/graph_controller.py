@@ -38,7 +38,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 
-@dataclass(slots=True)
+@dataclass
 class GraphState:
     loaded: bool = False
     nodes: int = 0
@@ -99,3 +99,45 @@ class GraphController:
 
     def get_state(self):
         return self.state
+
+
+"""
+═══════════════════════════════════════════════════════════════════════
+GENESIS HR®
+
+Graph Controller
+
+BUILD:0103
+
+═══════════════════════════════════════════════════════════════════════
+"""
+
+from flask import render_template
+
+from services.graph_service import graph_service
+from services.entity_service import entity_service
+from services.relation_service import relation_service
+
+
+class GraphController:
+
+    def workspace(self):
+
+        return render_template(
+            "workspaces/graph_workspace.html",
+            entities=entity_service.count(),
+            relations=relation_service.count()
+
+        )
+
+    def node(self, entity_id):
+        return {
+
+            "neighbors":
+                graph_service.neighbors(
+                    entity_id
+                )
+        }
+
+
+graph_controller = GraphController()

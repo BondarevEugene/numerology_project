@@ -1,72 +1,235 @@
 /*
-═══════════════════════════════════════════════
-Human Workspace
-═══════════════════════════════════════════════
+═══════════════════════════════════════════════════════════════════════
+GENESIS HR®
+
+GEN-OS Design Language
+
+FILE:
+workspace.css
+
+BUILD:
+0042
+
+DESCRIPTION:
+Главная рабочая область платформы.
+Digital Twin Workspace.
+
+═══════════════════════════════════════════════════════════════════════
 */
 
-.gen-human{
+.gen-workspace-host{
 display:flex;
 flex-direction:column;
-gap:24px;
+height:100%;
+min-height:100vh;
+background:linear-gradient(180deg,#121417 0%,#17191d 100%);
 }
 
-.gen-grid-human{
-display:grid;
-grid-template-columns:320px 1fr 380px;
-gap:24px;
+.gen-workspace-header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:28px 34px;
+border-bottom:1px solid var(--border);
+background:rgba(26,29,34,.85);
+backdrop-filter:blur(18px);
 }
 
-.gen-avatar{
-height:170px;
+.gen-workspace-title{
+font-size:28px;
+font-weight:700;
+letter-spacing:.02em;
+color:var(--accent-light);
+}
+
+.gen-workspace-description{
+margin-top:8px;
+font-size:13px;
+color:var(--muted);
+letter-spacing:.08em;
+text-transform:uppercase;
+}
+
+.gen-workspace-actions{
+display:flex;
+gap:14px;
+align-items:center;
+}
+
+.gen-workspace-body{
+flex:1;
+padding:34px;
+overflow:auto;
+}
+
+.gen-workspace-footer{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:18px 34px;
+background:#171a1e;
+border-top:1px solid var(--border);
+}
+
+.gen-footer-item{
+display:flex;
+flex-direction:column;
+gap:4px;
+font-size:12px;
+text-transform:uppercase;
+color:var(--muted);
+}
+
+.gen-footer-item strong{
+font-size:15px;
+font-weight:700;
+color:var(--accent);
+}
+
+.human-workspace{
+display:flex;
+flex-direction:column;
+gap:28px;
+}
+
+.human-avatar{
+display:flex;
+justify-content:center;
+margin:18px 0;
+}
+
+.human-avatar-circle{
+width:120px;
+height:120px;
+border-radius:50%;
 display:flex;
 align-items:center;
 justify-content:center;
-font-size:90px;
-border-radius:22px;
-background:#17191d;
-margin-bottom:20px;
-border:1px solid var(--border);
+font-size:54px;
+background:linear-gradient(145deg,#24282d,#17191d);
+border:1px solid rgba(200,164,77,.25);
+box-shadow:
+0 20px 60px rgba(0,0,0,.45),
+inset 0 1px 0 rgba(255,255,255,.05);
 }
 
-.gen-stat{
-font-size:12px;
-letter-spacing:.18em;
+.human-name{
+margin-top:10px;
+text-align:center;
+font-size:22px;
+font-weight:700;
+color:#fff;
+}
+
+.human-role{
+margin-top:6px;
+text-align:center;
+font-size:13px;
+letter-spacing:.15em;
 text-transform:uppercase;
 color:var(--muted);
+}
+
+.human-score{
+margin-top:16px;
+font-size:52px;
+font-weight:800;
+text-align:center;
+color:var(--accent-light);
+}
+
+.human-score-label{
+margin-top:8px;
+text-align:center;
+font-size:13px;
+letter-spacing:.12em;
+text-transform:uppercase;
+color:var(--muted);
+}
+
+.skill-list{
+display:flex;
+flex-direction:column;
+gap:14px;
 margin-top:18px;
 }
 
-.gen-value{
-font-size:18px;
-font-weight:600;
-color:var(--accent-light);
-margin-top:6px;
+.skill-row{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:12px 14px;
+border-radius:12px;
+background:#1b1f24;
+transition:.18s;
 }
 
-.gen-widget-list{
+.skill-row:hover{
+background:#232931;
+transform:translateX(6px);
+}
+
+.skill-row strong{
+color:var(--accent-light);
+}
+
+.roadmap{
 display:flex;
 flex-direction:column;
-gap:16px;
+gap:14px;
+margin-top:20px;
 }
 
-.gen-widget{
-padding:18px;
-border-radius:16px;
-background:#17191d;
-border:1px solid var(--border);
-transition:.25s;
-cursor:pointer;
+.roadmap-item{
+padding:14px 18px;
+background:#1b1f24;
+border-left:4px solid var(--accent);
+border-radius:12px;
+transition:.18s;
 }
 
-.gen-widget:hover{
+.roadmap-item:hover{
+background:#232931;
 transform:translateX(8px);
-background:#23272d;
 }
 
-.gen-roadmap{
-min-height:180px;
+.summary-block{
+line-height:1.9;
+font-size:15px;
+color:#d9d9d9;
+}
+
+.summary-block ul{
+margin-top:18px;
+padding-left:22px;
+}
+
+.summary-block li{
+margin-bottom:10px;
+}
+
+.gen-empty{
 display:flex;
-align-items:center;
+flex-direction:column;
 justify-content:center;
+align-items:center;
+height:100%;
+opacity:.75;
+}
+
+.gen-empty-icon{
+font-size:82px;
+margin-bottom:20px;
+}
+
+.gen-empty-title{
+font-size:28px;
+font-weight:700;
+color:var(--accent-light);
+}
+
+.gen-empty-text{
+margin-top:12px;
+font-size:15px;
 color:var(--muted);
 }

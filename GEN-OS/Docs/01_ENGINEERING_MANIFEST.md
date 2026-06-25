@@ -73,7 +73,22 @@ GEN-OS/
 
 
 
+Поэтому я предлагаю окончательный список модулей GEN-OS
+◎ Digital Twin
 
+◈ Career Intelligence
+
+⬒ Knowledge Import
+
+⬢ Knowledge Explorer
+
+◉ Future Simulator
+
+✦ AI Advisor
+
+⬡ Knowledge Graph
+
+⚙ Platform
 
 GENESIS MANIFEST v0.1
 
