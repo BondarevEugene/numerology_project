@@ -1,0 +1,19 @@
+.gen-statusbar{
+height:100%;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 16px;
+background:#14171b;
+border-top:1px solid var(--border);
+font-size:12px;
+}
+.status-left{
+color:#7ee27e;
+}
+.status-center{
+color:#999;
+}
+.status-right{
+color:#c8a44d;
+}

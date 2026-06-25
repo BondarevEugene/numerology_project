@@ -1,0 +1,45 @@
+<aside class="gen-explorer">
+
+<div class="gen-logo">
+
+GENESIS
+
+</div>
+
+<div class="gen-version">
+
+Human Intelligence Platform
+
+</div>
+
+<nav>
+
+{% for module in modules %}
+
+<a
+
+href="{{ module.route }}"
+
+class="gen-menu-item"
+
+>
+
+<div>
+
+{{ module.icon }}
+
+</div>
+
+<div>
+
+{{ module.title }}
+
+</div>
+
+</a>
+
+{% endfor %}
+
+</nav>
+
+</aside>

@@ -1,0 +1,125 @@
+/*
+Workspace Framework
+*/
+
+.gen-workspace-host {
+
+	display: flex;
+
+	flex-direction: column;
+
+	height: 100%;
+
+}
+
+.gen-workspace-header {
+
+	display: flex;
+
+	justify-content: space-between;
+
+	align-items: center;
+
+	padding: 26px 30px;
+
+	border-bottom: 1px solid var(--border);
+
+	background: var(--bg-panel);
+
+}
+
+.gen-workspace-title {
+
+	font-size: 28px;
+
+	font-weight: 700;
+
+}
+
+.gen-workspace-description {
+
+	color: var(--text-muted);
+
+	margin-top: 6px;
+
+}
+
+.gen-workspace-actions {
+
+	display: flex;
+
+	gap: 12px;
+
+}
+
+.gen-workspace-body {
+
+	flex: 1;
+
+	padding: 28px;
+
+	overflow: auto;
+
+}
+
+.gen-workspace-footer {
+
+	display: flex;
+
+	gap: 40px;
+
+	padding: 16px 30px;
+
+	border-top: 1px solid var(--border);
+
+	background: #15191f;
+
+}
+
+.gen-footer-item {
+
+	display: flex;
+
+	flex-direction: column;
+
+	gap: 4px;
+
+}
+
+.gen-footer-item span {
+
+	color: var(--text-muted);
+
+	font-size: 12px;
+
+}
+
+.gen-empty {
+
+	height: 100%;
+
+	display: flex;
+
+	flex-direction: column;
+
+	justify-content: center;
+
+	align-items: center;
+
+	gap: 20px;
+
+}
+
+.gen-empty-icon {
+
+	font-size: 72px;
+
+}
+
+.gen-empty-title {
+
+	font-size: 24px;
+
+	font-weight: 700;
+
+}

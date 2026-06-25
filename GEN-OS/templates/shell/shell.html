@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>GEN-OS</title>
+
+    <!-- GENESIS DESIGN SYSTEM -->
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/genesis.css') }}">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/layout.css') }}">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/components.css') }}">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/workspace.css') }}">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/typography.css') }}">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/animations.css') }}">
+
+    <!-- EXISTING -->
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/shell.css') }}">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/explorer.css') }}">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/console.css') }}">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/inspector.css') }}">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/statusbar.css') }}">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/knowledge.css') }}">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/graph.css') }}">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/simulation.css') }}">
+
+</head>
+   <body class="gen-shell">
+      <div class="shell-window">
+         <header class="shell-toolbar">
+            {% include "shell/toolbar.html" %}
+         </header>
+         <div class="shell-body">
+            <aside class="shell-explorer">
+               {% include "shell/explorer.html" %}
+            </aside>
+            <main class="shell-workspace">
+               {% include "shell/workspace_host.html" %}
+            </main>
+            <aside class="shell-inspector">
+               {% include "shell/inspector.html" %}
+            </aside>
+         </div>
+         <section class="shell-console">
+            {% include "shell/console.html" %}
+         </section>
+         <footer class="shell-statusbar">
+            {% include "shell/statusbar.html" %}
+         </footer>
+      </div>
+      <!--
+      <script src="{{ url_for('static',filename='js/shell.js') }}"></script>
+      -->
+      <script src="{{ url_for('static',filename='js/workspace_loader.js') }}"></script>
+      <script src="{{ url_for('static',filename='js/explorer.js') }}"></script>
+      <script src="{{ url_for('static',filename='js/toolbar.js') }}"></script>
+      <script src="{{ url_for('static',filename='js/console.js') }}"></script>
+      <script src="{{ url_for('static',filename='js/inspector.js') }}"></script>
+   </body>
+</html>

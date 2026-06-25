@@ -1,0 +1,169 @@
+<!--
+   ═══════════════════════════════════════════════════════════════════════
+   GEN-OS®
+   Knowledge Import Workspace
+   BUILD-0016
+   Первый полноценный Workspace платформы.
+   Не является страницей.
+   Загружается внутрь Workspace Loader.
+
+   ═══════════════════════════════════════════════════════════════════════
+   -->
+<div class="gen-workspace">
+   <div class="gen-workspace-header">
+      <div>
+         <div class="gen-workspace-title">
+            Knowledge Import
+         </div>
+         <div class="gen-workspace-subtitle">
+            Excel • ESCO • O*NET • JSON • API
+         </div>
+      </div>
+      <div class="gen-toolbar">
+         <button class="gen-btn">
+         New Session
+         </button>
+         <button class="gen-btn">
+         History
+         </button>
+         <button class="gen-btn gen-btn-primary">
+         Import
+         </button>
+      </div>
+   </div>
+   <div class="gen-workspace-content">
+      <div class="gen-import-grid">
+         <div class="gen-card gen-dropzone">
+            <div class="gen-card-title">
+               DROP SOURCE
+            </div>
+            <div class="drop-icon">
+               ⬒
+            </div>
+            <div class="drop-title">
+               Drop Excel here
+            </div>
+            <div class="drop-sub">
+               or choose file
+            </div>
+            <input
+               type="file"
+               id="import-file"
+               hidden>
+            <button
+               class="gen-btn"
+               onclick="document.getElementById('import-file').click()">
+            Browse...
+            </button>
+         </div>
+         <div class="gen-card">
+            <div class="gen-card-title">
+               PIPELINE
+            </div>
+            <div class="pipeline">
+               <div class="pipeline-step active">
+                  ① Parse
+               </div>
+               <div class="pipeline-step">
+                  ② Validate
+               </div>
+               <div class="pipeline-step">
+                  ③ Normalize
+               </div>
+               <div class="pipeline-step">
+                  ④ Build Entities
+               </div>
+               <div class="pipeline-step">
+                  ⑤ Build Relations
+               </div>
+               <div class="pipeline-step">
+                  ⑥ Preview
+               </div>
+               <div class="pipeline-step">
+                  ⑦ Registry
+               </div>
+            </div>
+         </div>
+         <div class="gen-card gen-span-2">
+            <div class="gen-card-title">
+               PREVIEW
+            </div>
+            <table class="gen-table">
+               <thead>
+                  <tr>
+                     <th>
+                        Profession
+                     </th>
+                     <th>
+                        Category
+                     </th>
+                     <th>
+                        Status
+                     </th>
+                  </tr>
+               </thead>
+               <tbody id="preview-table">
+                  <tr>
+                     <td colspan="3">
+                        Waiting for file...
+                     </td>
+                  </tr>
+               </tbody>
+            </table>
+         </div>
+         <div class="gen-card">
+            <div class="gen-card-title">
+               SESSION
+            </div>
+            <div class="gen-property">
+               <span>
+               Source
+               </span>
+               <strong>
+               Excel
+               </strong>
+            </div>
+            <div class="gen-property">
+               <span>
+               Rows
+               </span>
+               <strong>
+               0
+               </strong>
+            </div>
+            <div class="gen-property">
+               <span>
+               Imported
+               </span>
+               <strong>
+               0
+               </strong>
+            </div>
+            <div class="gen-property">
+               <span>
+               Failed
+               </span>
+               <strong>
+               0
+               </strong>
+            </div>
+            <div class="gen-property">
+               <span>
+               Updated
+               </span>
+               <strong>
+               0
+               </strong>
+            </div>
+            <div class="gen-property">
+               <span>
+               Registry
+               </span>
+               <strong>
+               Idle
+               </strong>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>

@@ -1,0 +1,20 @@
+<aside class="gen-sidebar">
+<div class="sidebar-title">
+WORKSPACE
+</div>
+<nav>
+{% for module in modules %}
+<a
+href="{{ module.route }}"
+class="gen-nav-item"
+>
+<span>
+{{ module.icon }}
+</span>
+<span>
+{{ module.title }}
+</span>
+</a>
+{% endfor %}
+</nav>
+</aside>

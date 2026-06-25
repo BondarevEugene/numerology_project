@@ -1,0 +1,35 @@
+<aside class="gen-explorer">
+
+    <div class="explorer-title">
+
+        WORKSPACE
+
+    </div>
+
+    {% for module in modules %}
+
+    <a
+
+        href="{{ module.route }}"
+
+        class="gen-nav"
+
+    >
+
+        <span>
+
+            {{ module.icon }}
+
+        </span>
+
+        <span>
+
+            {{ module.title }}
+
+        </span>
+
+    </a>
+
+    {% endfor %}
+
+</aside>

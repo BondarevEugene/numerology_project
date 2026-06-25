@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mission Control | System Architecture</title>
+    <style>
+        :root {
+            --bg: #0a0a0c;
+            --panel: #121215;
+            --accent: #00f2ff;
+            --text: #e0e0e0;
+            --dim: #666;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Courier New', Courier, monospace;
+            padding: 40px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: var(--accent);
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 30px;
+            border-left: 3px solid var(--accent);
+            padding-left: 15px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 40px;
+        }
+
+        .code-item {
+            background: var(--panel);
+            padding: 10px 15px;
+            border: 1px solid #222;
+            font-size: 0.9rem;
+        }
+
+        .code-item span { color: var(--dim); margin-right: 10px; }
+
+        .module-list {
+            border-top: 1px solid #333;
+            padding-top: 20px;
+        }
+
+        ul { list-style: none; padding: 0; }
+        li {
+            padding: 5px 0;
+            border-bottom: 1px solid #1a1a1a;
+            display: flex;
+            align-items: center;
+        }
+        li::before {
+            content: "▹";
+            color: var(--accent);
+            margin-right: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Mission Control // Architecture</h1>
+
+    <div class="grid">
+        <div class="code-item"><span>01</span>mission.py</div>
+        <div class="code-item"><span>02</span>events.py</div>
+        <div class="code-item"><span>03</span>dashboard.py</div>
+        <div class="code-item"><span>04</span>console.py</div>
+        <div class="code-item"><span>05</span>statistics.py</div>
+        <div class="code-item"><span>06</span>progress.py</div>
+        <div class="code-item"><span>07</span>timer.py</div>
+        <div class="code-item"><span>08</span>colors.py</div>
+        <div class="code-item"><span>09</span>icons.py</div>
+        <div class="code-item"><span>10</span>formatter.py</div>
+        <div class="code-item"><span>11</span>panels.py</div>
+        <div class="code-item"><span>12</span>renderer.py</div>
+    </div>
+
+    <h3>SYSTEM INTEGRATION CORE</h3>
+    <ul class="module-list">
+        <li>Import Pipeline</li>
+        <li>Knowledge Pipeline</li>
+        <li>Graph Engine</li>
+        <li>Inference Engine</li>
+        <li>Recommendation Engine</li>
+        <li>API / Web UI</li>
+        <li>Batch-импорт / Тесты</li>
+        <li>Future AI-Agents</li>
+    </ul>
+</div>
+
+<div>
+<li>├── mission/</li>
+<li>│</li>
+<li>├── __init__.py</li>
+<li>│</li>
+<li>├── mission.py          ⭐ Главный API</li>
+<li>├── dashboard.py</li>
+<li>├── events.py</li>
+<li>├── statistics.py</li>
+<li>├── progress.py</li>
+<li>├── renderer.py</li>
+<li>├── formatter.py</li>
+<li>├── theme.py</li>
+<li>├── console.py</li>
+<li>├── timer.py</li>
+<li>├── memory.py</li>
+<li>├── session.py</li>
+<li>├── report.py</li>
+<li>├── export.py</li>
+<li>└── log.py</li>
+</div>
+
+</body>
+</html>

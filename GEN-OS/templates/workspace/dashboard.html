@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+{% block workspace %}
+<div class="gen-dashboard">
+   <div class="gen-dashboard-header">
+      <div>
+         <h1>
+            Digital Human Workspace
+         </h1>
+         <p>
+            Genesis Operating System • Digital Twin Environment
+         </p>
+      </div>
+      <div class="gen-dashboard-actions">
+         <button class="gen-btn">
+         Import
+         </button>
+         <button class="gen-btn">
+         Knowledge
+         </button>
+         <button class="gen-btn gen-btn-primary">
+         Run Analysis
+         </button>
+      </div>
+   </div>
+   <div class="gen-grid-4">
+      {% include "widgets/system_status.html" %}
+      {% include "widgets/current_profile.html" %}
+      {% include "widgets/career_score.html" %}
+      {% include "widgets/future_prediction.html" %}
+   </div>
+   <div class="gen-grid-2">
+      {% include "widgets/top_competencies.html" %}
+      {% include "widgets/risk_analysis.html" %}
+   </div>
+   <div class="gen-grid-2">
+      {% include "widgets/recommended_professions.html" %}
+      {% include "widgets/development_plan.html" %}
+   </div>
+   <div class="gen-grid">
+      {% include "widgets/recommendation_feed.html" %}
+   </div>
+</div>
+{% endblock %}

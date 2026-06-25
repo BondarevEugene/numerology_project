@@ -1,0 +1,28 @@
+<!--
+   ═══════════════════════════════════════════════════════════════
+   GENESIS HR®
+
+   GENOS Design Language
+
+   Component:
+   gen-panel
+
+   BUILD-0023
+   ═══════════════════════════════════════════════════════════════
+   -->
+<div class="gen-panel">
+   <div class="gen-panel-header">
+      <div class="gen-panel-title">
+         {{ title }}
+      </div>
+      <div class="gen-panel-actions">
+         {{ actions|default("") }}
+      </div>
+   </div>
+   <div class="gen-panel-body">
+      {{ body|safe }}
+   </div>
+   <div class="gen-panel-footer">
+      {{ footer|default("") }}
+   </div>
+</div>
