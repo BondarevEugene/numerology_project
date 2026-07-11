@@ -1,0 +1,32 @@
+<div class="gen-card dashboard-card">
+    <div class="gen-card-header">
+        📚 KNOWLEDGE
+    </div>
+    <div class="dashboard-body">
+        <div class="dashboard-row">
+            <span>Registry</span>
+            <strong>
+                {% if knowledge.statistics().loaded %}
+                    READY
+                {% else %}
+                    EMPTY
+                {% endif %}
+            </strong>
+        </div>
+        <div class="dashboard-row">
+            <span>Entities</span>
+            <strong>
+                {{ knowledge.statistics().entities }}
+            </strong>
+        </div>
+        <div class="dashboard-row">
+            <span>Status</span>
+            <strong>
+                ACTIVE
+            </strong>
+        </div>
+    </div>
+    <div class="dashboard-footer">
+        Knowledge Registry
+    </div>
+</div>

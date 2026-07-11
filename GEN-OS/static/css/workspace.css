@@ -1,125 +1,297 @@
 /*
+═══════════════════════════════════════════════════════════════════════
+GENESIS HR®
 Workspace Framework
+BUILD-0112
+═══════════════════════════════════════════════════════════════════════
 */
 
-.gen-workspace-host {
+/* =======================================================
+   HOST
+======================================================= */
 
-	display: flex;
-
-	flex-direction: column;
-
-	height: 100%;
-
-}
-
-.gen-workspace-header {
-
-	display: flex;
-
-	justify-content: space-between;
-
-	align-items: center;
-
-	padding: 26px 30px;
-
-	border-bottom: 1px solid var(--border);
-
-	background: var(--bg-panel);
+.gen-workspace-host{
+    display:flex;
+    flex-direction:column;
+    height:100%;
+    overflow:hidden;
+    background:linear-gradient(
+        180deg,
+        #151922,
+        #11151c
+    );
 
 }
 
-.gen-workspace-title {
+/* =======================================================
+   HEADER
+======================================================= */
 
-	font-size: 28px;
-
-	font-weight: 700;
-
+.gen-workspace-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:24px 32px;
+    background:rgba(25,30,40,.92);
+    border-bottom:1px solid var(--border);
+    backdrop-filter:blur(12px);
 }
 
-.gen-workspace-description {
-
-	color: var(--text-muted);
-
-	margin-top: 6px;
-
+.gen-workspace-title{
+    font-size:30px;
+    font-weight:700;
+    color:var(--text);
+    letter-spacing:.5px;
 }
 
-.gen-workspace-actions {
-
-	display: flex;
-
-	gap: 12px;
-
+.gen-workspace-description{
+    margin-top:6px;
+    color:var(--text-muted);
+    font-size:14px;
 }
 
-.gen-workspace-body {
+/* =======================================================
+   ACTIONS
+======================================================= */
 
-	flex: 1;
-
-	padding: 28px;
-
-	overflow: auto;
-
+.gen-workspace-actions{
+    display:flex;
+    gap:14px;
 }
 
-.gen-workspace-footer {
+/* =======================================================
+   BODY
+======================================================= */
 
-	display: flex;
-
-	gap: 40px;
-
-	padding: 16px 30px;
-
-	border-top: 1px solid var(--border);
-
-	background: #15191f;
-
+.gen-workspace-body{
+    flex:1;
+    overflow:auto;
+    padding:32px;
 }
 
-.gen-footer-item {
+/* =======================================================
+   FOOTER
+======================================================= */
 
-	display: flex;
-
-	flex-direction: column;
-
-	gap: 4px;
-
+.gen-workspace-footer{
+    display:flex;
+    justify-content:space-between;
+    gap:24px;
+    padding:18px 30px;
+    border-top:1px solid var(--border);
+    background:#171c24;
 }
 
-.gen-footer-item span {
-
-	color: var(--text-muted);
-
-	font-size: 12px;
-
+.gen-footer-item{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
 }
 
-.gen-empty {
-
-	height: 100%;
-
-	display: flex;
-
-	flex-direction: column;
-
-	justify-content: center;
-
-	align-items: center;
-
-	gap: 20px;
-
+.gen-footer-item span{
+    font-size:11px;
+    color:var(--text-muted);
+    text-transform:uppercase;
 }
 
-.gen-empty-icon {
-
-	font-size: 72px;
-
+.gen-footer-item strong{
+    font-size:16px;
+    color:var(--primary);
 }
 
-.gen-empty-title {
+/* =======================================================
+   PANELS
+======================================================= */
 
-	font-size: 24px;
+.gen-panel{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:24px;
+    box-shadow:var(--shadow);
+}
 
-	font-weight: 700;
+.gen-panel-title{
+    font-size:18px;
+    font-weight:700;
+    margin-bottom:18px;
+}
 
+.gen-panel-subtitle{
+    color:var(--text-muted);
+    margin-bottom:22px;
+}
+
+/* =======================================================
+   HERO
+======================================================= */
+
+.gen-hero{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:30px;
+    border-radius:22px;
+    background:
+        linear-gradient(
+            135deg,
+            rgba(83,213,255,.18),
+            rgba(111,91,255,.10)
+        );
+
+    border:1px solid rgba(90,212,255,.25);
+    margin-bottom:30px;
+}
+
+.gen-hero-title{
+    font-size:34px;
+    font-weight:700;
+}
+
+.gen-hero-text{
+    margin-top:12px;
+    color:var(--text-soft);
+    max-width:700px;
+}
+
+/* =======================================================
+   DASHBOARD
+======================================================= */
+
+.gen-dashboard{
+    display:grid;
+    grid-template-columns:
+        repeat(auto-fit,minmax(260px,1fr));
+    gap:22px;
+}
+
+.gen-stat{
+    background:var(--panel);
+    border-radius:18px;
+    border:1px solid var(--border);
+    padding:22px;
+    transition:.2s;
+}
+
+.gen-stat:hover{
+    transform:translateY(-3px);
+    box-shadow:var(--shadow);
+}
+
+.gen-stat-value{
+    font-size:34px;
+    font-weight:700;
+    margin-top:12px;
+}
+
+.gen-stat-label{
+    color:var(--text-muted);
+}
+
+/* =======================================================
+   PROPERTY GRID
+======================================================= */
+
+.gen-properties{
+    display:grid;
+    gap:14px;
+}
+
+.gen-property{
+    display:flex;
+    justify-content:space-between;
+    padding:12px 0;
+    border-bottom:1px solid rgba(255,255,255,.05);
+}
+
+.gen-property span{
+    color:var(--text-muted);
+}
+
+.gen-property strong{
+    color:var(--primary);
+}
+
+/* =======================================================
+   TABLE
+======================================================= */
+
+.gen-table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+.gen-table th{
+    text-align:left;
+    padding:14px;
+    background:#212834;
+}
+
+.gen-table td{
+    padding:14px;
+    border-bottom:1px solid rgba(255,255,255,.06);
+}
+
+.gen-table tr:hover{
+    background:#1c222d;
+}
+
+/* =======================================================
+   EMPTY
+======================================================= */
+
+.gen-empty{
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    gap:18px;
+    color:var(--text-muted);
+}
+
+.gen-empty-icon{
+    font-size:72px;
+}
+
+.gen-empty-title{
+    font-size:26px;
+    color:white;
+}
+
+.gen-empty-text{
+    max-width:480px;
+    text-align:center;
+}
+
+/* =======================================================
+   SPLIT
+======================================================= */
+
+.gen-split{
+    display:grid;
+    grid-template-columns:
+        420px
+        1fr;
+    gap:28px;
+}
+
+/* =======================================================
+   SIDEBAR
+======================================================= */
+
+.gen-sidebar{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+}
+
+/* =======================================================
+   CONTENT
+======================================================= */
+
+.gen-content{
+    display:flex;
+    flex-direction:column;
+    gap:26px;
 }

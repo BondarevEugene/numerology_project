@@ -1,0 +1,350 @@
+/*
+═══════════════════════════════════════════════════════════════
+GENESIS®
+Signature Footer
+BUILD 0500
+═══════════════════════════════════════════════════════════════
+*/
+
+.genesis-footer{
+    position:relative;
+    margin-top:35px;
+    background:#050705;
+    border-top:1px solid rgba(0,255,140,.15);
+    overflow:hidden;
+    user-select:none;
+}
+
+/* =======================================================
+   TOP GLOW
+======================================================= */
+
+.genesis-footer-topline{
+    height:2px;
+    background:linear-gradient(
+        90deg,
+        transparent,
+        #00ff88,
+        #78ffbf,
+        #00ff88,
+        transparent
+    );
+
+    box-shadow:
+        0 0 15px #00ff88,
+        0 0 35px rgba(0,255,136,.45);
+
+}
+
+/* =======================================================
+   MAIN GRID
+======================================================= */
+
+.genesis-footer-wrapper{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:50px;
+    padding:26px 40px;
+}
+
+/* =======================================================
+   LEFT
+======================================================= */
+
+.footer-left{
+    display:flex;
+    align-items:center;
+    gap:22px;
+}
+
+/* =======================================================
+   ATOM
+======================================================= */
+
+.genesis-atom{
+    position:relative;
+    width:62px;
+    height:62px;
+}
+
+.nucleus{
+    position:absolute;
+    left:50%;
+    top:50%;
+    width:12px;
+    height:12px;
+    margin-left:-6px;
+    margin-top:-6px;
+    background:#00ff88;
+    border-radius:50%;
+    box-shadow:
+        0 0 8px #00ff88,
+        0 0 22px #00ff88;
+    animation:pulseCore 3s infinite;
+}
+
+.orbit{
+    position:absolute;
+    inset:0;
+    border:1px solid rgba(0,255,136,.28);
+    border-radius:50%;
+}
+
+.orbit-1{
+    transform:rotate(20deg);
+}
+
+.orbit-2{
+    transform:rotate(82deg);
+}
+
+.orbit-3{
+    transform:rotate(145deg);
+}
+
+/* =======================================================
+   BRAND
+======================================================= */
+
+.footer-title{
+    font-size:24px;
+    font-weight:700;
+    letter-spacing:5px;
+    color:#00ff88;
+    text-shadow:
+        0 0 12px rgba(0,255,136,.45);
+}
+
+.footer-subtitle{
+    margin-top:4px;
+    color:#8edeb8;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:2px;
+}
+
+/* =======================================================
+   CENTER
+======================================================= */
+
+.footer-center{
+    flex:1;
+    text-align:center;
+}
+
+.footer-chain{
+    color:#bfffe1;
+    font-size:14px;
+    letter-spacing:1px;
+}
+
+.footer-chain span{
+    padding:0 12px;
+    color:#00ff88;
+}
+
+.footer-quote{
+    margin-top:12px;
+    color:#6f9d83;
+    font-size:12px;
+    font-style:italic;
+    letter-spacing:.4px;
+}
+
+/* ==========================================================
+   RIGHT BLOCK
+========================================================== */
+
+.footer-right{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    justify-content:center;
+    gap:8px;
+    min-width:340px;
+    padding-right:24px;
+}
+
+/* ==========================================================
+   SYSTEM STATUS
+========================================================== */
+
+.footer-system{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:15px;
+    font-weight:700;
+    letter-spacing:.08em;
+    color:#3dff9d;
+    text-transform:uppercase;
+}
+
+.footer-system::before{
+    content:"";
+    width:9px;
+    height:9px;
+    border-radius:50%;
+    background:#3dff9d;
+    box-shadow:
+        0 0 10px #3dff9d,
+        0 0 18px #3dff9d;
+}
+
+/* ==========================================================
+   BUILD
+========================================================== */
+
+.footer-build{
+    font-size:13px;
+    color:#c9d4de;
+    opacity:.95;
+    font-weight:600;
+}
+
+/* ==========================================================
+   AUTHOR
+========================================================== */
+
+.footer-author{
+    margin-top:6px;
+    font-size:18px;
+    font-weight:800;
+    color:#46ffb2;
+    letter-spacing:.04em;
+    text-shadow:
+        0 0 8px rgba(70,255,178,.45);
+}
+
+
+/* ==========================================================
+   ROLE
+========================================================== */
+
+.footer-role{
+    font-size:14px;
+    color:#ffffff;
+    opacity:.82;
+    font-weight:500;
+}
+.footer-status{
+    display:flex;
+    justify-content:flex-end;
+    align-items:center;
+    gap:10px;
+    color:#00ff88;
+    font-size:13px;
+    letter-spacing:1px;
+}
+
+.status-dot{
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    background:#00ff88;
+    box-shadow:
+        0 0 10px #00ff88,
+        0 0 20px #00ff88;
+    animation:pulseDot 2s infinite;
+}
+
+.footer-build{
+    margin-top:10px;
+    color:#8fd8b4;
+    font-size:12px;
+}
+
+.footer-author{
+    margin-top:12px;
+    color:#96b9a5;
+    font-size:12px;
+    line-height:1.6;
+}
+
+.footer-author strong{
+    color:#00ff88;
+}
+
+/* =======================================================
+   BOTTOM
+======================================================= */
+
+.footer-bottom{
+    display:flex;
+    justify-content:center;
+    gap:40px;
+    align-items:center;
+    padding:12px 20px;
+    border-top:1px solid rgba(255,255,255,.05);
+    color:#6e8d7a;
+    font-size:11px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+}
+
+/* =======================================================
+   HOVER
+======================================================= */
+
+.genesis-footer:hover{
+    box-shadow:
+        inset 0 1px 0 rgba(0,255,140,.12),
+        0 -5px 40px rgba(0,255,140,.06);
+}
+
+/* =======================================================
+   ANIMATION
+======================================================= */
+
+@keyframes pulseCore{
+    0%{
+        transform:scale(.85);
+        opacity:.65;
+    }
+    50%{
+        transform:scale(1.25);
+        opacity:1;
+    }
+    100%{
+        transform:scale(.85);
+        opacity:.65;
+    }
+}
+
+@keyframes pulseDot{
+    0%{
+        opacity:.4;
+    }
+    50%{
+        opacity:1;
+    }
+    100%{
+        opacity:.4;
+    }
+}
+
+/* =======================================================
+   RESPONSIVE
+======================================================= */
+
+@media (max-width:1100px){
+    .genesis-footer-wrapper{
+        flex-direction:column;
+        gap:24px;
+        text-align:center;
+    }
+    .footer-left{
+        justify-content:center;
+    }
+    .footer-right{
+        text-align:center;
+    }
+    .footer-status{
+        justify-content:center;
+    }
+    .footer-bottom{
+        flex-wrap:wrap;
+        gap:14px;
+    }
+}

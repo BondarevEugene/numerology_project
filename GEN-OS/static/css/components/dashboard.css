@@ -1,0 +1,86 @@
+/* ==========================================================
+   GENESIS CONTROL CENTER
+   ========================================================== */
+
+.gen-dashboard{
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+    padding:24px;
+}
+
+.dashboard-title{
+    font-size:34px;
+    font-weight:700;
+    letter-spacing:.08em;
+    color:#ffffff;
+}
+
+.dashboard-subtitle{
+    color:#7e8ca4;
+    margin-top:-10px;
+    margin-bottom:10px;
+    font-size:14px;
+}
+
+.dashboard-card{
+    min-height:250px;
+    display:flex;
+    flex-direction:column;
+}
+
+.dashboard-body{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-top:15px;
+}
+
+.dashboard-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:8px 0;
+    border-bottom:1px solid rgba(255,255,255,.05);
+}
+
+.dashboard-row:last-child{
+    border-bottom:none;
+}
+
+.dashboard-row span{
+    color:#8ea1bb;
+    font-size:13px;
+}
+
+.dashboard-row strong{
+    color:white;
+    font-size:13px;
+}
+
+.dashboard-footer{
+    margin-top:18px;
+    color:#6e7b90;
+    font-size:12px;
+    border-top:1px solid rgba(255,255,255,.06);
+    padding-top:12px;
+}
+
+.dashboard-card:hover{
+    transform:translateY(-2px);
+    transition:.18s;
+    border-color:#4f8cff;
+}
+
+.dashboard-status-online{
+    color:#39d98a;
+}
+
+.dashboard-status-warning{
+    color:#ffb84d;
+}
+
+.dashboard-status-danger{
+    color:#ff5b6e;
+}

@@ -128,41 +128,12 @@ class WorkspaceRuntime:
 
         return context
 
-    def prepare(
-            self,
-            context
-    ):
-
-        human = self.service(
-            "human"
-        )
-
+    def prepare(self, context):
+        human = self.service("human")
         if human:
-
-            context.data[
-                "dashboard"
-            ] = human.load_dashboard()
-
-            context.data[
-                "profile"
-            ] = human.load_profile()
-
-            context.data[
-                "competencies"
-            ] = human.load_top_competencies()
-
-            context.data[
-                "professions"
-            ] = human.load_recommended_professions()
-
-            context.data[
-                "risks"
-            ] = human.load_risks()
-
-            context.data[
-                "roadmap"
-            ] = human.load_roadmap()
-
+            context.data["human"] = (
+                human.build_workspace()
+            )
         return context
 
 

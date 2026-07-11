@@ -1,117 +1,239 @@
 /*
 ═══════════════════════════════════════════════════════════════════════
+
 GENESIS HR®
 
 Toolbar Controller
 
-BUILD:0119
+BUILD 0300
 
-DESCRIPTION
+Главная панель управления платформой.
 
-Главная панель действий платформы.
+Все действия проходят через Genesis EventBus.
 
 ═══════════════════════════════════════════════════════════════════════
 */
 
 class Toolbar {
 
-   constructor() {
+    constructor() {
 
-      this.initialize();
-   }
+        this.buttons = [];
 
-   initialize() {
+        this.tabs = [];
 
-      console.log(
-         "[TOOLBAR] Ready"
-      );
+        this.initialized = false;
 
-      this.bind();
+    }
 
-      this.bindWorkspaceTabs();
-   }
+    /*
+    ==========================================================
+    INITIALIZE
+    ==========================================================
+    */
 
-   bindWorkspaceTabs() {
+    initialize() {
 
-      document
-         .querySelectorAll(
-            ".gen-tab"
-         )
-         .forEach(
-            tab => {
+        if (this.initialized) {
+            return;
+        }
 
-               tab.addEventListener(
-                  "click",
-                  () => {
+        this.initialized = true;
 
-                     const workspaceId =
-                        tab.dataset.workspace;
+        this.buttons = Array.from(
+            document.querySelectorAll(
+                "[data-toolbar-action]"
+            )
+        );
 
-                     console.log(
-                        "[WORKSPACE TAB]",
-                        workspaceId
-                     );
+        this.tabs = Array.from(
+            document.querySelectorAll(
+                "[data-workspace]"
+            )
+        );
 
-                     if (
-                        window.workspaceLoader
-                     ) {
+        this.bindButtons();
 
-                        window
-                           .workspaceLoader
-                           .open(
-                              workspaceId
-                           );
+        this.bindWorkspaces();
 
-                     }
+        console.log("[Toolbar] Ready");
 
-                  }
-               );
+    }
+
+    /*
+    ==========================================================
+    TOOLBAR BUTTONS
+    ==========================================================
+    */
+
+    bindButtons() {
+
+        this.buttons.forEach(button => {
+
+            button.addEventListener("click", () => {
+
+                this.execute(
+
+                    button.dataset.toolbarAction
+
+                );
+
+            });
+
+        });
+
+    }
+
+    /*
+    ==========================================================
+    WORKSPACE BUTTONS
+    ==========================================================
+    */
+
+    bindWorkspaces() {
+
+        this.tabs.forEach(tab => {
+
+            tab.addEventListener("click", () => {
+
+                this.openWorkspace(
+
+                    tab.dataset.workspace
+
+                );
+
+            });
+
+        });
+
+    }
+
+    /*
+    ==========================================================
+    OPEN WORKSPACE
+    ==========================================================
+    */
+
+    openWorkspace(workspace) {
+
+        if (!workspace)
+            return;
+
+        this.tabs.forEach(tab => {
+
+            tab.classList.remove("active");
+
+            if (
+
+                tab.dataset.workspace === workspace
+
+            ) {
+
+                tab.classList.add("active");
 
             }
-         );
-   }
-   bind() {
 
-      document
-         .querySelectorAll(
-            "[data-toolbar-action]"
-         )
-         .forEach(
-            button => {
+        });
 
-               button.addEventListener(
-                  "click",
-                  () => {
+        console.log(
 
-                     this.execute(
-                        button.dataset.toolbarAction
-                     );
+            "[Toolbar] Workspace:",
 
-                  }
-               );
+            workspace
 
-            }
-         );
-   }
+        );
 
-   execute(action) {
+        if (window.bus) {
 
-      console.log(
-         "[TOOLBAR]",
-         action
-      );
+            window.bus.emit(
 
-      document.dispatchEvent(
-         new CustomEvent(
-            "toolbar.action", {
-               detail: {
-                  action
-               }
-            }
-         )
-      );
-   }
+                "workspace.change",
+
+                {
+
+                    workspace
+
+                }
+
+            );
+
+        }
+
+    }
+
+    /*
+    ==========================================================
+    TOOLBAR ACTION
+    ==========================================================
+    */
+
+    execute(action) {
+
+        if (!action)
+            return;
+
+        console.log(
+
+            "[Toolbar]",
+
+            action
+
+        );
+
+        if (window.bus) {
+
+            window.bus.emit(
+
+                "toolbar.action",
+
+                {
+
+                    action
+
+                }
+
+            );
+
+        }
+
+    }
+
+    /*
+    ==========================================================
+    REFRESH
+    ==========================================================
+    */
+
+    refresh() {
+
+        this.buttons = Array.from(
+
+            document.querySelectorAll(
+
+                "[data-toolbar-action]"
+
+            )
+
+        );
+
+        this.tabs = Array.from(
+
+            document.querySelectorAll(
+
+                "[data-workspace]"
+
+            )
+
+        );
+
+    }
+
 }
 
-window.toolbar =
-   new Toolbar();
+/*
+==========================================================
+GLOBAL
+==========================================================
+*/
+
+window.toolbar = new Toolbar();

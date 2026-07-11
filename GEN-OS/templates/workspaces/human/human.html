@@ -1,0 +1,148 @@
+{% extends "workspaces/base_workspace.html" %}
+
+{% block workspace %}
+
+<div class="human-workspace">
+
+    <!-- ===================================================== -->
+    <!-- HEADER -->
+    <!-- ===================================================== -->
+
+    <section class="human-header">
+
+        <div class="human-header-left">
+
+            <div class="workspace-icon">
+                🧠
+            </div>
+
+            <div>
+
+                <div class="workspace-caption">
+                    DIGITAL HUMAN TWIN
+                </div>
+
+                <h1
+                    class="workspace-title"
+                    data-human-title
+                >
+                    Digital Human
+                </h1>
+
+                <div class="workspace-subtitle">
+
+                    Human Intelligence Analysis Platform
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="human-header-right">
+
+            <button
+                class="gen-button"
+                onclick="humanWorkspace.refresh()"
+            >
+                ⟳ Refresh
+            </button>
+
+            <button
+                class="gen-button"
+                onclick="humanWorkspace.report()"
+            >
+                📄 Report
+            </button>
+
+            <button
+                class="gen-button primary"
+                onclick="humanWorkspace.export()"
+            >
+                Export
+            </button>
+
+        </div>
+
+    </section>
+
+    <!-- ===================================================== -->
+    <!-- DASHBOARD -->
+    <!-- ===================================================== -->
+
+    <section class="workspace-section">
+
+        {% include "widgets/dashboard/human_summary.html" %}
+
+    </section>
+
+    <!-- ===================================================== -->
+    <!-- SCORE -->
+    <!-- ===================================================== -->
+
+    <div class="gen-grid gen-grid-3">
+
+        {% include "widgets/current_profile.html" %}
+
+        {% include "widgets/career_score.html" %}
+
+        {% include "widgets/system_status.html" %}
+
+    </div>
+
+    <!-- ===================================================== -->
+    <!-- MAIN -->
+    <!-- ===================================================== -->
+
+    <div class="gen-grid gen-grid-2">
+
+        <div>
+
+            {% include "widgets/top_competencies.html" %}
+
+            {% include "widgets/recommended_professions.html" %}
+
+            {% include "widgets/development_plan.html" %}
+
+        </div>
+
+        <div>
+
+            {% include "widgets/future_prediction.html" %}
+
+            {% include "widgets/risk_analysis.html" %}
+
+            {% include "widgets/recommendation_feed.html" %}
+
+        </div>
+
+    </div>
+
+    <!-- ===================================================== -->
+    <!-- FOOTER -->
+    <!-- ===================================================== -->
+
+    <section class="workspace-footer">
+
+        <div class="workspace-build">
+
+            Workspace:
+            Human Intelligence
+
+        </div>
+
+        <div class="workspace-status">
+
+            <span class="status-dot"></span>
+
+            Connected
+
+        </div>
+
+    </section>
+
+</div>
+
+<script src="/static/js/human_workspace.js"></script>
+
+{% endblock %}

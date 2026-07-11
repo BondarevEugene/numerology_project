@@ -1,0 +1,327 @@
+/*
+═══════════════════════════════════════════════════════════════════════
+GENESIS HR®
+Toolbar Framework
+BUILD-0211
+═══════════════════════════════════════════════════════════════════════
+*/
+
+/* ======================================================= */
+
+.gen-toolbar {
+	height: 100%;
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 28px;
+}
+
+/* ======================================================= */
+
+.gen-toolbar-left {
+	display: flex;
+	align-items: center;
+	gap: 28px;
+	min-width: 0;
+}
+
+/* ======================================================= */
+
+.gen-toolbar-center {
+	flex: 1;
+	display: flex;
+	justify-content: center;
+}
+
+/* ======================================================= */
+
+.gen-toolbar-right {
+	display: flex;
+	align-items: center;
+	gap: 22px;
+}
+
+/* ======================================================= */
+
+.gen-logo {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	user-select: none;
+}
+
+/* ======================================================= */
+
+gen-logo-icon {
+	width: 42px;
+	height: 42px;
+	border-radius: 14px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background:
+		linear-gradient(135deg,
+			rgba(90, 212, 255, .20),
+			rgba(111, 91, 255, .18));
+	border: 1px solid rgba(90, 212, 255, .28);
+	color: var(--primary);
+	font-size: 22px;
+	box-shadow: var(--shadow-small);
+}
+
+/* ======================================================= */
+
+.gen-title {
+	font-size: 17px;
+	font-weight: 700;
+	letter-spacing: .6px;
+}
+
+/* ======================================================= */
+
+.gen-subtitle {
+	font-size: 11px;
+	color: var(--text-muted);
+	margin-top: 3px;
+}
+
+/* ======================================================= */
+
+.gen-workspace-tabs {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	overflow: auto;
+}
+
+/* ======================================================= */
+
+.gen-workspace-tabs::-webkit-scrollbar {
+	display: none;
+}
+
+/* ======================================================= */
+
+.gen-tab {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 10px 18px;
+	border-radius: 14px;
+	border: 1px solid transparent;
+	background: transparent;
+	color: var(--text-soft);
+	cursor: pointer;
+	transition: var(--transition);
+	white-space: nowrap;
+}
+
+/* ======================================================= */
+
+.gen-tab:hover {
+	background: rgba(255, 255, 255, .05);
+	border-color: rgba(90, 212, 255, .18);
+	color: white;
+}
+
+/* ======================================================= */
+
+.gen-tab.active {
+	background:
+		linear-gradient(135deg,
+			rgba(90, 212, 255, .16),
+			rgba(111, 91, 255, .10));
+	border-color: rgba(90, 212, 255, .28);
+	color: white;
+	box-shadow: var(--shadow-small);
+}
+
+/* ======================================================= */
+
+.gen-tab-icon {
+	color: var(--primary);
+	font-size: 15px;
+}
+
+/* ======================================================= */
+
+.gen-search {
+	width: 100%;
+	max-width: 620px;
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	padding: 0 18px;
+	height: 44px;
+	border-radius: 14px;
+	background: #141b25;
+	border: 1px solid var(--border);
+	transition: var(--transition);
+}
+
+/* ======================================================= */
+
+.gen-search:hover {
+	border-color: var(--border-light);
+}
+
+/* ======================================================= */
+
+.gen-search:focus-within {
+
+	border-color: var(--primary);
+
+	box-shadow: 0 0 0 3px rgba(90, 212, 255, .12);
+
+}
+
+/* ======================================================= */
+
+.gen-search-icon {
+
+	width: 18px;
+
+	height: 18px;
+
+	stroke: var(--text-muted);
+
+	fill: none;
+
+	stroke-width: 2;
+
+}
+
+/* ======================================================= */
+
+.gen-search-input {
+
+	flex: 1;
+
+	background: transparent;
+
+	border: none;
+
+	outline: none;
+
+	color: var(--text);
+
+}
+
+/* ======================================================= */
+
+.gen-search-input::placeholder {
+
+	color: var(--text-muted);
+
+}
+
+/* ======================================================= */
+
+.gen-kernel {
+
+	display: flex;
+
+	align-items: center;
+
+	gap: 10px;
+
+	color: var(--text-soft);
+
+	font-size: 13px;
+
+}
+
+/* ======================================================= */
+
+.kernel-dot {
+
+	width: 9px;
+
+	height: 9px;
+
+	border-radius: 50%;
+
+	background: var(--success);
+
+	box-shadow:
+
+		0 0 12px rgba(68, 210, 140, .45);
+
+}
+
+/* ======================================================= */
+
+.gen-clock {
+
+	font-family:
+
+		"JetBrains Mono",
+
+		monospace;
+
+	color: var(--text-soft);
+
+	font-size: 13px;
+
+}
+
+/* ======================================================= */
+
+.gen-user {
+
+	display: flex;
+
+	align-items: center;
+
+	gap: 12px;
+
+}
+
+/* ======================================================= */
+
+.user-avatar {
+
+	width: 38px;
+
+	height: 38px;
+
+	border-radius: 12px;
+
+	display: flex;
+
+	align-items: center;
+
+	justify-content: center;
+
+	background:
+
+		linear-gradient(135deg,
+			#55d4ff,
+			#5e7cff);
+
+	color: #081018;
+
+	font-weight: 700;
+
+}
+
+/* ======================================================= */
+
+.user-name {
+
+	font-size: 14px;
+
+	font-weight: 600;
+
+}
+
+/* ======================================================= */
+
+.user-role {
+
+	font-size: 11px;
+
+	color: var(--text-muted);
+
+}

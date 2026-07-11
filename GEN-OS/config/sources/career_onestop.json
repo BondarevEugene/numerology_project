@@ -1,0 +1,9 @@
+{
+    "id":"career_onestop",
+    "name":"CareerOneStop",
+    "type":"REST",
+    "enabled":true,
+    "priority":40,
+    "api_url":"https://services.onetcenter.org",
+    "readonly":true
+}

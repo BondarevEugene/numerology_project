@@ -1,0 +1,43 @@
+{# ==========================================================================
+   GENESIS®
+   Universal Workspace Header
+   BUILD 0200
+   ========================================================================== #}
+
+<div class="gen-workspace-header">
+    <div class="gen-workspace-header-left">
+        {% if icon %}
+        <div class="gen-workspace-icon">
+
+            {{ icon|safe }}
+        </div>
+        {% endif %}
+        <div class="gen-workspace-heading">
+            <div class="gen-workspace-title">
+                {{ title }}
+            </div>
+            {% if subtitle %}
+            <div class="gen-workspace-subtitle">
+                {{ subtitle }}
+            </div>
+            {% endif %}
+            {% if description %}
+            <div class="gen-workspace-description">
+                {{ description }}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="gen-workspace-header-right">
+        {% if badges %}
+        <div class="gen-workspace-badges">
+            {{ badges|safe }}
+        </div>
+        {% endif %}
+        {% if actions %}
+        <div class="gen-toolbar">
+            {{ actions|safe }}
+        </div>
+        {% endif %}
+    </div>
+</div>

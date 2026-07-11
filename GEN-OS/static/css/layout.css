@@ -1,6 +1,18 @@
 /*
-GEN Layout
+═══════════════════════════════════════════════════════════════════════
+
+GENESIS HR®
+
+GEN-OS
+
+LAYOUT ENGINE
+
+BUILD-0111
+
+═══════════════════════════════════════════════════════════════════════
 */
+
+/* ======================================================= */
 
 .gen-shell {
 
@@ -14,11 +26,255 @@ GEN Layout
 
 }
 
+/* ======================================================= */
+
 .shell-window {
+
+	width: 100%;
+
+	height: 100%;
+
+	display: grid;
+
+	grid-template-rows:
+
+		64px 1fr 180px 32px;
+
+}
+
+/* ======================================================= */
+
+.shell-toolbar {
+
+	background: var(--panel);
+
+	border-bottom: 1px solid var(--border);
+
+	display: flex;
+
+	align-items: center;
+
+	padding: 0 24px;
+
+	z-index: 30;
+
+}
+
+/* ======================================================= */
+
+.shell-body {
+
+	display: grid;
+
+	grid-template-columns:
+
+		310px 1fr 340px;
+
+	overflow: hidden;
+
+}
+
+/* ======================================================= */
+
+.shell-explorer {
+
+	background: #141922;
+
+	border-right: 1px solid var(--border);
+
+	overflow: auto;
+
+}
+
+/* ======================================================= */
+
+.shell-workspace {
+
+	background: #11151b;
+
+	overflow: auto;
+
+	position: relative;
+
+}
+
+/* ======================================================= */
+
+.shell-inspector {
+
+	background: #161c24;
+
+	border-left: 1px solid var(--border);
+
+	overflow: auto;
+
+}
+
+/* ======================================================= */
+
+.shell-console {
+
+	background: #0f1318;
+
+	border-top: 1px solid var(--border);
+
+	overflow: auto;
+
+}
+
+/* ======================================================= */
+
+.shell-statusbar {
+
+	background: #11161d;
+
+	border-top: 1px solid var(--border);
+
+	display: flex;
+
+	align-items: center;
+
+	padding: 0 18px;
+
+}
+
+/* ======================================================= */
+
+.gen-grid {
+
+	display: grid;
+
+	gap: 24px;
+
+}
+
+/* ======================================================= */
+
+.gen-grid-2 {
+
+	grid-template-columns:
+
+		1fr 1fr;
+
+}
+
+/* ======================================================= */
+
+.gen-grid-3 {
+
+	grid-template-columns:
+
+		repeat(3, 1fr);
+
+}
+
+/* ======================================================= */
+
+.gen-grid-4 {
+
+	grid-template-columns:
+
+		repeat(4, 1fr);
+
+}
+
+/* ======================================================= */
+
+.gen-flex {
+
+	display: flex;
+
+}
+
+/* ======================================================= */
+
+.gen-row {
+
+	display: flex;
+
+	align-items: center;
+
+}
+
+/* ======================================================= */
+
+.gen-column {
 
 	display: flex;
 
 	flex-direction: column;
+
+}
+
+/* ======================================================= */
+
+.gen-space {
+
+	justify-content: space-between;
+
+}
+
+/* ======================================================= */
+
+.gen-center {
+
+	justify-content: center;
+
+	align-items: center;
+
+}
+
+/* ======================================================= */
+
+.gen-gap-xs {
+
+	gap: 8px;
+
+}
+
+.gen-gap {
+
+	gap: 16px;
+
+}
+
+.gen-gap-lg {
+
+	gap: 24px;
+
+}
+
+.gen-gap-xl {
+
+	gap: 36px;
+
+}
+
+/* ======================================================= */
+
+.gen-padding {
+
+	padding: 24px;
+
+}
+
+.gen-padding-lg {
+
+	padding: 36px;
+
+}
+
+/* ======================================================= */
+
+.gen-scroll {
+
+	overflow: auto;
+
+}
+
+/* ======================================================= */
+
+.gen-fill {
 
 	width: 100%;
 
@@ -26,60 +282,10 @@ GEN Layout
 
 }
 
-.shell-toolbar {
+/* ======================================================= */
 
-	height: 70px;
+.gen-hidden {
 
-	background: #0f1218;
-
-	border-bottom: 1px solid var(--border);
-
-}
-
-.shell-body {
-
-	flex: 1;
-
-	display: grid;
-
-	grid-template-columns:
-
-		320px 1fr 330px;
-
-}
-
-.shell-explorer {
-
-	overflow: auto;
-
-	border-right: 1px solid var(--border);
-
-}
-
-.shell-workspace {
-
-	overflow: auto;
-
-	background: #15191f;
-
-}
-
-.shell-inspector {
-
-	overflow: auto;
-
-	border-left: 1px solid var(--border);
-
-}
-
-.shell-console {
-
-	height: 180px;
-
-}
-
-.shell-statusbar {
-
-	height: 32px;
+	display: none;
 
 }

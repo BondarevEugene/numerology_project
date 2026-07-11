@@ -1,74 +1,105 @@
 /*
 ═══════════════════════════════════════════════════════════════════════
-Console Engine
-BUILD:0120
-═══════════════════════════════════════════════════════════════════════
+GENESIS HR®
+Console Controller
+BUILD 0300
+══════════════════════════════════════════════════════════════════════
 */
 
-class GenConsole {
+class GenesisConsole {
     constructor() {
-        this.buffer = [];
+        this.container = null;
+        this.initialized = false;
+        this.maxLines = 500;
     }
-    info(message) {
-        this.write(
-            "INFO",
-            message
+    /*
+    ==========================================================
+    INITIALIZE
+    ==========================================================
+    */
+    initialize() {
+        if (this.initialized)
+            return;
+        this.initialized = true;
+        this.container = document.querySelector(
+            ".gen-console-body"
         );
-    }
-
-    warning(message) {
-        this.write(
-            "WARNING",
-            message
-        );
-    }
-
-    error(message) {
-        this.write(
-            "ERROR",
-            message
-        );
-    }
-
-    write(
-        level,
-        message
-    ) {
-
-        const record = {
-            timestamp:
-                new Date()
-                .toISOString(),
-
-            level,
-
-            message
-        };
-
-        this.buffer.push(
-            record
-        );
-
         console.log(
-            `[${level}]`,
-            message
+            "[Console] Ready"
         );
-
-        document.dispatchEvent(
-            new CustomEvent(
-                "console.message",
-                {
-                    detail: record
-                }
-            )
+        this.write(
+            "GENESIS Console initialized."
         );
     }
 
-    history() {
+    /*
+    ==========================================================
+    WRITE
+    ==========================================================
+    */
 
-        return this.buffer;
+    write(message, level = "info") {
+        if (!this.container)
+            return;
+        const row =
+            document.createElement("div");
+        row.className =
+            "gen-console-row " + level;
+        const time =
+            new Date().toLocaleTimeString();
+        row.innerHTML =
+            `<span class="console-time">${time}</span>
+             <span class="console-text">${message}</span>`;
+        this.container.appendChild(row);
+        while (
+            this.container.children.length >
+            this.maxLines
+        ) {
+            this.container.removeChild(
+                this.container.firstChild
+            );
+        }
+        this.container.scrollTop =
+            this.container.scrollHeight;
+    }
+
+    /*
+    ==========================================================
+    CLEAR
+    ==========================================================
+    */
+
+    clear() {
+        if (!this.container)
+            return;
+        this.container.innerHTML = "";
+    }
+
+    /*
+    ==========================================================
+    LEVELS
+    ==========================================================
+    */
+
+    info(text) {
+        this.write(text, "info");
+    }
+    success(text) {
+        this.write(text, "success");
+    }
+    warning(text) {
+        this.write(text, "warning");
+    }
+    error(text) {
+        this.write(text, "error");
     }
 }
 
+/*
+==========================================================
+GLOBAL
+==========================================================
+*/
+
 window.genConsole =
-    new GenConsole();
+    new GenesisConsole();

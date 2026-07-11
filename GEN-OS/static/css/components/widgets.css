@@ -1,0 +1,25 @@
+.human-score{
+    font-size:42px;
+    font-weight:700;
+    color:var(--primary);
+}
+
+.human-score-label{
+    color:var(--text-soft);
+    margin-top:6px;
+}
+
+.skill-row{
+    display:flex;
+    justify-content:space-between;
+    padding:8px 0;
+    border-bottom:1px solid rgba(255,255,255,.06);
+}
+
+.skill-row:last-child{
+    border:none;
+}
+.roadmap-item{
+    padding:10px 0;
+    color:var(--text);
+}

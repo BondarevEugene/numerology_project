@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GENESIS EVO // Экосистема Многовекторности Личности</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-space: #030407;
+            --bg-glass: rgba(10, 13, 23, 0.45);
+            --border-glass: rgba(255, 255, 255, 0.03);
+
+            /* Цветовая кодировка векторов эволюции сознания */
+            --color-soul: #6366f1;       /* Глубокий королевский индиго (Центр духа) */
+            --color-genome: #10b981;     /* Яркий изумруд (Генезис и эволюция биологии) */
+            --color-intellect: #06b6d4;  /* Ментальный бирюзовый (Многовекторный разум) */
+            --color-amber: #f59e0b;      /* Энергетический янтарный (Воля, зрелость) */
+
+            --text-pure: #f8fafc;
+            --text-muted: #475569;
+            --font-premium: 'Plus Jakarta Sans', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-space);
+            color: var(--text-pure);
+            font-family: var(--font-premium);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* 3D-БИОИНЖЕНЕРНЫЙ ИНТЕРАКТИВНЫЙ ХОЛСТ */
+        #bioCanvas {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1; pointer-events: none; opacity: 0.9;
+        }
+
+        /* ГЛУБОКИЕ ЖИВЫЕ КЛЕТОЧНЫЕ СВЕЧЕНИЯ */
+        .ambient-sphere-1 {
+            position: absolute; top: -15%; left: -5%; width: 55%; height: 65%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.14) 0%, transparent 75%);
+            z-index: 2; pointer-events: none; filter: blur(100px);
+        }
+        .ambient-sphere-2 {
+            position: absolute; bottom: -15%; right: -5%; width: 55%; height: 65%;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.09) 0%, transparent 75%);
+            z-index: 2; pointer-events: none; filter: blur(100px);
+        }
+
+        .app-overlay {
+            position: relative; z-index: 10;
+            display: flex; flex-direction: column; height: 100vh;
+            background: rgba(3, 4, 7, 0.1); backdrop-filter: blur(14px);
+        }
+
+        /* ХЕДЕР С САКРАЛЬНЫМ CSS ЛОГОТИПОМ */
+        header {
+            padding: 24px 64px; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+        }
+
+        .brand-cluster { display: flex; align-items: center; gap: 24px; }
+
+        /* ЖИВОЙ АТОМ ГЕНЕЗИСА */
+        .genesis-logo {
+            width: 36px; height: 36px; position: relative;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .logo-nucleus {
+            width: 10px; height: 10px;
+            background: linear-gradient(135deg, var(--color-genome), var(--color-intellect));
+            border-radius: 50%; box-shadow: 0 0 15px var(--color-intellect); z-index: 5;
+        }
+        .logo-orbit {
+            position: absolute; border: 1px solid rgba(255, 255, 255, 0.09); border-radius: 50%;
+            width: 100%; height: 35%; transform: rotate(45deg);
+            animation: rotateOrbit 4s linear infinite;
+        }
+        .logo-orbit:nth-child(2) { transform: rotate(-45deg); animation: rotateOrbit 4s linear infinite reverse; }
+        .logo-orbit:nth-child(3) { transform: rotate(90deg); height: 100%; width: 35%; animation: rotateOrbit 6s linear infinite; }
+
+        .brand-text-block { display: flex; flex-direction: column; }
+        .brand-title {
+            font-size: 16px; font-weight: 600; letter-spacing: 5px; text-transform: uppercase;
+            background: linear-gradient(90deg, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .brand-subtitle {
+            font-family: var(--font-mono); font-size: 10px; color: var(--color-genome);
+            letter-spacing: 1.5px; margin-top: 2px; text-transform: uppercase;
+        }
+
+        .sys-node-info {
+            font-size: 13px; color: var(--text-pure); opacity: 0.8; background: rgba(255,255,255,0.01);
+            padding: 8px 20px; border-radius: 30px; border: 1px solid var(--border-glass);
+            display: flex; align-items: center; gap: 10px;
+        }
+        .node-dot { width: 6px; height: 6px; background: var(--color-intellect); border-radius: 50%; box-shadow: 0 0 10px var(--color-intellect); }
+
+        /* МАРШРУТЫ И САЙДБАР */
+        .workspace { display: flex; flex: 1; overflow: hidden; }
+        sidebar { width: 320px; padding: 48px 32px; display: flex; flex-direction: column; gap: 12px; }
+
+        .nav-item {
+            padding: 16px 24px; color: #64748b; cursor: pointer; font-size: 14px; font-weight: 400; border-radius: 18px;
+            display: flex; align-items: center; gap: 18px; transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1); border: 1px solid transparent;
+        }
+        .nav-item span { font-size: 20px; opacity: 0.5; transition: transform 0.3s; }
+        .nav-item:hover { color: var(--text-pure); background: rgba(255, 255, 255, 0.015); transform: translateX(4px); }
+        .nav-item:hover span { transform: rotate(15deg) scale(1.1); }
+
+        .nav-item.active {
+            color: var(--text-pure); background: var(--bg-glass); border-color: var(--border-glass);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.05);
+        }
+
+        /* ОСНОВНОЙ ПУЛЬТ С ТРЕХМЕРНЫМИ КАРТОЧКАМИ */
+        main { flex: 1; padding: 48px 80px 48px 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 48px; }
+
+        .intro-zone h1 {
+            font-size: 40px; font-weight: 300; letter-spacing: -0.02em; margin-bottom: 16px;
+            background: linear-gradient(90deg, #ffffff, #a5b4fc, #99f6e4); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .intro-zone p { color: #94a3b8; font-size: 16.5px; line-height: 1.75; max-width: 880px; font-weight: 300; }
+
+        .catalog-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 40px; }
+
+        /* Сложная объемная 2.5D плашка */
+        .genome-card {
+            background: var(--bg-glass); border: 1px solid var(--border-glass); border-radius: 32px; padding: 40px;
+            height: 310px; display: flex; flex-direction: column; justify-content: space-between;
+            position: relative; perspective: 1000px; transform-style: preserve-3d;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.03);
+            transition: border-color 0.4s, box-shadow 0.4s; overflow: hidden; cursor: pointer;
+        }
+
+        .card-vector-indicator {
+            position: absolute; top: 0; right: 0; width: 90px; height: 90px;
+            background: radial-gradient(circle at 100% 0%, var(--vector-color, var(--color-soul)) 0%, transparent 70%);
+            opacity: 0.4; transition: opacity 0.4s;
+        }
+
+        .genome-card:hover { border-color: rgba(255, 255, 255, 0.09); box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6); }
+        .genome-card:hover .card-vector-indicator { opacity: 0.8; }
+
+        .card-header-row { display: flex; justify-content: space-between; align-items: center; transform: translateZ(30px); }
+        .card-sphere-icon {
+            width: 52px; height: 52px; background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04); border-radius: 18px;
+            display: flex; align-items: center; justify-content: center; font-size: 24px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3); color: var(--vector-color, #fff);
+        }
+        .card-meta-tag {
+            font-family: var(--font-mono); font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 3px;
+            color: var(--vector-color, var(--color-genome)); background: rgba(255,255,255,0.01);
+            padding: 6px 14px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.02);
+        }
+
+        .card-content-block { transform: translateZ(40px); }
+        .card-content-block h3 { font-size: 20px; font-weight: 400; color: #fff; margin-bottom: 10px; letter-spacing: -0.01em; }
+        .card-content-block p { font-size: 14px; color: #64748b; line-height: 1.65; font-weight: 300; }
+
+        .card-action-trigger {
+            font-size: 13.5px; font-weight: 500; color: #fff; display: flex; align-items: center; gap: 8px;
+            margin-top: 18px; opacity: 0.35; transition: all 0.3s ease; transform: translateZ(20px);
+        }
+        .genome-card:hover .card-action-trigger { opacity: 1; color: var(--vector-color, var(--color-intellect)); transform: translateZ(20px) translateX(6px); }
+
+        /* МОНУМЕНТАЛЬНЫЙ КЛАТЕРНЫЙ ФУТЕР ДУХОВНОГО ПОРТАЛА */
+        footer {
+            background: rgba(3, 4, 7, 0.93); border-top: 1px solid rgba(255, 255, 255, 0.02);
+            padding: 40px 64px; display: grid; grid-template-columns: 2.2fr 1fr; gap: 40px;
+            align-items: center; backdrop-filter: blur(24px); position: relative;
+        }
+        footer::before {
+            content: ''; position: absolute; top: 0; left: 10%; width: 80%; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.15), rgba(16, 185, 129, 0.15), transparent);
+        }
+
+        .footer-left-cluster { display: flex; flex-direction: column; gap: 16px; }
+        .system-live-status { display: flex; align-items: center; gap: 16px; font-size: 14px; color: #94a3b8; }
+        .live-indicator-pool { display: flex; align-items: center; gap: 8px; font-weight: 500; color: #fff; }
+        .pulse-bio-node { width: 8px; height: 8px; background: var(--color-genome); border-radius: 50%; box-shadow: 0 0 14px var(--color-genome); animation: nodeBlink 2s infinite; }
+
+        .grid-telemetry-cluster {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px 40px;
+            font-family: var(--font-mono); font-size: 11px; color: #475569;
+            border-top: 1px dashed rgba(255,255,255,0.03); padding-top: 16px;
+        }
+        .telemetry-item span { color: #94a3b8; font-weight: 400; }
+        .telemetry-item strong { color: var(--text-pure); font-weight: 500; }
+
+        .footer-right-cluster { text-align: right; display: flex; flex-direction: column; gap: 6px; }
+        .footer-copyright { font-size: 14px; color: #334155; font-weight: 400; }
+        .footer-motto { font-size: 11px; color: #475569; font-style: italic; letter-spacing: 0.5px; }
+
+        @keyframes rotateOrbit { 100% { transform: rotate(360deg); } }
+        @keyframes nodeBlink { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <canvas id="bioCanvas"></canvas>
+    <div class="ambient-sphere-1"></div>
+    <div class="ambient-sphere-2"></div>
+
+    <div class="app-overlay">
+        <header>
+            <div class="brand-cluster">
+                <div class="genesis-logo">
+                    <div class="logo-orbit"></div>
+                    <div class="logo-orbit"></div>
+                    <div class="logo-orbit"></div>
+                    <div class="logo-nucleus"></div>
+                </div>
+                <div class="brand-text-block">
+                    <div class="brand-title">Genesis Platform</div>
+                    <div class="brand-subtitle">Многовекторная эволюция человека</div>
+                </div>
+            </div>
+            <div class="sys-node-info">
+                <div class="node-dot"></div>
+                <span>Кокон Сознания: <strong>Bondarev_E</strong></span>
+            </div>
+        </header>
+
+        <div class="workspace">
+            <sidebar>
+                <div class="nav-item active"><span>☉</span>Матрица Сущности</div>
+                <div class="nav-item"><span>🧬</span>Карта Эволюции</div>
+                <div class="nav-item"><span>🧠</span>Проводники Роста</div>
+                <div class="nav-item"><span>⚙️</span>Конфигурация Среды</div>
+            </sidebar>
+
+            <main>
+                <div class="intro-zone">
+                    <h1>Пространство проектирования и анализа потенциала личности</h1>
+                    <p>Интегрированная биоинженерная среда, исследующая разнонаправленность вариаций человеческой жизни. Платформа собирает воедино математическую точность психоматрицы Пифагора, архитектонику локальных нейросетей и автоматизацию OmniFactory, превращая хаос внутренних качеств в осознанные векторы эволюции.</p>
+                </div>
+
+                <div class="catalog-container">
+                    <div class="genome-card" style="--vector-color: var(--color-soul)">
+                        <div class="card-vector-indicator"></div>
+                        <div class="card-header-row">
+                            <div class="card-sphere-icon">☉</div>
+                            <div class="card-meta-tag">Психоматрица</div>
+                        </div>
+                        <div class="card-content-block">
+                            <h3>Ядро Личности (Код Сущности)</h3>
+                            <p>Вычисление базовых векторов энергии, характера, устойчивости здоровья и скрытых амбиций на основе числовой матрицы.</p>
+                            <div class="card-action-trigger">Развернуть вычислительное ядро &rarr;</div>
+                        </div>
+                    </div>
+
+                    <div class="genome-card" style="--vector-color: var(--color-genome)">
+                        <div class="card-vector-indicator"></div>
+                        <div class="card-header-row">
+                            <div class="card-sphere-icon">🧬</div>
+                            <div class="card-meta-tag">OmniFactory</div>
+                        </div>
+                        <div class="card-content-block">
+                            <h3>Сборочный Контур Проводников</h3>
+                            <p>Компиляция, логирование и развертывание асинхронных Python-компонентов ИИ-ботов для мягкого ведения человека по путям ментального роста.</p>
+                            <div class="card-action-trigger">Открыть интерактивный Билдер &rarr;</div>
+                        </div>
+                    </div>
+
+                    <div class="genome-card" style="--vector-color: var(--color-intellect)">
+                        <div class="card-vector-indicator"></div>
+                        <div class="card-header-row">
+                            <div class="card-sphere-icon">🧠</div>
+                            <div class="card-meta-tag">ИИ Архитектор</div>
+                        </div>
+                        <div class="card-content-block">
+                            <h3>Нейронное Сознание (Ollama Core)</h3>
+                            <p>Локальный инференс больших языковых моделей для синтеза сложных персонализированных отчетов, эссе и траекторий саморазвития.</p>
+                            <div class="card-action-trigger">Войти в когнитивный диалог &rarr;</div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <footer>
+            <div class="footer-left-cluster">
+                <div class="system-live-status">
+                    <div class="live-indicator-pool">
+                        <span class="pulse-bio-node"></span>
+                        <span>Синхронизация Среды: <span style="color: var(--color-genome)">ГАРМОНИЯ</span></span>
+                    </div>
+                    <span style="color: #334155;">|</span>
+                    <span>Режим супервизора: <strong style="color: #fff; font-weight: 500;">Мониторинг Эволюции</strong></span>
+                </div>
+
+                <div class="grid-telemetry-cluster">
+                    <div class="telemetry-item"><span>ENGINE NODE:</span> <strong>Genesis Enterprise Core Runtime</strong></div>
+                    <div class="telemetry-item"><span>TOTAL CONTEXT CAPACITY:</span> <strong style="color: var(--color-intellect)">38 Active Modules</strong></div>
+                    <div class="telemetry-item"><span>DB VECTOR MATRIX:</span> <strong>ChromaDB + SQLite3 Force-Patch Aligned</strong></div>
+                    <div class="telemetry-item"><span>DATA CHANNELS:</span> <strong>Asynchronous Python Threads (FastAPI)</strong></div>
+                </div>
+            </div>
+
+            <div class="footer-right-cluster">
+                <div class="footer-copyright">Экосистема Познания Личности &copy; 2026</div>
+                <div class="footer-motto">"Design aligned with internal strength, maturity and multifaceted human potential"</div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('bioCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let w = canvas.width = window.innerWidth;
+        let h = canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            w = canvas.width = window.innerWidth;
+            h = canvas.height = window.innerHeight;
+        });
+
+        const dots = [];
+        for (let i = 0; i < 45; i++) {
+            dots.push({
+                x: Math.random() * w, y: Math.random() * h, r: Math.random() * 4 + 1.5,
+                vx: (Math.random() - 0.5) * 0.25, vy: (Math.random() - 0.5) * 0.25,
+                color: Math.random() > 0.6 ? 'rgba(6, 182, 212, 0.15)' : (Math.random() > 0.5 ? 'rgba(99, 102, 241, 0.1)' : 'rgba(16, 185, 129, 0.08)'),
+                phase: Math.random() * Math.PI
+            });
+        }
+
+        function drawBioUniverse() {
+            ctx.clearRect(0, 0, w, h);
+            for (let i = 0; i < dots.length; i++) {
+                for (let j = i + 1; j < dots.length; j++) {
+                    const dist = Math.hypot(dots[i].x - dots[j].x, dots[i].y - dots[j].y);
+                    if (dist < 230) {
+                        ctx.beginPath(); ctx.moveTo(dots[i].x, dots[i].y); ctx.lineTo(dots[j].x, dots[j].y);
+                        ctx.strokeStyle = `rgba(148, 163, 184, ${0.06 * (1 - dist / 230)})`;
+                        ctx.lineWidth = 0.8; ctx.stroke();
+                    }
+                }
+            }
+            dots.forEach(dot => {
+                dot.phase += 0.005; const sizeOffset = Math.sin(dot.phase) * 1.5;
+                dot.x += dot.vx; dot.y += dot.vy;
+                if (dot.x < 0 || dot.x > w) dot.vx *= -1;
+                if (dot.y < 0 || dot.y > h) dot.vy *= -1;
+                ctx.beginPath(); ctx.arc(dot.x, dot.y, Math.max(0.5, dot.r + sizeOffset), 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.14)'; ctx.fill();
+                ctx.beginPath(); ctx.arc(dot.x, dot.y, (dot.r * 5) + sizeOffset * 2, 0, Math.PI * 2);
+                ctx.fillStyle = dot.color; ctx.fill();
+            });
+            requestAnimationFrame(drawBioUniverse);
+        }
+
+        // 3D PARALLAX ЭФФЕКТ ДЛЯ ТВОРЧЕСКОГО ВОСПРИЯТИЯ
+        document.addEventListener('mousemove', (e) => {
+            const cards = document.querySelectorAll('.genome-card');
+            cards.forEach(card => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left - (rect.width / 2);
+                const y = e.clientY - rect.top - (rect.height / 2);
+                const factor = 25;
+                card.style.transform = `rotateY(${-x / factor}deg) rotateX(${y / factor}deg)`;
+            });
+        });
+
+        document.addEventListener('mouseout', (e) => {
+            if(e.target.closest('.genome-card') === null) {
+                document.querySelectorAll('.genome-card').forEach(card => { card.style.transform = 'rotateY(0deg) rotateX(0deg)'; });
+            }
+        });
+
+        drawBioUniverse();
+    </script>
+</body>
+</html>

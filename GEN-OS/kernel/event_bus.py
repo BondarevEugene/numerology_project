@@ -1,23 +1,84 @@
 """
-═══════════════════════════════════════════════════════════════════════
-GENESIS Event Bus
-═══════════════════════════════════════════════════════════════════════
+═══════════════════════════════════════════════════════════════
+Genesis Event Bus
+BUILD 0600
+═══════════════════════════════════════════════════════════════
 """
-
-from collections import defaultdict
 
 
 class EventBus:
 
     def __init__(self):
-        self.listeners = defaultdict(list)
+        self.listeners = {}
+
+    # =====================================================
+
+    def on(self, event, callback):
+        self.listeners.setdefault(
+            event,
+            []
+        ).append(callback)
+
+    # =====================================================
+
+    def off(self, event, callback):
+
+        if event not in self.listeners:
+            return
+
+        if callback in self.listeners[event]:
+            self.listeners[event].remove(callback)
+
+    # =====================================================
+
+    def emit(self, event, *args, **kwargs):
+
+        for callback in self.listeners.get(
+            event,
+            []
+        ):
+            callback(
+                *args,
+                **kwargs
+            )
+
+    # =====================================================
+    # Backward compatibility
+    # =====================================================
+
+    def publish(self, event, *args, **kwargs):
+        """
+        Старое API.
+
+        Полностью совместимо.
+        """
+        return self.emit(
+            event,
+            *args,
+            **kwargs
+        )
+
+    # =====================================================
 
     def subscribe(self, event, callback):
-        self.listeners[event].append(callback)
+        """
+        Старое API.
+        """
+        return self.on(
+            event,
+            callback
+        )
 
-    def publish(self, event, data=None):
-        for callback in self.listeners[event]:
-            callback(data)
+    # =====================================================
+
+    def unsubscribe(self, event, callback):
+        """
+        Старое API.
+        """
+        return self.off(
+            event,
+            callback
+        )
 
 
 event_bus = EventBus()

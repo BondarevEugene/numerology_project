@@ -1,0 +1,12 @@
+.gen-panel{
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+}
+
+.gen-panel-title{
+    font-size:13px;
+    color:var(--text-soft);
+    text-transform:uppercase;
+    letter-spacing:.12em;
+}

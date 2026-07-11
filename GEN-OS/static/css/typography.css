@@ -1,13 +1,49 @@
+/*
+═══════════════════════════════════════════════════════════════
+GENESIS Typography
+═══════════════════════════════════════════════════════════════
+*/
+
 h1 {
 	font-size: 34px;
 	font-weight: 700;
+	letter-spacing: .4px;
 }
+
 h2 {
 	font-size: 28px;
+	font-weight: 700;
 }
+
 h3 {
 	font-size: 22px;
+	font-weight: 600;
 }
+
+h4 {
+	font-size: 18px;
+	font-weight: 600;
+}
+
 small {
 	color: var(--text-muted);
+}
+
+strong {
+	font-weight: 700;
+}
+
+.gen-title {
+	font-size: 30px;
+	font-weight: 700;
+}
+
+.gen-subtitle {
+	color: var(--text-muted);
+	margin-top: 8px;
+}
+
+.gen-caption {
+	color: var(--text-soft);
+	font-size: 13px;
 }

@@ -1,0 +1,39 @@
+<div class="gen-card dashboard-card">
+
+    <div class="gen-card-header">
+
+        ⚙ RUNTIME
+
+    </div>
+
+    <div class="dashboard-body">
+
+        <div class="dashboard-row">
+            <span>Current Workspace</span>
+            <strong>{{ platform.runtime.current().title }}</strong>
+        </div>
+
+        <div class="dashboard-row">
+            <span>Modules</span>
+            <strong>{{ platform.statistics().modules }}</strong>
+        </div>
+
+        <div class="dashboard-row">
+            <span>Workspaces</span>
+            <strong>{{ platform.statistics().workspaces }}</strong>
+        </div>
+
+        <div class="dashboard-row">
+            <span>State</span>
+            <strong>ACTIVE</strong>
+        </div>
+
+    </div>
+
+    <div class="dashboard-footer">
+
+        Runtime Controller
+
+    </div>
+
+</div>

@@ -1,0 +1,123 @@
+.gen-tree {
+
+	display: flex;
+
+	flex-direction: column;
+
+	padding: 18px;
+
+	gap: 6px;
+
+	height: 100%;
+
+	overflow: auto;
+
+}
+
+.gen-tree-group {
+
+	display: flex;
+
+	flex-direction: column;
+
+	gap: 4px;
+
+	margin-bottom: 18px;
+
+}
+
+.gen-tree-title {
+
+	font-size: 11px;
+
+	text-transform: uppercase;
+
+	letter-spacing: 1px;
+
+	color: var(--text-muted);
+
+	padding: 0 12px 10px;
+
+}
+
+.gen-tree-item {
+
+	display: flex;
+
+	align-items: center;
+
+	gap: 14px;
+
+	height: 44px;
+
+	padding: 0 14px;
+
+	border-radius: 12px;
+
+	cursor: pointer;
+
+	transition: var(--transition);
+
+	color: var(--text-soft);
+
+}
+
+.gen-tree-item:hover {
+
+	background:
+
+		rgba(255, 255, 255, .05);
+
+	color: white;
+
+}
+
+.gen-tree-item.active {
+
+	background:
+
+		linear-gradient(135deg,
+
+			rgba(89, 212, 255, .16),
+
+			rgba(107, 115, 255, .10));
+
+	border:
+
+		1px solid rgba(89, 212, 255, .20);
+
+}
+
+.tree-icon {
+
+	width: 22px;
+
+	display: flex;
+
+	justify-content: center;
+
+	font-size: 15px;
+
+	color: var(--primary);
+
+}
+
+.tree-text {
+
+	flex: 1;
+
+}
+
+.tree-badge {
+
+	padding: 3px 8px;
+
+	border-radius: 20px;
+
+	background:
+
+		var(--panel-light);
+
+	font-size: 11px;
+
+}

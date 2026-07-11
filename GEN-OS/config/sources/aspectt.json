@@ -1,0 +1,9 @@
+{
+    "id":"aspectt",
+    "name":"ASPECTT",
+    "type":"REST",
+    "enabled":true,
+    "priority":30,
+    "api_url":"https://aspectt.apps.autonomy.work",
+    "readonly":true
+}
