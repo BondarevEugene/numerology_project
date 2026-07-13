@@ -49,6 +49,14 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any
 import uuid
+
+from typing import Callable
+from typing import Any
+
+import logging
+LOGGER = logging.getLogger("GEN-OS.Registry")
+
+
 # =============================================================================
 # REGISTRY ENTITY
 # =============================================================================
@@ -75,40 +83,46 @@ class RegistryEntity:
     # KNOWLEDGE REGISTRY
     # =============================================================================
 
-    class KnowledgeRegistry:
-        """
-        Central entity registry.
-        """
-        def __init__(self):
-            #
-            # uid -> entity
-            #
-            self._entities: dict[str, RegistryEntity] = {}
-            #
-            # entity_type
-            #
-            self._by_type: dict[str, set[str]] = defaultdict(set)
-            #
-            # normalized_name
-            #
-            self._by_name: dict[str, str] = {}
-            #
-            # provider:id
-            #
-            self._external_index: dict[str, str] = {}
-            #
-            # aliases
-            #
-            self._alias_index: dict[str, str] = {}
-            #
-            # audit
-            #
-            self._history: list[dict] = []
-# =============================================================================
-#
-# NORMALIZATION
-#
-# =============================================================================
+
+class KnowledgeRegistry:
+    """
+    Central entity registry.
+    """
+    def __init__(self):
+        #
+        # uid -> entity
+        #
+        self._entities: dict[str, RegistryEntity] = {}
+        #
+        # entity_type
+        #
+        self._by_type: dict[str, set[str]] = defaultdict(set)
+        #
+        # normalized_name
+        #
+        self._by_name: dict[str, str] = {}
+        #
+        # provider:id
+        #
+        self._external_index: dict[str, str] = {}
+        #
+        # aliases
+        #
+        self._alias_index: dict[str, str] = {}
+        #
+        # audit
+        #
+        self._history: list[dict] = []
+
+        # =====================================================
+        # EVENT SUBSCRIBERS
+        # =====================================================
+
+        self._listeners: list[Callable[..., Any]] = []
+
+    # =============================================================================
+    # NORMALIZATION
+    # =============================================================================
 
     @staticmethod
     def normalize_name(name: str) -> str:
@@ -142,8 +156,8 @@ class RegistryEntity:
 
     @staticmethod
     def make_external_key(
-        provider: str,
-        external_id: str
+            provider: str,
+            external_id: str
     ) -> str:
 
         return f"{provider}:{external_id}"
@@ -157,22 +171,83 @@ class RegistryEntity:
         """
         return str(uuid.uuid4())
 
-# =============================================================================
-#
-# REGISTER ENTITY
-#
-# =============================================================================
+    # ============================================================
+    # OBSERVERS
+    # ============================================================
+
+    def subscribe(
+            self,
+            callback: Callable[..., Any]
+    ) -> None:
+        """
+        Subscribe for registry updates.
+        """
+
+        if callback not in self._listeners:
+            self._listeners.append(callback)
+
+    # ------------------------------------------------------------
+
+    def unsubscribe(
+            self,
+            callback: Callable[..., Any]
+    ) -> None:
+        """
+        Remove subscriber.
+        """
+
+        if callback in self._listeners:
+            self._listeners.remove(callback)
+
+    # ------------------------------------------------------------
+
+    def notify(
+            self,
+            event: str,
+            entity=None
+    ) -> None:
+        """
+        Notify subscribers.
+        """
+
+        for callback in self._listeners:
+
+            try:
+
+                callback(
+
+                    event=event,
+
+                    entity=entity,
+
+                    registry=self
+
+                )
+
+            except Exception as ex:
+
+                LOGGER.exception(
+
+                    "Registry listener failed: %s",
+
+                    ex
+
+                )
+
+    # =============================================================================
+    # REGISTER ENTITY
+    # =============================================================================
 
     def register(
-        self,
-        *,
-        entity_type: str,
-        name: str,
-        provider: str,
-        external_id: str | None = None,
-        description: str = "",
-        aliases: list[str] | None = None,
-        metadata: dict | None = None
+            self,
+            *,
+            entity_type: str,
+            name: str,
+            provider: str,
+            external_id: str | None = None,
+            description: str = "",
+            aliases: list[str] | None = None,
+            metadata: dict | None = None
     ) -> RegistryEntity:
         """
         Registers a canonical entity.
@@ -200,11 +275,9 @@ class RegistryEntity:
                 entity.metadata.update(metadata)
 
             if aliases:
-
                 entity.aliases.update(aliases)
 
             if external_id:
-
                 entity.external_ids[
                     provider
                 ] = external_id
@@ -222,6 +295,12 @@ class RegistryEntity:
                 "provider": provider,
                 "timestamp": datetime.utcnow()
             })
+
+            self.notify(
+                event="entity_registered",
+                entity=entity
+            )
+
             return entity
 
         #
@@ -287,9 +366,10 @@ class RegistryEntity:
             "timestamp": datetime.utcnow()
         })
         return entity
-# =============================================================================
-## SEARCH
-## =============================================================================
+
+    # =============================================================================
+    # SEARCH
+    #=============================================================================
 
     def exists(self, entity_type: str, name: str) -> bool:
         """
@@ -344,9 +424,9 @@ class RegistryEntity:
     # -------------------------------------------------------------------------
 
     def find_by_external_id(
-        self,
-        provider: str,
-        external_id: str
+            self,
+            provider: str,
+            external_id: str
     ) -> RegistryEntity | None:
         """
         Search entity by provider identifier.
@@ -365,7 +445,6 @@ class RegistryEntity:
         )
 
         if uid is None:
-
             return None
 
         return self._entities.get(uid)
@@ -373,8 +452,8 @@ class RegistryEntity:
     # -------------------------------------------------------------------------
 
     def by_type(
-        self,
-        entity_type: str
+            self,
+            entity_type: str
     ) -> list[RegistryEntity]:
         """
         Returns all entities of specified type.
@@ -412,15 +491,14 @@ class RegistryEntity:
     # -------------------------------------------------------------------------
 
     def count(
-        self,
-        entity_type: str | None = None
+            self,
+            entity_type: str | None = None
     ) -> int:
         """
         Registry statistics.
         """
 
         if entity_type is None:
-
             return len(
 
                 self._entities
@@ -442,7 +520,7 @@ class RegistryEntity:
     # -------------------------------------------------------------------------
 
     def entity_types(
-        self
+            self
     ) -> list[str]:
 
         return sorted(
@@ -450,11 +528,12 @@ class RegistryEntity:
             self._by_type.keys()
 
         )
-# =============================================================================
-#
-# PERSISTENCE
-#
-# =============================================================================
+
+    # =============================================================================
+    #
+    # PERSISTENCE
+    #
+    # =============================================================================
 
     def clear(self) -> None:
         """
@@ -467,16 +546,12 @@ class RegistryEntity:
         """
 
         self._entities.clear()
-
         self._by_name.clear()
-
         self._by_type.clear()
-
         self._external_index.clear()
-
         self._alias_index.clear()
-
         self._history.clear()
+        self.notify(event="registry_cleared")
 
     # ---------------------------------------------------------------------
 
@@ -521,7 +596,6 @@ class RegistryEntity:
             #
 
             for alias in entity.aliases:
-
                 self._alias_index[
                     self.normalize_name(alias)
                 ] = uid
@@ -531,7 +605,6 @@ class RegistryEntity:
             #
 
             for provider, external_id in entity.external_ids.items():
-
                 self._external_index[
                     self.make_external_key(
                         provider,
@@ -597,7 +670,6 @@ class RegistryEntity:
             key = self.normalize_name(entity.name)
 
             if key in names:
-
                 issues.append(
 
                     f"Duplicate canonical name: {entity.name}"
@@ -613,3 +685,11 @@ class RegistryEntity:
 
                 )
         return issues
+
+    def graph(self):
+        """
+        Return runtime graph.
+
+        Automatically rebuilds
+        if registry changed.
+        """

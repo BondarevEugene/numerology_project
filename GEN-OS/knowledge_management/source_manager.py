@@ -57,6 +57,9 @@ from .import_session import ImportStatus
 
 from .validation_engine import ValidationEngine
 
+from .normalization_engine import NormalizationEngine
+
+from registry.registry_loader import RegistryLoader
 
 # ==============================================================================
 # SOURCE STATUS
@@ -165,6 +168,9 @@ class SourceManager:
 
         self.validator = ValidationEngine()
 
+        self.normalizer = NormalizationEngine()
+
+        self.registry_loader = RegistryLoader()
     # -------------------------------------------------------------------------
 
     def register(self, source: KnowledgeSource) -> KnowledgeSource:
@@ -629,6 +635,9 @@ class SourceManager:
 
         return session
 
+    # -------------------------------------------------------------------------
+    # DATA MANAGEMENT: Validation
+    # -------------------------------------------------------------------------
     def validate_dataset(self, file_path):
 
         """
@@ -636,3 +645,34 @@ class SourceManager:
         """
 
         return self.validator.validate(file_path)
+
+    # -------------------------------------------------------------------------
+    # DATA MANAGEMENT: normalization
+    # -------------------------------------------------------------------------
+    def normalize_dataset(
+            self,
+            dataframe
+    ):
+
+        """
+        Запуск движка нормализации.
+        """
+
+        return self.normalizer.normalize_dataframe(
+            dataframe
+        )
+
+    def load_into_registry(
+            self,
+            dataframe
+    ):
+
+        """
+        Передает
+        нормализованный DataFrame
+        в Registry.
+        """
+
+        return self.registry_loader.load_dataframe(
+            dataframe
+        )

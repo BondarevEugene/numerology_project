@@ -230,56 +230,33 @@ class KnowledgeGraphService:
         ]
 
         if source in self._adjacency:
-
             remaining = []
-
             for edge in self._adjacency[source]:
-
                 if edge.target == target:
-
                     removed = True
-
                     continue
-
                 remaining.append(edge)
-
             self._adjacency[source] = remaining
-
         if target in self._reverse:
-
             self._reverse[target] = [
-
                 edge
-
                 for edge in self._reverse[target]
-
                 if edge.source != source
-
             ]
-
         return removed
     # ------------------------------------------------------------
     # SEARCH
     # ------------------------------------------------------------
 
-    def find_by_type(
-        self,
-        class_name: str
-    ) -> list:
+    def find_by_type(self, class_name: str) -> list:
         """
         Return every node of given class.
         """
-
         return [
-
             node
-
             for node in self._nodes.values()
-
             if node.__class__.__name__ == class_name
-
         ]
-
     # ------------------------------------------------------------
 
     def find_by_name(
@@ -456,223 +433,152 @@ class KnowledgeGraphService:
         """
         Export graph for Cytoscape.js.
         """
-
         nodes = []
-
         edges = []
-
         for node in self._nodes.values():
-
             nodes.append({
-
                 "data": {
-
                     "id": node.id,
-
                     "label": getattr(
                         node,
                         "name",
                         node.id
                     ),
-
                     "type": node.__class__.__name__
-
                 }
-
             })
-
         for edge in self._edges:
-
             edges.append({
-
                 "data": {
-
                     "source": edge.source,
-
                     "target": edge.target,
-
                     "label": edge.relation,
-
                     "weight": edge.weight
-
                 }
-
             })
-
         return {
-
             "nodes": nodes,
-
             "edges": edges
-
         }
 
-        # ------------------------------------------------------------
-        # GRAPH ALGORITHMS
-        # ------------------------------------------------------------
+    # ------------------------------------------------------------
+    # GRAPH ALGORITHMS
+    # ------------------------------------------------------------
 
-        def connected_nodes(
-                self,
-                node_id: str
-        ) -> list:
-            """
-            Return all directly connected nodes.
-            """
+    def connected_nodes(self, node_id: str) -> list:
+        """
+        Return all directly connected nodes.
+        """
+        result = []
+        result.extend(self.neighbours(node_id))
+        result.extend(self.parents(node_id))
 
-            result = []
+        unique = {}
 
-            result.extend(
-                self.neighbours(node_id)
-            )
+        for node in result:
+            unique[node.id] = node
 
-            result.extend(
-                self.parents(node_id)
-            )
+        return list(unique.values())
 
-            unique = {}
+    # ------------------------------------------------------------
 
-            for node in result:
-                unique[node.id] = node
+    def remove_node(self, node_id: str) -> bool:
+        """
+        Remove node and every connected edge.
+        """
 
-            return list(unique.values())
+        if node_id not in self._nodes:
+            return False
 
-        # ------------------------------------------------------------
+        del self._nodes[node_id]
 
-        def remove_node(
-                self,
-                node_id: str
-        ) -> bool:
-            """
-            Remove node and every connected edge.
-            """
+        self._edges = [
+            edge
+            for edge in self._edges
+            if edge.source != node_id
+            and edge.target != node_id
+        ]
 
-            if node_id not in self._nodes:
-                return False
+        self._adjacency.pop(node_id, None)
+        self._reverse.pop(node_id, None)
 
-            del self._nodes[node_id]
+        for source in self._adjacency:
 
-            self._edges = [
+            self._adjacency[source] = [
 
                 edge
 
-                for edge in self._edges
+                for edge in self._adjacency[source]
 
-                if edge.source != node_id
-
-                   and edge.target != node_id
+                if edge.target != node_id
 
             ]
 
-            self._adjacency.pop(
-                node_id,
-                None
-            )
+        for target in self._reverse:
 
-            self._reverse.pop(
-                node_id,
-                None
-            )
+            self._reverse[target] = [
 
-            for source in self._adjacency:
-                self._adjacency[source] = [
+                edge
 
-                    edge
+                for edge in self._reverse[target]
 
-                    for edge in self._adjacency[source]
+                if edge.source != node_id
 
-                    if edge.target != node_id
+            ]
 
-                ]
+        return True
 
-            for target in self._reverse:
-                self._reverse[target] = [
+    # ------------------------------------------------------------
 
-                    edge
+    def merge(
+        self,
+        other: "KnowledgeGraphService"
+    ) -> None:
+        """
+        Merge another graph.
+        """
 
-                    for edge in self._reverse[target]
+        self.add_nodes(
+            other.nodes.values()
+        )
 
-                    if edge.source != node_id
+        self.add_edges(
+            other.edges
+        )
 
-                ]
+    # ------------------------------------------------------------
 
-            return True
+    def shortest_path(
+        self,
+        source: str,
+        target: str
+    ) -> list[str]:
+        """
+        Breadth First Search.
 
-        # ------------------------------------------------------------
+        Returns list of node ids.
+        """
 
-        def merge(
-                self,
-                other: "KnowledgeGraphService"
-        ) -> None:
-            """
-            Merge another graph.
-            """
+        from collections import deque
 
-            self.add_nodes(
-                other.nodes.values()
-            )
-
-            self.add_edges(
-                other.edges
-            )
-
-        # ------------------------------------------------------------
-
-        def shortest_path(
-                self,
-                source: str,
-                target: str
-        ) -> list[str]:
-            """
-            Breadth First Search.
-
-            Returns node ids.
-            """
-
-            from collections import deque
-
-            queue = deque()
-
-            queue.append(
-                (source, [source])
-            )
-
-            visited = {
-
-                source
-
-            }
-
-            while queue:
-
-                current, path = queue.popleft()
-
-                if current == target:
-                    return path
-
-                for edge in self.outgoing_edges(
-                        current
-                ):
-
-                    if edge.target in visited:
-                        continue
-
-                    visited.add(
-                        edge.target
+        queue = deque()
+        queue.append((source, [source]))
+        visited = {source}
+        while queue:
+            current, path = queue.popleft()
+            if current == target:
+                return path
+            for edge in self.outgoing_edges(current):
+                if edge.target in visited:
+                    continue
+                visited.add(edge.target)
+                queue.append(
+                    (
+                        edge.target,
+                        path + [edge.target]
                     )
-
-                    queue.append(
-
-                        (
-
-                            edge.target,
-
-                            path + [edge.target]
-
-                        )
-
-                    )
-
-            return []
+                )
+        return []
 
         # ------------------------------------------------------------
 
@@ -688,13 +594,10 @@ class KnowledgeGraphService:
             visited = set()
 
             queue = [
-
                 (root, 0)
-
             ]
 
             nodes = []
-
             edges = []
 
             while queue:
@@ -704,9 +607,7 @@ class KnowledgeGraphService:
                 if node_id in visited:
                     continue
 
-                visited.add(
-                    node_id
-                )
+                visited.add(node_id)
 
                 node = self.node(node_id)
 
@@ -716,21 +617,14 @@ class KnowledgeGraphService:
                 if level >= depth:
                     continue
 
-                for edge in self.outgoing_edges(
-                        node_id
-                ):
+                for edge in self.outgoing_edges(node_id):
                     edges.append(edge)
 
                     queue.append(
-
                         (
-
                             edge.target,
-
                             level + 1
-
                         )
-
                     )
 
             return {
@@ -745,17 +639,13 @@ class KnowledgeGraphService:
 
         def __len__(self):
 
-            return len(
-                self._nodes
-            )
+            return len(self._nodes)
 
         # ------------------------------------------------------------
 
         def __iter__(self):
 
-            return iter(
-                self._nodes.values()
-            )
+            return iter(self._nodes.values())
 
         # ------------------------------------------------------------
 
@@ -780,8 +670,103 @@ class KnowledgeGraphService:
 
             )
 
+        # ============================================================
+        # REGISTRY BRIDGE
+        # ============================================================
+
+        def build_from_registry(
+                self,
+                registry
+        ) -> None:
+            """
+            Rebuild graph from Knowledge Registry.
+            Registry is the Single Source of Truth.
+            """
+
+            LOGGER.info(
+                "Building Knowledge Graph from Registry..."
+            )
+
+            self.clear()
+
+            entities = registry.all()
+
+            #
+            # ---------------- Nodes ----------------
+            #
+
+            for entity in entities:
+                node = KnowledgeNode(
+
+                    id=entity.uid,
+
+                    type=entity.entity_type,
+
+                    name=entity.name,
+
+                    description=entity.description,
+
+                    metadata=dict(entity.metadata)
+
+                )
+
+                self.add_node(node)
+
+            #
+            # ---------------- Relations ----------------
+            #
+
+            for entity in entities:
+
+                relations = entity.metadata.get(
+                    "relations",
+                    []
+                )
+
+                for relation in relations:
+
+                    target = relation.get("target")
+
+                    if target not in self._nodes:
+                        continue
+
+                    edge = KnowledgeEdge(
+
+                        source=entity.uid,
+
+                        target=target,
+
+                        relation=relation.get(
+                            "type",
+                            "RELATED_TO"
+                        ),
+
+                        weight=relation.get(
+                            "weight",
+                            1.0
+                        ),
+
+                        bidirectional=relation.get(
+                            "bidirectional",
+                            False
+                        )
+
+                    )
+
+                    self.add_edge(edge)
+
+            LOGGER.info(
+
+                "Knowledge Graph built successfully: %s nodes, %s edges",
+
+                self.node_count(),
+
+                self.edge_count()
+
+            )
+
     # ============================================================
-    # GLOBAL GRAPH
+    # GLOBAL INSTANCE
     # ============================================================
 
-    knowledge_graph = KnowledgeGraphService()
+    knowledge_graph_service = KnowledgeGraphService()

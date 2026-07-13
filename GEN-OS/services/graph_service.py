@@ -20,19 +20,39 @@ from services.entity_service import entity_service
 from services.relation_service import relation_service
 
 
+from services.knowledge_graph_service import (
+    knowledge_graph_service
+)
+
+
 class GraphService:
 
+    """
+    Runtime API
+    над Knowledge Graph.
+    """
+
     def nodes(self):
-        return entity_service.all()
+
+        return knowledge_graph_service.graph()["nodes"]
 
     def edges(self):
-        return relation_service.all()
+
+        return knowledge_graph_service.graph()["edges"]
+
+    def neighbors(
+        self,
+        uid
+    ):
+
+        return knowledge_graph_service.neighbors(uid)
 
     def statistics(self):
-        return {
-            "nodes": entity_service.count(),
-            "edges": relation_service.count()
-        }
+
+        return knowledge_graph_service.statistics()
+
+
+graph_service = GraphService()
 
 """
 ═══════════════════════════════════════════════════════════════════════
@@ -53,8 +73,8 @@ from services.relation_service import relation_service
 class GraphService:
 
     def neighbors(
-        self,
-        entity_id
+            self,
+            entity_id
     ):
         result = []
         for relation in relation_service.all():
@@ -66,8 +86,8 @@ class GraphService:
         return result
 
     def outgoing(
-        self,
-        entity_id
+            self,
+            entity_id
     ):
 
         result = []
@@ -79,8 +99,8 @@ class GraphService:
         return result
 
     def incoming(
-        self,
-        entity_id
+            self,
+            entity_id
     ):
         result = []
         for relation in relation_service.all():
