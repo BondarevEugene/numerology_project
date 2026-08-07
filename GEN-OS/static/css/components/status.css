@@ -1,0 +1,339 @@
+/*
+═══════════════════════════════════════════════════════════════════════
+GENESIS®
+STATUS SYSTEM
+BUILD 0200
+
+═══════════════════════════════════════════════════════════════════════
+*/
+
+/* ========================================================= */
+/* BASE */
+/* ========================================================= */
+
+.gen-status {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--text);
+}
+
+/* ========================================================= */
+/* DOT */
+/* ========================================================= */
+
+.gen-status-dot {
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	flex-shrink: 0;
+}
+
+/* ========================================================= */
+
+.gen-status-online .gen-status-dot {
+	background: var(--gen-green);
+	box-shadow:
+		0 0 12px rgba(70, 255, 178, .85);
+}
+
+/* ========================================================= */
+
+.gen-status-ready .gen-status-dot {
+	background: #5ad4ff;
+	box-shadow:
+		0 0 12px rgba(90, 212, 255, .7);
+}
+
+/* ========================================================= */
+
+.gen-status-warning .gen-status-dot {
+	background: #ffbc57;
+	box-shadow:
+		0 0 12px rgba(255, 188, 87, .7);
+}
+
+/* ========================================================= */
+
+.gen-status-error .gen-status-dot {
+	background: #ff7070;
+	box-shadow:
+		0 0 12px rgba(255, 112, 112, .8);
+}
+
+/* ========================================================= */
+
+.gen-status-offline .gen-status-dot {
+	background: #566270;
+}
+
+/* ========================================================= */
+/* TEXT COLORS */
+/* ========================================================= */
+
+.gen-status-online {
+	color: var(--gen-green);
+}
+
+.gen-status-ready {
+	color: #5ad4ff;
+}
+
+.gen-status-warning {
+	color: #ffbc57;
+}
+
+.gen-status-error {
+	color: #ff7070;
+}
+
+.gen-status-offline {
+	color: #8f9ca8;
+}
+
+/* ========================================================= */
+/* LED */
+/* ========================================================= */
+
+.gen-led {
+	width: 14px;
+	height: 14px;
+	border-radius: 50%;
+}
+
+.gen-led-online {
+	background: var(--gen-green);
+	box-shadow:
+		0 0 18px rgba(70, 255, 178, .9);
+}
+
+.gen-led-warning {
+	background: #ffbc57;
+	box-shadow:
+		0 0 18px rgba(255, 188, 87, .8);
+}
+
+.gen-led-error {
+	background: #ff7070;
+	box-shadow:
+		0 0 18px rgba(255, 112, 112, .9);
+}
+
+/* ========================================================= */
+/* HEARTBEAT */
+/* ========================================================= */
+
+.gen-heartbeat {
+	animation:
+		heartbeat 1.8s infinite;
+}
+
+@keyframes heartbeat {
+	0% {
+		transform: scale(1);
+		opacity: 1;
+	}
+
+	50% {
+		transform: scale(1.25);
+		opacity: .55;
+	}
+
+	100% {
+		transform: scale(1);
+		opacity: 1;
+	}
+
+}
+
+/* ========================================================= */
+/* STATUS BAR */
+/* ========================================================= */
+
+.gen-status-bar {
+	width: 100%;
+	height: 10px;
+	overflow: hidden;
+	border-radius: 999px;
+	background:
+		rgba(255, 255, 255, .05);
+}
+
+.gen-status-fill {
+	height: 100%;
+	border-radius: 999px;
+	background:
+		linear-gradient(90deg,
+			var(--gen-green-dark),
+			var(--gen-green));
+}
+
+/* ========================================================= */
+/* SERVICE STATUS */
+/* ========================================================= */
+
+.gen-service {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 10px 0;
+	border-bottom:
+		1px solid rgba(255, 255, 255, .04);
+}
+
+.gen-service:last-child {
+	border: none;
+}
+
+.gen-service-name {
+	color: var(--text-soft);
+}
+.gen-service-value {
+	font-weight: 700;
+}
+
+/* ========================================================= */
+/* KERNEL */
+/* ========================================================= */
+
+.gen-kernel-status {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	padding: 18px;
+	border-radius: 16px;
+	background:
+		rgba(70, 255, 178, .05);
+	border:
+		1px solid rgba(70, 255, 178, .12);
+}
+
+.gen-kernel-status-title {
+	font-size: 15px;
+	font-weight: 700;
+}
+
+.gen-kernel-status-subtitle {
+	margin-top: 4px;
+	color: var(--text-muted);
+	font-size: 12px;
+}
+
+/* ========================================================= */
+/* RUNTIME */
+/* ========================================================= */
+
+.gen-runtime-indicator {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+}
+
+.gen-runtime-value {
+	font-weight: 700;
+	color: white;
+}
+
+/* ========================================================= */
+/* NETWORK */
+/* ========================================================= */
+
+.gen-network {
+
+	display: flex;
+
+	gap: 4px;
+
+}
+
+.gen-network span {
+
+	width: 4px;
+
+	height: 18px;
+
+	border-radius: 4px;
+
+	background: rgba(255, 255, 255, .08);
+
+}
+
+.gen-network span.active {
+
+	background: var(--gen-green);
+
+}
+
+/* ========================================================= */
+/* SYSTEM MONITOR */
+/* ========================================================= */
+
+.gen-monitor {
+
+	display: flex;
+
+	flex-direction: column;
+
+	gap: 14px;
+
+}
+
+.gen-monitor-item {
+
+	display: flex;
+
+	justify-content: space-between;
+
+	align-items: center;
+
+}
+
+.gen-monitor-label {
+
+	color: var(--text-muted);
+
+}
+
+.gen-monitor-value {
+
+	font-weight: 700;
+
+}
+
+/* ========================================================= */
+/* LIVE */
+/* ========================================================= */
+
+.gen-live {
+
+	position: relative;
+
+}
+
+.gen-live::after {
+
+	content: "";
+
+	position: absolute;
+
+	left: -8px;
+
+	top: 50%;
+
+	transform: translateY(-50%);
+
+	width: 6px;
+
+	height: 6px;
+
+	border-radius: 50%;
+
+	background: var(--gen-green);
+
+	animation:
+
+		heartbeat 1.4s infinite;
+
+}

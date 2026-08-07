@@ -1,92 +1,168 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/genesis_footer.css') }}">
 
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
     <title>GEN-OS</title>
+    <!-- ========================= -->
+    <!-- THEME                     -->
+    <!-- ========================= -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/dashboard.css') }}">
 
-    <!-- GENESIS DESIGN SYSTEM -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/theme/reset.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/theme/fonts.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/theme/variables.css') }}">
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/genesis.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/layout/shell.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/panel.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/button.css') }}">
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/layout.css') }}">
+    <!-- ========================= -->
+    <!-- CSS                       -->
+    <!-- ========================= -->
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/components.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/genesis.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/toolbar.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/typography.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/cards.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/forms.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/workspace.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/utilities.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/workspace.css') }}">
-
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/typography.css') }}">
-
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/animations.css') }}">
-
-    <!-- EXISTING -->
-
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/shell.css') }}">
-
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/explorer.css') }}">
-
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/console.css') }}">
-
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/inspector.css') }}">
-
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/statusbar.css') }}">
-
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/knowledge.css') }}">
-
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/graph.css') }}">
-
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/simulation.css') }}">
+    <!-- старые специализированные -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/graph.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/knowledge.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/simulation.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/console.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/statusbar.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/inspector.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/explorer.css') }}">
 
 </head>
-   <body class="gen-shell">
-      <div class="shell-window">
-         <header class="shell-toolbar">
-            {% include "shell/toolbar.html" %}
-         </header>
-         <div class="shell-body">
-            <aside class="shell-explorer">
-               {% include "shell/explorer.html" %}
-            </aside>
-            <main class="shell-workspace">
-               {% include "shell/workspace_host.html" %}
-            </main>
-            <aside class="shell-inspector">
-               {% include "shell/inspector.html" %}
-            </aside>
-         </div>
-         <section class="shell-console">
-            {% include "shell/console.html" %}
-         </section>
-         <footer class="shell-statusbar">
-            {% include "shell/statusbar.html" %}
-         </footer>
-      </div>
-      <!--
-      <script src="{{ url_for('static',filename='js/shell.js') }}"></script>
-      -->
-      <script src="{{ url_for('static',filename='js/workspace_loader.js') }}"></script>
-      <script src="{{ url_for('static',filename='js/explorer.js') }}"></script>
-      <script src="{{ url_for('static',filename='js/toolbar.js') }}"></script>
-      <script src="{{ url_for('static',filename='js/console.js') }}"></script>
-      <script src="{{ url_for('static',filename='js/inspector.js') }}"></script>
-   </body>
+
+<body class="gen-shell">
+
+<div class="shell-window">
+
+    <header class="shell-toolbar">
+        {% include "shell/toolbar.html" %}
+    </header>
+
+    <div class="shell-body">
+
+        <aside class="shell-explorer">
+            {% include "shell/explorer.html" %}
+        </aside>
+
+        <main class="shell-workspace">
+            {% include "shell/workspace_host.html" %}
+        </main>
+
+        <aside class="shell-inspector">
+            {% include "shell/inspector.html" %}
+        </aside>
+
+    </div>
+
+    <section class="shell-console">
+        {% include "shell/console.html" %}
+    </section>
+
+    <footer class="shell-statusbar">
+        {% include "shell/statusbar.html" %}
+    </footer>
+
+    <footer class="shell-statusbar">
+        {% include "shell/statusbar.html" %}
+    </footer>
+
+{% include "components/genesis_footer.html" %}
+
+</div>
+
+<!-- ===================================================== -->
+<!-- CORE -->
+<!-- ===================================================== -->
+
+<script src="{{ url_for('static', filename='js/core/registry.js') }}"></script>
+<script src="{{ url_for('static', filename='js/core/state.js') }}"></script>
+
+<!-- ===================================================== -->
+<!-- SYSTEM -->
+<!-- ===================================================== -->
+
+<script src="{{ url_for('static', filename='js/event_bus.js') }}"></script>
+<script src="{{ url_for('static', filename='js/api_client.js') }}"></script>
+
+<!-- ===================================================== -->
+<!-- KERNEL -->
+<!-- ===================================================== -->
+
+<script src="{{ url_for('static', filename='js/core/kernel.js') }}"></script>
+<script src="{{ url_for('static', filename='js/core/app.js') }}"></script>
+
+<!-- ===================================================== -->
+<!-- UI -->
+<!-- ===================================================== -->
+
+<script src="{{ url_for('static', filename='js/workspace_loader.js') }}"></script>
+<script src="{{ url_for('static', filename='js/components/tree.js') }}"></script>
+<script src="{{ url_for('static', filename='js/explorer.js') }}"></script>
+<script src="{{ url_for('static', filename='js/toolbar.js') }}"></script>
+<script src="{{ url_for('static', filename='js/console.js') }}"></script>
+<script src="{{ url_for('static', filename='js/inspector.js') }}"></script>
+<script src="{{ url_for('static', filename='js/statusbar.js') }}"></script>
+
+<!-- ===================================================== -->
+<!-- WORKSPACES -->
+<!-- ===================================================== -->
+
+<script src="{{ url_for('static', filename='js/human_workspace.js') }}"></script>
+
+<script src="{{ url_for('static', filename='js/knowledge_workspace.js') }}"></script>
+
+<script src="{{ url_for('static', filename='js/graph_workspace.js') }}"></script>
+
+<script src="{{ url_for('static', filename='js/import_workspace.js') }}"></script>
+
+<script src="{{ url_for('static', filename='js/ai_workspace.js') }}"></script>
+
+<script src="{{ url_for('static', filename='js/career_workspace.js') }}"></script>
+
+<script src="{{ url_for('static', filename='js/platform_workspace.js') }}"></script>
+
+<script src="{{ url_for('static', filename='js/simulation_workspace.js') }}"></script>
+
+<!-- ===================================================== -->
+<!-- ENGINES -->
+<!-- ===================================================== -->
+
+<script src="{{ url_for('static', filename='js/graph_engine.js') }}"></script>
+
+<script src="{{ url_for('static', filename='js/graph_renderer.js') }}"></script>
+
+<script src="{{ url_for('static', filename='js/knowledge_graph.js') }}"></script>
+
+<script src="{{ url_for('static', filename='js/ai_chat.js') }}"></script>
+
+<!-- ===================================================== -->
+<!-- OPTIONAL -->
+<!-- ===================================================== -->
+
+<script src="{{ url_for('static', filename='js/logger.js') }}"></script>
+<script src="{{ url_for('static', filename='js/core/config.js') }}"></script>
+<script src="{{ url_for('static', filename='js/core/diagnostics.js') }}"></script>
+
+</body>
+
 </html>

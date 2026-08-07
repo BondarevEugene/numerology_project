@@ -1,0 +1,10 @@
+{
+    "id":"onet",
+    "name":"O*NET",
+    "type":"LOCAL",
+    "enabled":true,
+    "priority":10,
+    "location":"datasets/onet",
+    "version":"30.3",
+    "readonly":true
+}

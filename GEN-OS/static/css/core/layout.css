@@ -1,0 +1,181 @@
+/*
+══════════════════════════════════════════════════════════════
+
+GENESIS®
+CORE LAYOUT
+BUILD 0200
+
+══════════════════════════════════════════════════════════════
+*/
+
+/* ===================================================== */
+/* APP */
+/* ===================================================== */
+
+.gen-app{
+    display:flex;
+    width:100vw;
+    height:100vh;
+    overflow:hidden;
+    background:var(--gen-bg);
+}
+
+/* ===================================================== */
+/* MAIN */
+/* ===================================================== */
+
+.gen-main{
+    display:flex;
+    flex-direction:column;
+    flex:1;
+    min-width:0;
+    overflow:hidden;
+}
+
+/* ===================================================== */
+/* CONTENT */
+/* ===================================================== */
+
+.gen-content{
+    flex:1;
+    overflow:auto;
+    padding:26px;
+}
+
+/* ===================================================== */
+/* GRID */
+/* ===================================================== */
+
+.gen-grid{
+    display:grid;
+    gap:22px;
+}
+
+.gen-grid-2{
+    grid-template-columns:
+        repeat(2,minmax(0,1fr));
+}
+
+.gen-grid-3{
+    grid-template-columns:
+        repeat(3,minmax(0,1fr));
+}
+
+.gen-grid-4{
+    grid-template-columns:
+        repeat(4,minmax(0,1fr));
+}
+
+/* ===================================================== */
+/* SPLIT */
+/* ===================================================== */
+
+.gen-split{
+    display:grid;
+    grid-template-columns:
+        340px 1fr;
+    gap:22px;
+}
+
+/* ===================================================== */
+/* SIDEBAR */
+/* ===================================================== */
+
+.gen-sidebar{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+}
+
+/* ===================================================== */
+/* PANEL */
+/* ===================================================== */
+
+.gen-panel{
+    display:flex;
+    flex-direction:column;
+    background:var(--gen-panel);
+    border-radius:var(--radius);
+    border:1px solid var(--gen-border);
+}
+
+/* ===================================================== */
+
+.gen-panel-header{
+    padding:18px 22px;
+    border-bottom:1px solid rgba(255,255,255,.05);
+}
+
+/* ===================================================== */
+
+.gen-panel-body{
+    padding:22px;
+    flex:1;
+}
+
+/* ===================================================== */
+
+.gen-panel-footer{
+    padding:18px 22px;
+    border-top:1px solid rgba(255,255,255,.05);
+}
+
+/* ===================================================== */
+/* STACK */
+/* ===================================================== */
+
+.gen-stack{
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+}
+
+.gen-inline{
+    display:flex;
+    gap:16px;
+    align-items:center;
+    flex-wrap:wrap;
+}
+
+/* ===================================================== */
+/* SCROLLBAR */
+/* ===================================================== */
+
+::-webkit-scrollbar{
+    width:10px;
+    height:10px;
+}
+
+::-webkit-scrollbar-thumb{
+    background:rgba(255,255,255,.12);
+    border-radius:999px;
+}
+
+::-webkit-scrollbar-thumb:hover{
+    background:rgba(70,255,178,.35);
+}
+
+/* ===================================================== */
+/* RESPONSIVE */
+/* ===================================================== */
+
+@media (max-width:1400px){
+    .gen-grid-4{
+        grid-template-columns:
+            repeat(2,1fr);
+    }
+}
+
+@media (max-width:980px){
+    .gen-grid-2,
+    .gen-grid-3,
+    .gen-grid-4,
+    .gen-split{
+        grid-template-columns:1fr;
+    }
+
+    .gen-content{
+        padding:18px;
+    }
+
+}

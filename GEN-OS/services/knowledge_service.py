@@ -1,71 +1,79 @@
 """
-═══════════════════════════════════════════════════════════════════════
-GENESIS HR®
-
-GEN-OS
-
-Knowledge Service
-
-FILE: knowledge_service.py
-
-BUILD: 0034
-
-AUTHOR: OpenAI + Yevhenii Bondariev
-
-DESCRIPTION
------------
-Центральный сервис доступа ко всем знаниям платформы.
-Не знает ничего о GUI.
-Используется:
-
-• Explorer
-• Inspector
-• Graph
-• Human Workspace
-• Career Engine
-• AI
-• Recommendation
-• Prediction
-
-═══════════════════════════════════════════════════════════════════════
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                                                                              ║
+║   GENESIS HR®                                                                ║
+║──────────────────────────────────────────────────────────────────────────────║
+║ MODULE      : Knowledge Service                                              ║
+║ FILE        : services/knowledge_service.py                                  ║
+║ LAYER       : Business Logic                                                 ║
+║ BUILD       : 0500                                                           ║
+║ STATUS      : ACTIVE                                                         ║
+║                                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 """
 
-from typing import List
-from typing import Optional
+from __future__ import annotations
+
+from services.base_service import BaseService
 
 
-class KnowledgeService:
+class KnowledgeService(BaseService):
 
     def __init__(self):
+
+        super().__init__()
+
+        self.name = "Knowledge"
+
         self.registry = None
 
+        self.boot()
+
+    # ==========================================================
+    # REGISTRY
+    # ==========================================================
+
     def attach(self, registry):
+
         self.registry = registry
 
-    def loaded(self):
+    def ready(self):
+
         return self.registry is not None
 
+    # ==========================================================
+    # DATA
+    # ==========================================================
+
     def all(self):
-        if not self.loaded():
+
+        if not self.ready():
+
             return []
+
         return self.registry.all()
 
     def count(self):
+
         return len(self.all())
 
-    def find(self, entity_id):
-        if not self.loaded():
+    def get(self, node_id):
+        if not self.ready():
             return None
-
         return self.registry.find(entity_id)
 
-    def search(self, text):
-        if not self.loaded():
-            return []
+    # ==========================================================
+    # SEARCH
+    # ==========================================================
 
-        text = text.lower()
+    def search(self, query):
+        if not self.ready():
+            return []
+        if not query:
+            return []
+        query = query.lower()
         result = []
-        for entity in self.registry.all():
+        for entity in self.all():
             title = str(
                 getattr(
                     entity,
@@ -73,16 +81,39 @@ class KnowledgeService:
                     ""
                 )
             ).lower()
-
-            if text in title:
+            name = str(
+                getattr(
+                    entity,
+                    "name",
+                    ""
+                )
+            ).lower()
+            description = str(
+                getattr(
+                    entity,
+                    "description",
+                    ""
+                )
+            ).lower()
+            if (
+                query in title
+                or
+                query in name
+                or
+                query in description
+            ):
                 result.append(entity)
         return result
 
+    # ==========================================================
+    # FILTER
+    # ==========================================================
+
     def by_type(self, entity_type):
-        if not self.loaded():
+        if not self.ready():
             return []
         result = []
-        for entity in self.registry.all():
+        for entity in self.all():
             if getattr(
                 entity,
                 "entity_type",
@@ -91,11 +122,86 @@ class KnowledgeService:
                 result.append(entity)
         return result
 
-    def statistics(self):
+    # ==========================================================
+    # GRAPH
+    # ==========================================================
+
+    def nodes(self):
+        return self.all()
+
+    def edges(self):
+        return []
+
+    def graph(self):
         return {
-            "loaded": self.loaded(),
-            "entities": self.count()
+            "nodes": self.nodes(),
+            "edges": self.edges()
         }
 
+    # ==========================================================
+    # DASHBOARD
+    # ==========================================================
+
+    def dashboard(self):
+        return [
+            {
+                "title": "Knowledge",
+                "value": self.count(),
+                "subtitle": "Entities",
+                "icon": "📚"
+            },
+            {
+                "title": "Graph",
+                "value": len(self.edges()),
+                "subtitle": "Relations",
+                "icon": "🕸"
+            }
+        ]
+
+    # ==========================================================
+    # SUMMARY
+    # ==========================================================
+
+    def summary(self):
+        return {
+            "loaded": self.ready(),
+            "entities": self.count(),
+            "relations": len(self.edges())
+        }
+
+    # ==========================================================
+    # WORKSPACE
+    # ==========================================================
+
+    def workspace(self):
+        return {
+            "summary": self.summary(),
+            "dashboard": self.dashboard(),
+            "nodes": self.nodes(),
+            "edges": self.edges()
+        }
+
+    # ==========================================================
+    # STATISTICS
+    # ==========================================================
+
+    def statistics(self):
+        return {
+            "loaded": self.ready(),
+            "entities": self.count(),
+            "nodes": len(self.nodes()),
+            "edges": len(self.edges())
+        }
+
+    # ==========================================================
+    # HEALTH
+    # ==========================================================
+
+    def health(self):
+        return {
+            "service": self.name,
+            "ready": self.ready(),
+            "entities": self.count()
+        }
 
 knowledge_service = KnowledgeService()

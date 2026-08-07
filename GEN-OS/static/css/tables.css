@@ -1,0 +1,63 @@
+/*
+═══════════════════════════════════════════════════════
+
+GENESIS TABLE ENGINE
+
+═══════════════════════════════════════════════════════
+*/
+
+.gen-table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+}
+
+.gen-table thead{
+
+    background:#202834;
+
+}
+
+.gen-table th{
+
+    text-align:left;
+
+    padding:16px;
+
+    color:var(--text-soft);
+
+}
+
+.gen-table td{
+
+    padding:16px;
+
+    border-bottom:1px solid rgba(255,255,255,.05);
+
+}
+
+.gen-table tr{
+
+    transition:.18s;
+
+}
+
+.gen-table tbody tr:hover{
+
+    background:#202733;
+
+}
+
+.gen-table-striped tbody tr:nth-child(even){
+
+    background:#181f28;
+
+}
+
+.gen-table-compact td{
+
+    padding:10px;
+
+}

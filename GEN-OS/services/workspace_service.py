@@ -63,15 +63,14 @@ class WorkspaceService:
         self._load_registry()
 
     def _load_registry(self):
-        for workspace in WORKSPACES.values():
-            self._registry[
-                workspace.id
-            ] = WorkspaceSession(
-                id=workspace.id,
-                title=workspace.title,
-                icon=workspace.icon,
-                template=workspace.template,
-                javascript=workspace.javascript
+        for key, data in WORKSPACES.items():
+            # Создаем объект сессии и добавляем в словарь
+            self._registry[key] = WorkspaceSession(
+                id=key,
+                title=data.get('title', ''),
+                icon=data.get('icon', ''),
+                template=data.get('template', ''),
+                javascript=""  # Если в словаре нет JS, передаем пустую строку
             )
 
     def list(self):

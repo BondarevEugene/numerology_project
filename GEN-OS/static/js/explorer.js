@@ -1,65 +1,141 @@
 /*
 ═══════════════════════════════════════════════════════════════════════
-Explorer
-
-BUILD:0117
+GENESIS HR®
+Explorer Controller
+BUILD 0300
+Navigator Workspace
 ═══════════════════════════════════════════════════════════════════════
 */
-
 class Explorer {
-
     constructor() {
-
-        this.initialize();
+        this.root = null;
+        this.items = [];
+        this.initialized = false;
     }
+
+    /*
+    ==========================================================
+    INITIALIZE
+    ==========================================================
+    */
 
     initialize() {
-
-        this.bindTree();
+        if (this.initialized)
+            return;
+        this.initialized = true;
+        this.root = document.querySelector(".gen-explorer");
+        if (!this.root) {
+            console.warn(
+                "[Explorer] Root not found."
+            );
+            return;
+        }
+        this.items = Array.from(
+            this.root.querySelectorAll(
+                "[data-workspace]"
+            )
+        );
+        this.bind();
+        console.log(
+            "[Explorer] Ready"
+        );
     }
 
-    bindTree() {
+    /*
+    ==========================================================
+    EVENTS
+    ==========================================================
+    */
+    bind() {
+        this.items.forEach(item => {
+            item.addEventListener(
+                "click",
+                () => {
+                    const workspace =
+                        item.dataset.workspace;
 
-        document
-            .querySelectorAll(
-                ".gen-tree-item"
-            )
-            .forEach(
-                item => {
+                    this.activate(workspace);
 
-                    item.addEventListener(
-                        "click",
-                        () => {
+                    if (window.bus) {
 
-                            document
-                                .querySelectorAll(
-                                    ".gen-tree-item"
-                                )
-                                .forEach(
-                                    x => x.classList.remove(
-                                        "active"
-                                    )
-                                );
+                        window.bus.emit(
 
-                            item.classList.add(
-                                "active"
-                            );
+                            "workspace.change",
 
-                            console.log(
-                                item.dataset.workspace
-                            );
-                        }
-                    );
+                            {
+
+                                workspace
+
+                            }
+
+                        );
+
+                    }
 
                 }
+
             );
+
+        });
+
     }
+
+    /*
+    ==========================================================
+    ACTIVE
+    ==========================================================
+    */
+
+    activate(workspace) {
+
+        this.items.forEach(item => {
+
+            item.classList.remove(
+                "active"
+            );
+
+            if (
+
+                item.dataset.workspace === workspace
+
+            ) {
+
+                item.classList.add(
+                    "active"
+                );
+
+            }
+
+        });
+
+    }
+
+    /*
+    ==========================================================
+    API
+    ==========================================================
+    */
+
+    refresh() {
+
+        this.items = Array.from(
+
+            this.root.querySelectorAll(
+
+                "[data-workspace]"
+
+            )
+
+        );
+
+    }
+
 }
 
-window.addEventListener(
-    "DOMContentLoaded",
-    () => {
+/*
+==========================================================
+GLOBAL
+==========================================================
+*/
 
-        new Explorer();
-    }
-);
+window.explorer = new Explorer();

@@ -1,227 +1,250 @@
 /*
-═══════════════════════════════════════════════════════════════════════════════
+═══════════════════════════════════════════════════════════════════════
 
-GEN-OS®
-Genesys Operating System
+GENESIS HR®
 
-Workspace Loader
+GEN-OS Workspace Loader
 
-Version:
-BUILD-0016
+BUILD 0300
 
-Description:
+Workspace Loader отвечает только за:
 
-Главный загрузчик рабочих областей GEN-OS.
+• загрузку Workspace
+• кэширование
+• вставку HTML
+• вызов WorkspaceInit()
 
-Shell никогда не знает содержимого Workspace.
-Workspace никогда не знает Shell.
-
-Все взаимодействие происходит через WorkspaceLoader.
-
-═══════════════════════════════════════════════════════════════════════════════
+═══════════════════════════════════════════════════════════════════════
 */
 
 class WorkspaceLoader {
 
-   constructor() {
+    constructor() {
 
-      this.currentWorkspace = null;
+        this.current = null;
 
-      this.cache = {};
+        this.cache = {};
 
-      this.container = document.getElementById("workspace-container");
+        this.container = null;
 
-   }
+    }
 
-   async open(name) {
+    /*
+    =========================================================
+    INIT
+    =========================================================
+    */
 
-      if (this.currentWorkspace === name) {
+initialize() {
 
-         return;
+    this.container = document.getElementById("workspace-container");
+    if (!this.container) {
+        console.error(
+            "[WorkspaceLoader] #workspace-container not found."
+        );
+        return;
+    }
+    if (window.bus) {
+        window.bus.on(
+            "workspace.change",
+            payload => {
+                this.open(
+                    payload.workspace
+                );
+            }
+        );
+    }
 
-      }
+    console.log(
+        "[WorkspaceLoader] Ready"
+    );
 
-      this.showLoading();
+}
 
-      try {
+        /*
+        EventBus
+        */
 
-         let html;
+        if (window.bus) {
 
-         if (this.cache[name]) {
+            window.bus.on(
 
-            html = this.cache[name];
+                "workspace.change",
 
-         } else {
+                payload => {
 
-            const response = await fetch(
+                    this.open(
+                        payload.workspace
+                    );
 
-               `/workspace/${name}`
+                }
 
             );
 
-            html = await response.text();
+        }
 
-            this.cache[name] = html;
+        this.open("human");
 
-         }
+    }
 
-         this.container.innerHTML = html;
+    /*
+    =========================================================
+    OPEN
+    =========================================================
+    */
 
-         this.currentWorkspace = name;
+    async open(name) {
 
-         this.highlightDock(name);
+        if (!name)
+            return;
 
-         this.updateTitle(name);
+        if (this.current === name)
+            return;
 
-         this.log(
+        if (!this.container)
+            return;
 
-            "Workspace",
+        console.log("[Workspace] Opening:", name);
+        this.loading();
 
-            `${name} loaded`,
+        try {
 
-            "success"
+            let html;
 
-         );
+            if (this.cache[name]) {
 
-         this.initializeWorkspace(name);
-
-      } catch (e) {
-
-         console.error(e);
-
-         this.container.innerHTML = this.errorScreen(e);
-
-         this.log(
-
-            "Loader",
-
-            e.message,
-
-            "error"
-
-         );
-
-      }
-
-   }
-
-   initializeWorkspace(name) {
-
-      const fn =
-
-         window[
-
-            `${name}WorkspaceInit`
-
-         ];
-
-      if (typeof fn === "function") {
-
-         fn();
-
-      }
-
-   }
-
-   highlightDock(name) {
-
-      document
-
-         .querySelectorAll(
-
-            ".dock-button"
-
-         )
-
-         .forEach(btn => {
-
-            btn.classList.remove("active");
-
-            if (btn.dataset.workspace === name) {
-
-               btn.classList.add("active");
+                html = this.cache[name];
 
             }
 
-         });
+            else {
 
-   }
+                const response =
+                    await fetch(
+                        `/workspace/${name}`
+                    );
 
-   updateTitle(name) {
+                if (!response.ok)
+                    throw new Error(
+                        response.statusText
+                    );
 
-      const title =
+                html =
+                    await response.text();
 
-         document.querySelector(
+                this.cache[name] = html;
 
-            ".workspace-title h2"
+            }
 
-         );
+            this.container.innerHTML = html;
+            window.dispatchEvent(
+                new CustomEvent(
+                    "workspace.loaded",
+                    {
+                        detail: {
+                            workspace: name
+                    }
+                }
+            )
+        );
+            this.current = name;
+            this.initializeWorkspace(name);
+            window.Genesis.emit(
+                "workspace.loaded",
+                {
+                    workspace: name
+                }
+            );
+        }
 
-      const subtitle =
+        catch (e) {
 
-         document.querySelector(
+            console.error(e);
 
-            ".workspace-title span"
+            this.error(e);
 
-         );
+        }
 
-      const names = {
+    }
 
-         human: "Digital Twin",
+    /*
+    =========================================================
+    ACTIVATE MENU
+    =========================================================
+    */
 
-         career: "Career Intelligence",
+    activate(name) {
 
-         knowledge: "Knowledge Explorer",
+        document
 
-         import: "Knowledge Import",
+            .querySelectorAll(
+                "[data-workspace]"
+            )
 
-         simulation: "Future Simulator",
+            .forEach(item => {
 
-         ai: "AI Advisor",
+                item.classList.remove(
+                    "active"
+                );
 
-         platform: "Platform"
+                if (
 
-      };
+                    item.dataset.workspace ===
+                    name
 
-      const subtitles = {
+                ) {
 
-         human: "Human Intelligence",
+                    item.classList.add(
+                        "active"
+                    );
 
-         career: "Professional Analytics",
+                }
 
-         knowledge: "Knowledge Graph",
+            });
 
-         import: "Registry Import Pipeline",
+    }
 
-         simulation: "Future Prediction",
+    /*
+    =========================================================
+    WORKSPACE INIT
+    =========================================================
+    */
 
-         ai: "Genesis Neural Core",
+    initializeWorkspace(name) {
 
-         platform: "Configuration"
+        const fn =
+            window[
+                `${name}WorkspaceInit`
+            ];
 
-      };
+        if (
 
-      title.innerHTML =
+            typeof fn ===
+            "function"
 
-         names[name] || name;
+        ) {
 
-      subtitle.innerHTML =
+            fn();
 
-         subtitles[name] || "";
+        }
 
-   }
+    }
 
-   showLoading() {
+    /*
+    =========================================================
+    LOADING
+    =========================================================
+    */
 
-      this.container.innerHTML =
+    loading() {
 
-         `
+        this.container.innerHTML = `
 
 <div class="gen-loading">
 
 <div class="gen-spinner"></div>
 
-<div class="gen-loading-title">
+<div class="gen-loading-text">
 
 Loading Workspace...
 
@@ -231,23 +254,23 @@ Loading Workspace...
 
 `;
 
-   }
+    }
 
-   errorScreen(error) {
+    /*
+    =========================================================
+    ERROR
+    =========================================================
+    */
 
-      return `
+    error(error) {
+
+        this.container.innerHTML = `
 
 <div class="gen-error">
 
-<div class="gen-error-icon">
-
-⚠
-
-</div>
-
 <h2>
 
-Workspace failed
+Workspace Error
 
 </h2>
 
@@ -261,70 +284,15 @@ ${error.message}
 
 `;
 
-   }
-
-   log(module, message, type = "info") {
-
-      if (
-
-         typeof consoleLog === "function"
-
-      ) {
-
-         consoleLog(
-
-            module,
-
-            message,
-
-            type
-
-         );
-
-      }
-
-   }
+    }
 
 }
 
-window.loader =
+window.workspaceLoader =
+    new WorkspaceLoader();
 
-   new WorkspaceLoader();
+workspaceLoader.initialize();
 
-document
+    }
 
-   .addEventListener(
-
-      "DOMContentLoaded",
-
-      () => {
-
-         document
-
-            .querySelectorAll(
-
-               ".dock-button"
-
-            )
-
-            .forEach(button => {
-
-               button.onclick = () => {
-
-                  loader.open(
-
-                     button.dataset.workspace
-
-                  );
-
-               };
-
-            });
-
-         loader.open(
-
-            "human"
-
-         );
-
-      });
+);

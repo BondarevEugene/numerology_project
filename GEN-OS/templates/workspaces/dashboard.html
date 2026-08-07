@@ -1,0 +1,86 @@
+{% extends "genos_shell.html" %}
+{% block workspace %}
+<div class="dashboard">
+
+    {# ========================================================= #}
+    {# HERO #}
+    {# ========================================================= #}
+
+    {% set
+        title="GENESIS Operating System"
+    %}
+
+    {% set
+        subtitle="AI Intelligence Platform"
+    %}
+
+    {% set
+        description="
+        Unified platform for Human Intelligence,
+        Knowledge Graph, Career Prediction,
+        Artificial Intelligence and Simulation.
+        "
+    %}
+
+    {% set
+        icon="🧠"
+    %}
+
+    {% set
+        badges='
+            <span class="tag">ONLINE</span>
+            <span class="tag">AI READY</span>
+            <span class="tag">GRAPH ACTIVE</span>
+        '
+    %}
+
+    {% include "components/gen_header.html" %}
+
+    {# ========================================================= #}
+    {# KPI #}
+    {# ========================================================= #}
+
+    <div class="gen-grid-4">
+
+        {% include "widgets/dashboard/platform_status.html" %}
+        {% include "widgets/dashboard/runtime_status.html" %}
+        {% include "widgets/dashboard/services_status.html" %}
+        {% include "widgets/dashboard/workspace_status.html" %}
+
+    </div>
+
+    {# ========================================================= #}
+    {# CORE #}
+    {# ========================================================= #}
+
+    <div class="gen-grid-4">
+
+        {% include "widgets/dashboard/human_summary.html" %}
+        {% include "widgets/dashboard/knowledge_summary.html" %}
+        {% include "widgets/dashboard/graph_summary.html" %}
+        {% include "widgets/dashboard/ai_summary.html" %}
+
+    </div>
+
+    {# ========================================================= #}
+    {# OPERATIONS #}
+    {# ========================================================= #}
+
+    <div class="gen-grid-2">
+
+        {% include "widgets/dashboard/activity_feed.html" %}
+        {% include "widgets/dashboard/notifications.html" %}
+
+    </div>
+
+    {# ========================================================= #}
+    {# ACTIONS #}
+    {# ========================================================= #}
+
+    <div class="gen-grid">
+        {% include "widgets/dashboard/quick_actions.html" %}
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,21 @@
+.gen-card{
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:18px;
+    box-shadow:var(--shadow);
+    transition:var(--transition);
+}
+
+.gen-card:hover{
+    border-color:var(--primary);
+}
+
+.gen-card-header{
+    color:var(--text);
+    font-weight:700;
+    font-size:14px;
+    margin-bottom:16px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+}

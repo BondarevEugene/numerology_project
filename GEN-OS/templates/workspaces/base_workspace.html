@@ -1,0 +1,20 @@
+<div class="gen-workspace">
+    <div class="gen-workspace-header">
+        <div>
+            <div class="gen-workspace-title">
+                {{ workspace.title }}
+            </div>
+            <div class="gen-workspace-subtitle">
+                {{ workspace.description }}
+            </div>
+        </div>
+        <div class="gen-toolbar">
+            {% block actions %}
+            {% endblock %}
+        </div>
+    </div>
+    <div class="gen-workspace-content">
+        {% block workspace %}
+        {% endblock %}
+    </div>
+</div>

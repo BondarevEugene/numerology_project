@@ -1,0 +1,21 @@
+<div class="gen-card dashboard-card">
+    <div class="gen-card-header">
+        🗂 WORKSPACES
+    </div>
+    <div class="dashboard-body">
+        {% for workspace in workspaces %}
+        <div class="dashboard-row">
+            <span>
+                {{ workspace.title }}
+            </span>
+
+            <strong>
+                READY
+            </strong>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="dashboard-footer">
+        Registered Workspaces
+    </div>
+</div>

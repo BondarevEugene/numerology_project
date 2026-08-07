@@ -1,0 +1,381 @@
+/*
+═══════════════════════════════════════════════════════════════════════
+GENESIS HR®
+CARD SYSTEM
+BUILD-0114
+═══════════════════════════════════════════════════════════════════════
+*/
+
+/* ====================================================== */
+
+.gen-card{
+    background:linear-gradient(
+        180deg,
+        #1b222d,
+        #181f29
+    );
+
+    border:1px solid var(--border);
+    border-radius:22px;
+    padding:24px;
+    box-shadow:var(--shadow);
+    transition:.22s;
+}
+
+/* ====================================================== */
+
+.gen-card:hover{
+    transform:translateY(-4px);
+    border-color:var(--primary);
+    box-shadow:
+        var(--shadow),
+        var(--glow);
+}
+
+/* ====================================================== */
+
+.gen-card-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+/* ====================================================== */
+
+.gen-card-title{
+    font-size:20px;
+    font-weight:700;
+}
+
+/* ====================================================== */
+
+.gen-card-subtitle{
+    color:var(--text-muted);
+    margin-top:6px;
+}
+
+/* ====================================================== */
+
+.gen-card-body{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+}
+
+/* ====================================================== */
+
+.gen-card-footer{
+    margin-top:22px;
+    display:flex;
+    justify-content:flex-end;
+    gap:12px;
+}
+
+/* ====================================================== */
+
+.gen-metric-card{
+    background:
+        linear-gradient(
+            145deg,
+            rgba(78,208,255,.18),
+            rgba(123,91,255,.08)
+        );
+
+}
+.gen-metric-value{
+    font-size:44px;
+    font-weight:700;
+    margin-top:20px;
+}
+
+.gen-metric-label{
+    color:var(--text-muted);
+}
+
+/* ====================================================== */
+
+.gen-ai-card{
+    border-color:#5fd7ff;
+}
+
+.gen-human-card{
+    border-color:#4fd68f;
+}
+
+.gen-graph-card{
+    border-color:#8b6fff;
+}
+
+.gen-warning-card{
+    border-color:#ffb347;
+}
+
+.gen-danger-card{
+    border-color:#ff6584;
+}
+
+/* ========================================================= */
+/* METRIC */
+/* ========================================================= */
+
+.gen-metric{
+    min-height:190px;
+}
+
+.gen-metric-icon{
+    width:42px;
+    height:42px;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(68,255,176,.08);
+    color:#44ffb0;
+    font-size:22px;
+}
+
+.gen-metric-title{
+    font-size:13px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:#91a3ae;
+}
+
+.gen-metric-subtitle{
+    margin-top:4px;
+    color:#70818b;
+    font-size:12px;
+}
+
+.gen-metric-body{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    gap:18px;
+}
+
+.gen-metric-value{
+    font-size:42px;
+    font-weight:800;
+    color:white;
+}
+
+.gen-metric-trend{
+    color:#44ffb0;
+    font-size:12px;
+    font-weight:700;
+}
+
+.gen-progress{
+    width:100%;
+    height:8px;
+    background:rgba(255,255,255,.05);
+    border-radius:999px;
+    overflow:hidden;
+}
+
+.gen-progress-fill{
+    height:100%;
+    border-radius:999px;
+    background:linear-gradient(
+        90deg,
+        #28d98d,
+        #44ffb0
+    );
+
+}
+/* ====================================================== */
+/* CARD ICON */
+/* ====================================================== */
+
+.gen-card-header-left{
+    display:flex;
+    align-items:center;
+    gap:16px;
+}
+
+.gen-card-icon{
+    width:46px;
+    height:46px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:14px;
+    background:
+        linear-gradient(
+            145deg,
+            rgba(70,255,178,.12),
+            rgba(70,255,178,.04)
+        );
+
+    border:1px solid rgba(70,255,178,.12);
+    color:var(--gen-green);
+    font-size:22px;
+    flex-shrink:0;
+}
+/* ====================================================== */
+/* TOOLBAR */
+/* ====================================================== */
+
+.gen-card-toolbar{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+/* ====================================================== */
+/* ACTIONS */
+/* ====================================================== */
+
+.gen-card-actions{
+    display:flex;
+    gap:12px;
+    margin-top:20px;
+    flex-wrap:wrap;
+}
+/* ====================================================== */
+/* CHIP */
+/* ====================================================== */
+
+.gen-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:6px 12px;
+    border-radius:999px;
+    background:rgba(70,255,178,.08);
+    color:var(--gen-green);
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:.05em;
+}
+/* ====================================================== */
+/* STATUS STRIP */
+/* ====================================================== */
+
+.gen-card-status{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:18px;
+    padding-top:16px;
+    border-top:1px solid rgba(255,255,255,.05);
+}
+/* ====================================================== */
+/* MENU */
+/* ====================================================== */
+
+.gen-card-menu{
+    cursor:pointer;
+    color:var(--text-muted);
+    transition:.2s;
+}
+
+.gen-card-menu:hover{
+    color:var(--gen-green);
+}
+/* ====================================================== */
+/* LOADING */
+/* ====================================================== */
+
+.gen-card-loading{
+    position:relative;
+    overflow:hidden;
+}
+
+.gen-card-loading::after{
+    content:"";
+    position:absolute;
+    top:0;
+    left:-100%;
+    width:60%;
+    height:100%;
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,.08),
+            transparent
+        );
+    animation:
+        cardLoading 1.4s infinite;
+}
+
+@keyframes cardLoading{
+    to{
+        left:160%;
+    }
+
+}
+/* ====================================================== */
+/* COMPACT */
+/* ====================================================== */
+
+.gen-card-compact{
+    padding:16px;
+
+}
+.gen-card-compact
+
+.gen-card-header{
+    margin-bottom:12px;
+}
+/* ====================================================== */
+/* SELECTED */
+/* ====================================================== */
+
+.gen-card-selected{
+    border-color:var(--gen-green);
+
+    box-shadow:
+        var(--shadow),
+        0 0 30px rgba(70,255,178,.18);
+}
+/* ====================================================== */
+/* GLASS */
+/* ====================================================== */
+
+.gen-card-glass{
+    backdrop-filter:blur(18px);
+    background:
+        rgba(27,34,45,.72);
+}
+/* ====================================================== */
+/* KPI ROW */
+/* ====================================================== */
+
+.gen-kpi-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:18px;
+    margin-top:18px;
+}
+
+.gen-kpi{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+}
+
+.gen-kpi-value{
+    font-size:26px;
+    font-weight:700;
+}
+
+.gen-kpi-label{
+    color:var(--text-muted);
+    font-size:11px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+}
+/* ====================================================== */
+/* BADGES */
+/* ====================================================== */
+
+.gen-card-badges{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}

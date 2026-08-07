@@ -1,0 +1,441 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="6eb95a8b-e607-44a0-8ef5-a6183af34a1e" name="Changes" comment="UPGRAGE. 14/07/26">
+      <change afterPath="$PROJECT_DIR$/GEN-OS/core/lifecycle.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GEN-OS/core/service_registry.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GEN-OS/kernel/component.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GEN-OS/kernel/module.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GEN-OS/modules/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GEN-OS/modules/ai/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GEN-OS/modules/career/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GEN-OS/modules/decision/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GEN-OS/modules/human/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GEN-OS/modules/importer/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GEN-OS/modules/importer/module.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GEN-OS/modules/knowledge/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GEN-OS/modules/knowledge/module.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GEN-OS/modules/platform/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/GEN-OS/modules/prediction/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modules/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modules/knowledge/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/modules/knowledge/module.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GEN-OS/kernel/bootstrap.py" beforeDir="false" afterPath="$PROJECT_DIR$/GEN-OS/kernel/bootstrap.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GEN-OS/kernel/module_loader.py" beforeDir="false" afterPath="$PROJECT_DIR$/GEN-OS/kernel/module_loader.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GEN-OS/kernel/modules.py" beforeDir="false" afterPath="$PROJECT_DIR$/GEN-OS/kernel/modules.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GEN-OS/services/import_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/GEN-OS/services/import_service.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="HTML File" />
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="Genesys_road" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;BondarevEugene&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/BondarevEugene/numerology_project&quot;,
+    &quot;accountId&quot;: &quot;a5bc0d04-974a-4304-8acc-2987b417382a&quot;
+  },
+  &quot;recentNewPullRequestHead&quot;: {
+    &quot;server&quot;: {
+      &quot;useHttp&quot;: false,
+      &quot;host&quot;: &quot;github.com&quot;,
+      &quot;port&quot;: null,
+      &quot;suffix&quot;: null
+    },
+    &quot;owner&quot;: &quot;BondarevEugene&quot;,
+    &quot;repository&quot;: &quot;numerology_project&quot;
+  }
+}</component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/templates/index.html" root0="SKIP_INSPECTION" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
+  <component name="ProjectId" id="3CUcy6F7phBoKVyWhrGydK1chkD" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="openDirectoriesWithSingleClick" value="true" />
+    <option name="showLibraryContents" value="true" />
+    <option name="showMembers" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;Python.admin.executor&quot;: &quot;Run&quot;,
+    &quot;Python.app.executor&quot;: &quot;Run&quot;,
+    &quot;Python.fix_db.executor&quot;: &quot;Run&quot;,
+    &quot;Python.force_update.executor&quot;: &quot;Run&quot;,
+    &quot;Python.init_db_LK.executor&quot;: &quot;Run&quot;,
+    &quot;Python.launcher.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main (1).executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.run.executor&quot;: &quot;Run&quot;,
+    &quot;Python.run_import.executor&quot;: &quot;Run&quot;,
+    &quot;Python.seed_genesis.executor&quot;: &quot;Run&quot;,
+    &quot;Python.server.executor&quot;: &quot;Run&quot;,
+    &quot;Python.test_registry.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;Shell Script.deploy.sh.executor&quot;: &quot;Run&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;Genesys__road__1&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/bonda/PycharmProjects/numerology_project/GEN-OS/static/js/core&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.appearance&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\bonda\PycharmProjects\numerology_project\templates\admin" />
+      <recent name="C:\Users\bonda\PycharmProjects\numerology_project\templates_v3" />
+      <recent name="C:\Users\bonda\PycharmProjects\numerology_project\archive" />
+      <recent name="C:\Users\bonda\PycharmProjects\numerology_project\templates" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\bonda\PycharmProjects\numerology_project\GEN-OS\_ARCHIVE" />
+      <recent name="C:\Users\bonda\PycharmProjects\numerology_project\GEN-OS\repositories" />
+      <recent name="C:\Users\bonda\PycharmProjects\numerology_project\GEN-OS\datasets\onet" />
+      <recent name="C:\Users\bonda\PycharmProjects\numerology_project\GEN-OS\datasets\esco" />
+      <recent name="C:\Users\bonda\PycharmProjects\numerology_project\GEN-OS\kernel" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python.launcher">
+    <configuration name="launcher" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="numerology_project" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/GEN-OS" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/GEN-OS/launcher.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="numerology_project" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/GEN-OS/api" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="C:\Users\bonda\PycharmProjects\numerology_project\GEN-OS\_ARCHIVE\main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="run" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="numerology_project" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/GEN-OS" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/GEN-OS/run.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="run_import" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="numerology_project" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/GEN-OS" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/GEN-OS/run_import.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="server" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="numerology_project" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/GEN-OS" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/GEN-OS/server.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.launcher" />
+        <item itemvalue="Python.server" />
+        <item itemvalue="Python.run" />
+        <item itemvalue="Python.main (1)" />
+        <item itemvalue="Python.run_import" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-337b0a7a993a-31b6be0877a2-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-241.19416.19" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="6eb95a8b-e607-44a0-8ef5-a6183af34a1e" name="Changes" comment="" />
+      <created>1717574533643</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1717574533643</updated>
+    </task>
+    <task id="LOCAL-00001" summary="&quot;fix error 500 and update lila portal&quot;">
+      <option name="closed" value="true" />
+      <created>1776490446324</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1776490446324</updated>
+    </task>
+    <task id="LOCAL-00002" summary="пред ФИНАЛЬНАЯ РАБОЧАЯ ВЕРСИЯ 9.13 220426">
+      <option name="closed" value="true" />
+      <created>1776828428268</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1776828428268</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Genesys .2.0-PRO 25\04\2026&#10;full working">
+      <option name="closed" value="true" />
+      <created>1777108343623</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1777108343623</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Genesys .2.0-PRO 25\04\2026&#10;full working">
+      <option name="closed" value="true" />
+      <created>1777108384893</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1777108384893</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Genesys .4.0-PRO 12\05\2026&#10;full working">
+      <option name="closed" value="true" />
+      <created>1778591604599</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1778591604599</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Genesys .5.0-PRO 07\06\2026&#10;upd_max">
+      <option name="closed" value="true" />
+      <created>1780817637022</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1780817637022</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Genesys .5.0-PRO 17\06\2026&#10;lust_update before rebuilds">
+      <option name="closed" value="true" />
+      <created>1781678224364</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1781678224364</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Захват кондитерской .1.0-PRO 18\06\2026&#10;for gpt">
+      <option name="closed" value="true" />
+      <created>1781766081069</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1781766081069</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Genos 01">
+      <option name="closed" value="true" />
+      <created>1781885338729</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1781885338730</updated>
+    </task>
+    <task id="LOCAL-00010" summary="Genos 02">
+      <option name="closed" value="true" />
+      <created>1781913277922</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1781913277922</updated>
+    </task>
+    <task id="LOCAL-00011" summary="GenOs 03">
+      <option name="closed" value="true" />
+      <created>1781986290389</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1781986290389</updated>
+    </task>
+    <task id="LOCAL-00012" summary="working">
+      <option name="closed" value="true" />
+      <created>1782073934322</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1782073934322</updated>
+    </task>
+    <task id="LOCAL-00013" summary="working_2_22/06/26">
+      <option name="closed" value="true" />
+      <created>1782150476440</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1782150476440</updated>
+    </task>
+    <task id="LOCAL-00014" summary="css added 25/06/26">
+      <option name="closed" value="true" />
+      <created>1782416201648</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1782416201648</updated>
+    </task>
+    <task id="LOCAL-00015" summary="Knowledge Pipeline. 11/07/26">
+      <option name="closed" value="true" />
+      <created>1783741744514</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1783741744514</updated>
+    </task>
+    <task id="LOCAL-00016" summary="UPGRAGE. 14/07/26">
+      <option name="closed" value="true" />
+      <created>1783976539922</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1783976539922</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="&quot;fix error 500 and update lila portal&quot;" />
+    <MESSAGE value="пред ФИНАЛЬНАЯ РАБОЧАЯ ВЕРСИЯ 9.13 220426" />
+    <MESSAGE value="Genesys .2.0-PRO 25\04\2026&#10;full working" />
+    <MESSAGE value="Genesys .4.0-PRO 12\05\2026&#10;full working" />
+    <MESSAGE value="Genesys .5.0-PRO 07\06\2026&#10;upd_max" />
+    <MESSAGE value="Genesys .5.0-PRO 17\06\2026&#10;lust_update before rebuilds" />
+    <MESSAGE value="Захват кондитерской .1.0-PRO 18\06\2026&#10;for gpt" />
+    <MESSAGE value="Genos 01" />
+    <MESSAGE value="Genos 02" />
+    <MESSAGE value="GenOs 03" />
+    <MESSAGE value="working" />
+    <MESSAGE value="working_2_22/06/26" />
+    <MESSAGE value="css added 25/06/26" />
+    <MESSAGE value="Knowledge Pipeline. 11/07/26" />
+    <MESSAGE value="UPGRAGE. 14/07/26" />
+    <option name="LAST_COMMIT_MESSAGE" value="UPGRAGE. 14/07/26" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/GEN-OS/models/competency.py</url>
+          <line>13</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>

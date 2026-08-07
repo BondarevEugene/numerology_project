@@ -1,0 +1,42 @@
+{# ==========================================================================
+   GENESIS®
+   Universal Card Component
+   BUILD 0200
+   ========================================================================== #}
+
+<div class="gen-card {{ card_class|default('') }}">
+    {% if title or subtitle or toolbar %}
+    <div class="gen-card-header">
+        <div class="gen-card-header-left">
+            {% if icon %}
+                <span class="gen-card-icon">{{ icon|safe }}</span>
+            {% endif %}
+            <div class="gen-card-heading">
+                {% if title %}
+                    <div class="gen-card-title">
+                        {{ title }}
+                    </div>
+                {% endif %}
+                {% if subtitle %}
+                    <div class="gen-card-subtitle">
+                        {{ subtitle }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        {% if toolbar %}
+            <div class="gen-card-toolbar">
+                {{ toolbar|safe }}
+            </div>
+        {% endif %}
+    </div>
+    {% endif %}
+    <div class="gen-card-body">
+        {{ body|safe }}
+    </div>
+    {% if footer %}
+    <div class="gen-card-footer">
+        {{ footer|safe }}
+    </div>
+    {% endif %}
+</div>

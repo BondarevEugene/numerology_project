@@ -1,0 +1,50 @@
+{# ==========================================================================
+   GENESIS®
+   Metric Card
+   BUILD 0200
+   ========================================================================== #}
+
+<div class="gen-card gen-metric {{ metric_class|default('') }}">
+    <div class="gen-card-header">
+        <div class="gen-card-header-left">
+            {% if icon %}
+            <div class="gen-metric-icon">
+                {{ icon|safe }}
+            </div>
+            {% endif %}
+            <div>
+                <div class="gen-metric-title">
+                    {{ title }}
+                </div>
+                {% if subtitle %}
+                <div class="gen-metric-subtitle">
+                    {{ subtitle }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% if trend %}
+        <div class="gen-metric-trend">
+            {{ trend }}
+        </div>
+        {% endif %}
+    </div>
+    <div class="gen-metric-body">
+        <div class="gen-metric-value">
+            {{ value }}
+        </div>
+        {% if progress %}
+        <div class="gen-progress">
+            <div
+                class="gen-progress-fill"
+                style="width: {{ progress }}%;">
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% if footer %}
+    <div class="gen-card-footer">
+        {{ footer }}
+    </div>
+    {% endif %}
+</div>

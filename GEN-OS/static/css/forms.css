@@ -1,0 +1,185 @@
+/*
+═══════════════════════════════════════════════════════════════════════
+GENESIS HR®
+FORMS ENGINE
+BUILD-0113
+═══════════════════════════════════════════════════════════════════════
+*/
+/* =======================================================
+   FORM
+======================================================= */
+.gen-form{
+    display:flex;
+    flex-direction:column;
+    gap:24px;
+}
+
+/* =======================================================
+   GROUP
+======================================================= */
+
+.gen-form-group{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.gen-form-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+}
+
+.gen-form-row-3{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:20px;
+}
+
+/* =======================================================
+   LABEL
+======================================================= */
+
+.gen-label{
+    font-size:13px;
+    font-weight:600;
+    color:var(--text-soft);
+    text-transform:uppercase;
+    letter-spacing:.8px;
+}
+
+/* =======================================================
+   INPUT
+======================================================= */
+
+.gen-input,
+.gen-select,
+.gen-textarea{
+
+    width:100%;
+    background:#151b24;
+    color:var(--text);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:14px 16px;
+    outline:none;
+    transition:.18s;
+}
+
+.gen-input::placeholder,
+.gen-textarea::placeholder{
+    color:var(--text-muted);
+}
+
+.gen-input:hover,
+.gen-select:hover,
+.gen-textarea:hover{
+
+    border-color:#4c617e;
+}
+
+.gen-input:focus,
+.gen-select:focus,
+.gen-textarea:focus{
+
+    border-color:var(--primary);
+    box-shadow:var(--glow);
+}
+
+/* =======================================================
+   TEXTAREA
+======================================================= */
+
+.gen-textarea{
+    resize:vertical;
+    min-height:160px;
+}
+
+/* =======================================================
+   SEARCH
+======================================================= */
+
+.gen-search{
+    position:relative;
+}
+
+.gen-search input{
+    width:100%;
+    padding-left:48px;
+}
+
+.gen-search-icon{
+    position:absolute;
+    left:18px;
+    top:50%;
+    transform:translateY(-50%);
+    opacity:.55;
+}
+
+/* =======================================================
+   CHECKBOX
+======================================================= */
+
+.gen-check{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.gen-check input{
+    width:18px;
+    height:18px;
+}
+
+/* =======================================================
+   SWITCH
+======================================================= */
+
+.gen-switch{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.gen-switch input{
+    width:52px;
+    height:26px;
+}
+
+/* =======================================================
+   BUTTON BAR
+======================================================= */
+
+.gen-form-actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:14px;
+    margin-top:20px;
+}
+
+/* =======================================================
+   HELP
+======================================================= */
+
+.gen-help{
+    font-size:13px;
+    color:var(--text-muted);
+}
+
+/* =======================================================
+   ERROR
+======================================================= */
+
+.gen-error{
+    color:var(--danger);
+    font-size:13px;
+}
+
+/* =======================================================
+   SUCCESS
+======================================================= */
+
+.gen-success{
+    color:var(--success);
+    font-size:13px;
+}

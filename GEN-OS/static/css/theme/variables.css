@@ -1,0 +1,32 @@
+:root{
+
+    --bg:#0b0f17;
+    --bg-elev:#121826;
+    --bg-panel:#171f2e;
+
+    --border:#2b3548;
+
+    --text:#eef2ff;
+    --text-soft:#9aa8bf;
+
+    --primary:#4f8cff;
+    --primary-hover:#76a7ff;
+
+    --success:#35d07f;
+    --warning:#ffb648;
+    --danger:#ff5d6c;
+
+    --radius:14px;
+
+    --shadow:
+        0 10px 40px rgba(0,0,0,.28);
+
+    --transition:.18s ease;
+
+    --sidebar:320px;
+
+    --toolbar:58px;
+
+    --statusbar:28px;
+
+}

@@ -1,0 +1,10 @@
+{
+    "id":"esco",
+    "name":"ESCO",
+    "type":"LOCAL",
+    "enabled":true,
+    "priority":20,
+    "location":"datasets/esco",
+    "version":"1.2",
+    "readonly":true
+}

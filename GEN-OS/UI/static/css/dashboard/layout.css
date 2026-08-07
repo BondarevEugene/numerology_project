@@ -1,0 +1,144 @@
+/*
+═══════════════════════════════════════════════════════════════════════
+GENESIS®
+Dashboard Layout
+BUILD 0200
+═══════════════════════════════════════════════════════════════════════
+*/
+
+.dashboard{
+    display:flex;
+    flex-direction:column;
+    gap:32px;
+    padding:28px;
+    height:100%;
+    overflow:auto;
+    animation:dashboardFade .35s ease;
+
+}
+
+/* ============================================================= */
+
+.dashboard-section{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+}
+
+/* ============================================================= */
+
+.dashboard-title{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+/* ============================================================= */
+
+.dashboard-title h2{
+    margin:0;
+    font-size:28px;
+    font-weight:700;
+    color:var(--text);
+}
+
+.dashboard-title span{
+    color:var(--muted);
+}
+
+/* ============================================================= */
+
+.gen-grid{
+    display:grid;
+    grid-template-columns:
+        repeat(auto-fit,minmax(320px,1fr));
+    gap:22px;
+}
+
+/* ============================================================= */
+
+.gen-grid-2{
+    display:grid;
+    grid-template-columns:
+        repeat(2,minmax(0,1fr));
+    gap:22px;
+}
+
+/* ============================================================= */
+
+.gen-grid-3{
+    display:grid;
+    grid-template-columns:
+        repeat(3,minmax(0,1fr));
+    gap:22px;
+}
+
+/* ============================================================= */
+
+.gen-grid-4{
+    display:grid;
+    grid-template-columns:
+        repeat(4,minmax(0,1fr));
+    gap:22px;
+}
+
+/* ============================================================= */
+
+.gen-grid-wide{
+    display:grid;
+    grid-template-columns:
+        2fr 1fr;
+    gap:22px;
+}
+
+/* ============================================================= */
+
+.gen-grid-sidebar{
+    display:grid;
+    grid-template-columns:
+        280px 1fr;
+    gap:22px;
+}
+
+/* ============================================================= */
+
+.gen-row{
+    display:flex;
+    gap:20px;
+}
+
+.gen-column{
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+}
+
+.gen-fill{
+    flex:1;
+}
+
+/* ============================================================= */
+
+.dashboard-divider{
+    height:1px;
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,.08),
+            transparent
+        );
+}
+
+/* ============================================================= */
+
+@keyframes dashboardFade{
+    from{
+        opacity:0;
+        transform:translateY(10px);
+    }
+    to{
+        opacity:1;
+        transform:none;
+    }
+}
